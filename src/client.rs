@@ -392,28 +392,38 @@ impl McmasterClient {
         self.ensure_authenticated()?;
         
         let url = format!("{}/v1/products", BASE_URL);
+        let request_body = serde_json::json!({
+            "URL": format!("https://mcmaster.com/{}", product)
+        });
+        
         let response = self
             .client
             .delete(&url)
             .bearer_auth(self.token.as_ref().unwrap())
-            .json(&serde_json::json!({ "ProductNumber": product }))
+            .json(&request_body)
             .send()
             .await
             .context("Failed to remove product")?;
 
         if response.status().is_success() {
-            println!("Product {} removed from subscription", product);
+            println!("✅ Removed {} from subscription", product);
         } else {
-            let error: ErrorResponse = response
-                .json()
-                .await
-                .context("Failed to parse error response")?;
+            // Try to parse as JSON error response, but handle parsing failures gracefully
+            let status = response.status();
+            let response_text = response.text().await.unwrap_or_default();
             
-            return Err(anyhow::anyhow!(
-                "Failed to remove product: {} - {}",
-                error.error_message.unwrap_or_default(),
-                error.error_description.unwrap_or_default()
-            ));
+            if let Ok(error) = serde_json::from_str::<ErrorResponse>(&response_text) {
+                return Err(anyhow::anyhow!(
+                    "Failed to remove product: {} - {}",
+                    error.error_message.unwrap_or_default(),
+                    error.error_description.unwrap_or_default()
+                ));
+            } else {
+                return Err(anyhow::anyhow!(
+                    "Failed to remove product {}. Status: {}. Response: {}",
+                    product, status, response_text
+                ));
+            }
         }
 
         Ok(())
