@@ -107,6 +107,7 @@ impl NameGenerator {
         
         // Material abbreviations
         screw_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
+        screw_abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
         screw_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
         screw_abbrevs.insert("Steel".to_string(), "Steel".to_string());
         screw_abbrevs.insert("Brass".to_string(), "Brass".to_string());
@@ -173,6 +174,7 @@ impl NameGenerator {
         // Washer template
         let mut washer_abbrevs = HashMap::new();
         washer_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
+        washer_abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
         washer_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
         washer_abbrevs.insert("Steel".to_string(), "Steel".to_string());
         washer_abbrevs.insert("Brass".to_string(), "Brass".to_string());
@@ -187,6 +189,72 @@ impl NameGenerator {
             spec_abbreviations: washer_abbrevs,
         };
         self.category_templates.insert("washer".to_string(), washer_template);
+        
+        // Nut templates
+        let mut nut_abbrevs = HashMap::new();
+        nut_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
+        nut_abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
+        nut_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
+        nut_abbrevs.insert("Steel".to_string(), "Steel".to_string());
+        nut_abbrevs.insert("Brass".to_string(), "Brass".to_string());
+        nut_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
+        
+        // Locknut template (nylon-insert, prevailing torque, etc.)
+        let locknut_template = NamingTemplate {
+            prefix: "LOCKNUT".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(),
+            ],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("locknut".to_string(), locknut_template);
+        
+        // Hex nut template
+        let hex_nut_template = NamingTemplate {
+            prefix: "HEXNUT".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(),
+                "Height".to_string(),
+            ],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("hex_nut".to_string(), hex_nut_template);
+        
+        // Wing nut template
+        let wing_nut_template = NamingTemplate {
+            prefix: "WINGNUT".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(),
+            ],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("wing_nut".to_string(), wing_nut_template);
+        
+        // Cap nut template
+        let cap_nut_template = NamingTemplate {
+            prefix: "CAPNUT".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(),
+                "Height".to_string(),
+            ],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("cap_nut".to_string(), cap_nut_template);
+        
+        // Generic nut template
+        let generic_nut_template = NamingTemplate {
+            prefix: "NUT".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(),
+            ],
+            spec_abbreviations: nut_abbrevs,
+        };
+        self.category_templates.insert("generic_nut".to_string(), generic_nut_template);
     }
 
     pub fn generate_name(&self, product: &ProductDetail) -> String {
@@ -217,6 +285,20 @@ impl NameGenerator {
             "generic_screw".to_string()
         } else if category_lower.contains("washer") || family_lower.contains("washer") {
             "washer".to_string()
+        } else if category_lower.contains("nuts") || category_lower.contains("nut") || family_lower.contains("nut") {
+            // Determine specific nut type
+            if family_lower.contains("locknut") || family_lower.contains("lock nut") || 
+               family_lower.contains("nylon-insert") || family_lower.contains("prevailing torque") {
+                "locknut".to_string()
+            } else if family_lower.contains("hex nut") || family_lower.contains("hexnut") {
+                "hex_nut".to_string()
+            } else if family_lower.contains("wing nut") || family_lower.contains("wingnut") {
+                "wing_nut".to_string()
+            } else if family_lower.contains("cap nut") || family_lower.contains("capnut") {
+                "cap_nut".to_string()
+            } else {
+                "generic_nut".to_string()
+            }
         } else {
             "unknown".to_string()
         }
