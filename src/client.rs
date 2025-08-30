@@ -6,6 +6,7 @@ use dirs::{home_dir, config_dir};
 use tokio::fs;
 use native_tls::{Identity, TlsConnector};
 use std::fs as std_fs;
+use std::io::{self, Write};
 
 const BASE_URL: &str = "https://api.mcmaster.com";
 
@@ -340,17 +341,71 @@ impl McmasterClient {
                 .context("Failed to parse product response")?;
             
             println!("{}", serde_json::to_string_pretty(&product_data)?);
-        } else {
-            let error: ErrorResponse = response
-                .json()
-                .await
-                .context("Failed to parse error response")?;
+        } else if response.status().as_u16() == 403 {
+            // Product is not in subscription - offer to add it
+            println!("❌ Product {} is not in your subscription.", product);
+            print!("Would you like to add it to your subscription? (Y/n): ");
+            io::stdout().flush().unwrap();
             
-            return Err(anyhow::anyhow!(
-                "Failed to get product: {} - {}",
-                error.error_message.unwrap_or_default(),
-                error.error_description.unwrap_or_default()
-            ));
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
+            let input = input.trim().to_lowercase();
+            
+            if input == "y" || input == "yes" || input.is_empty() {
+                println!("Adding product {} to subscription...", product);
+                self.add_product(product).await?;
+                println!("✅ Product added! Getting product information...");
+                
+                // Retry the product request after adding to subscription
+                let url = format!("{}/v1/products/{}", BASE_URL, product);
+                let response = self
+                    .client
+                    .get(&url)
+                    .bearer_auth(self.token.as_ref().unwrap())
+                    .send()
+                    .await
+                    .context("Failed to get product after adding to subscription")?;
+                
+                if response.status().is_success() {
+                    let product_data: serde_json::Value = response
+                        .json()
+                        .await
+                        .context("Failed to parse product response")?;
+                    
+                    println!("{}", serde_json::to_string_pretty(&product_data)?);
+                    return Ok(());
+                } else {
+                    let status = response.status();
+                    let response_text = response.text().await.unwrap_or_default();
+                    return Err(anyhow::anyhow!(
+                        "Failed to get product after adding to subscription. Status: {}. Response: {}",
+                        status, response_text
+                    ));
+                }
+            } else {
+                return Err(anyhow::anyhow!(
+                    "Product {} is not in your subscription. Add it first with: mmc add {}",
+                    product, product
+                ));
+            }
+        } else {
+            // Try to parse as JSON error response, but handle parsing failures gracefully
+            let status = response.status();
+            let response_text = response.text().await.unwrap_or_default();
+            
+            if let Ok(error) = serde_json::from_str::<ErrorResponse>(&response_text) {
+                return Err(anyhow::anyhow!(
+                    "Failed to get product: {} - {}",
+                    error.error_message.unwrap_or_default(),
+                    error.error_description.unwrap_or_default()
+                ));
+            } else {
+                return Err(anyhow::anyhow!(
+                    "Failed to get product. Status: {}. Response: {}",
+                    status,
+                    response_text
+                ));
+            }
         }
 
         Ok(())
@@ -375,17 +430,71 @@ impl McmasterClient {
                 .context("Failed to parse price response")?;
             
             println!("{}", serde_json::to_string_pretty(&price_data)?);
-        } else {
-            let error: ErrorResponse = response
-                .json()
-                .await
-                .context("Failed to parse error response")?;
+        } else if response.status().as_u16() == 403 {
+            // Product is not in subscription - offer to add it
+            println!("❌ Product {} is not in your subscription.", product);
+            print!("Would you like to add it to your subscription? (Y/n): ");
+            io::stdout().flush().unwrap();
             
-            return Err(anyhow::anyhow!(
-                "Failed to get price: {} - {}",
-                error.error_message.unwrap_or_default(),
-                error.error_description.unwrap_or_default()
-            ));
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
+            let input = input.trim().to_lowercase();
+            
+            if input == "y" || input == "yes" || input.is_empty() {
+                println!("Adding product {} to subscription...", product);
+                self.add_product(product).await?;
+                println!("✅ Product added! Getting price information...");
+                
+                // Retry the price request after adding to subscription
+                let url = format!("{}/v1/products/{}/price", BASE_URL, product);
+                let response = self
+                    .client
+                    .get(&url)
+                    .bearer_auth(self.token.as_ref().unwrap())
+                    .send()
+                    .await
+                    .context("Failed to get price after adding to subscription")?;
+                
+                if response.status().is_success() {
+                    let price_data: serde_json::Value = response
+                        .json()
+                        .await
+                        .context("Failed to parse price response")?;
+                    
+                    println!("{}", serde_json::to_string_pretty(&price_data)?);
+                    return Ok(());
+                } else {
+                    let status = response.status();
+                    let response_text = response.text().await.unwrap_or_default();
+                    return Err(anyhow::anyhow!(
+                        "Failed to get price after adding to subscription. Status: {}. Response: {}",
+                        status, response_text
+                    ));
+                }
+            } else {
+                return Err(anyhow::anyhow!(
+                    "Product {} is not in your subscription. Add it first with: mmc add {}",
+                    product, product
+                ));
+            }
+        } else {
+            // Try to parse as JSON error response, but handle parsing failures gracefully
+            let status = response.status();
+            let response_text = response.text().await.unwrap_or_default();
+            
+            if let Ok(error) = serde_json::from_str::<ErrorResponse>(&response_text) {
+                return Err(anyhow::anyhow!(
+                    "Failed to get price: {} - {}",
+                    error.error_message.unwrap_or_default(),
+                    error.error_description.unwrap_or_default()
+                ));
+            } else {
+                return Err(anyhow::anyhow!(
+                    "Failed to get price. Status: {}. Response: {}",
+                    status,
+                    response_text
+                ));
+            }
         }
 
         Ok(())
