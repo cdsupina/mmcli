@@ -126,6 +126,16 @@ pub struct ProductInfo {
     pub family_description: Option<String>,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct PriceInfo {
+    #[serde(rename = "Amount")]
+    pub amount: f64,
+    #[serde(rename = "MinimumQuantity")]
+    pub minimum_quantity: f64,
+    #[serde(rename = "UnitOfMeasure")]
+    pub unit_of_measure: String,
+}
+
 pub struct McmasterClient {
     client: Client,
     token: Option<String>,
@@ -531,12 +541,12 @@ impl McmasterClient {
             .context("Failed to get price")?;
 
         if response.status().is_success() {
-            let price_data: serde_json::Value = response
+            let price_data: Vec<PriceInfo> = response
                 .json()
                 .await
                 .context("Failed to parse price response")?;
             
-            println!("{}", serde_json::to_string_pretty(&price_data)?);
+            self.format_price_output(product, &price_data);
         } else if response.status().as_u16() == 403 {
             // Product is not in subscription - offer to add it
             println!("❌ Product {} is not in your subscription.", product);
@@ -563,12 +573,12 @@ impl McmasterClient {
                     .context("Failed to get price after adding to subscription")?;
                 
                 if response.status().is_success() {
-                    let price_data: serde_json::Value = response
+                    let price_data: Vec<PriceInfo> = response
                         .json()
                         .await
                         .context("Failed to parse price response")?;
                     
-                    println!("{}", serde_json::to_string_pretty(&price_data)?);
+                    self.format_price_output(product, &price_data);
                     return Ok(());
                 } else {
                     let status = response.status();
@@ -890,6 +900,36 @@ certificate_password = "certificate_password"
                 .with_context(|| format!("Failed to create directory: {}", path.display()))?;
         }
         Ok(())
+    }
+
+    // Helper method to format price output
+    fn format_price_output(&self, product: &str, price_data: &[PriceInfo]) {
+        println!("💰 Price for {}:", product);
+        
+        for price in price_data {
+            // Format the unit of measure (singular if minimum is 1)
+            let unit = if price.minimum_quantity == 1.0 && price.unit_of_measure.ends_with('s') {
+                // Remove the 's' for singular form when minimum is 1
+                price.unit_of_measure.trim_end_matches('s')
+            } else {
+                &price.unit_of_measure
+            };
+            
+            println!("   ${:.2} per {}", price.amount, unit.to_lowercase());
+            
+            if price.minimum_quantity > 1.0 {
+                println!("   Minimum order: {} {}", 
+                    if price.minimum_quantity.fract() == 0.0 {
+                        format!("{:.0}", price.minimum_quantity)
+                    } else {
+                        format!("{}", price.minimum_quantity)
+                    },
+                    price.unit_of_measure.to_lowercase()
+                );
+            } else {
+                println!("   Minimum order: 1 {}", unit.to_lowercase());
+            }
+        }
     }
 
     // Helper method to download a single asset
