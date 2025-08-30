@@ -187,6 +187,59 @@ impl NameGenerator {
         };
         self.category_templates.insert("flat_head_screw".to_string(), fhs_template);
         
+        // Flat Head subcategory templates  
+        // Narrow Flat Head Screw
+        let narrow_fhs_template = NamingTemplate {
+            prefix: "NFHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("narrow_flat_head_screw".to_string(), narrow_fhs_template);
+        
+        // Standard Flat Head Screw
+        let standard_fhs_template = NamingTemplate {
+            prefix: "SFHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("standard_flat_head_screw".to_string(), standard_fhs_template);
+        
+        // Undercut Flat Head Screw
+        let undercut_fhs_template = NamingTemplate {
+            prefix: "UFHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("undercut_flat_head_screw".to_string(), undercut_fhs_template);
+        
+        // Wide Flat Head Screw
+        let wide_fhs_template = NamingTemplate {
+            prefix: "WFHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("wide_flat_head_screw".to_string(), wide_fhs_template);
+        
         // Socket Head Screw template
         let shs_template = NamingTemplate {
             prefix: "SHS".to_string(),
@@ -199,6 +252,59 @@ impl NameGenerator {
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("socket_head_screw".to_string(), shs_template);
+        
+        // Socket Head subcategory templates
+        // High Socket Head Screw
+        let high_shs_template = NamingTemplate {
+            prefix: "HSHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("high_socket_head_screw".to_string(), high_shs_template);
+        
+        // Low Socket Head Screw  
+        let low_shs_template = NamingTemplate {
+            prefix: "LSHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("low_socket_head_screw".to_string(), low_shs_template);
+        
+        // Ultra Low Socket Head Screw
+        let ultra_low_shs_template = NamingTemplate {
+            prefix: "ULSHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("ultra_low_socket_head_screw".to_string(), ultra_low_shs_template);
+        
+        // Standard Socket Head Screw
+        let standard_shs_template = NamingTemplate {
+            prefix: "SSHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("standard_socket_head_screw".to_string(), standard_shs_template);
         
         // Pan Head Screw template
         let phs_template = NamingTemplate {
@@ -224,6 +330,290 @@ impl NameGenerator {
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("generic_screw".to_string(), generic_screw_template);
+        
+        // All head type templates
+        // 12-Point Head Screw
+        let twelve_point_template = NamingTemplate {
+            prefix: "12PHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("12_point_head_screw".to_string(), twelve_point_template);
+        
+        // Domed Head Screw
+        let domed_template = NamingTemplate {
+            prefix: "DHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("domed_head_screw".to_string(), domed_template);
+        
+        // Eye Screw
+        let eye_template = NamingTemplate {
+            prefix: "EYE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("eye_screw".to_string(), eye_template);
+        
+        // Headless Screw (Set Screw)
+        let headless_template = NamingTemplate {
+            prefix: "HEADLESS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("headless_screw".to_string(), headless_template);
+        
+        // Hex Head Screw
+        let hex_head_template = NamingTemplate {
+            prefix: "HHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("hex_head_screw".to_string(), hex_head_template);
+        
+        // Hook Screw
+        let hook_template = NamingTemplate {
+            prefix: "HOOK".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("hook_screw".to_string(), hook_template);
+        
+        // Knob Screw
+        let knob_template = NamingTemplate {
+            prefix: "KNOB".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("knob_screw".to_string(), knob_template);
+        
+        // L-Handle Screw
+        let l_handle_template = NamingTemplate {
+            prefix: "LHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("l_handle_screw".to_string(), l_handle_template);
+        
+        // Oval Head Screw
+        let oval_template = NamingTemplate {
+            prefix: "OHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("oval_head_screw".to_string(), oval_template);
+        
+        // Oval Head subcategory templates
+        // Standard Oval Head Screw
+        let standard_oval_template = NamingTemplate {
+            prefix: "SOHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("standard_oval_head_screw".to_string(), standard_oval_template);
+        
+        // Undercut Oval Head Screw
+        let undercut_oval_template = NamingTemplate {
+            prefix: "UOHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("undercut_oval_head_screw".to_string(), undercut_oval_template);
+        
+        // Pentagon Head Screw
+        let pentagon_head_template = NamingTemplate {
+            prefix: "PENTHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("pentagon_head_screw".to_string(), pentagon_head_template);
+        
+        // Ring Screw
+        let ring_template = NamingTemplate {
+            prefix: "RING".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("ring_screw".to_string(), ring_template);
+        
+        // Rounded Head Screw
+        let rounded_template = NamingTemplate {
+            prefix: "RHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("rounded_head_screw".to_string(), rounded_template);
+        
+        // Square Head Screw
+        let square_head_template = NamingTemplate {
+            prefix: "SQHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("square_head_screw".to_string(), square_head_template);
+        
+        // Tee Screw
+        let tee_template = NamingTemplate {
+            prefix: "TEE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("tee_screw".to_string(), tee_template);
+        
+        // T-Handle Screw
+        let t_handle_template = NamingTemplate {
+            prefix: "THS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("t_handle_screw".to_string(), t_handle_template);
+        
+        // Threaded Screw
+        let threaded_template = NamingTemplate {
+            prefix: "THREADED".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("threaded_screw".to_string(), threaded_template);
+        
+        // Thumb Screw
+        let thumb_template = NamingTemplate {
+            prefix: "THUMB".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("thumb_screw".to_string(), thumb_template);
+        
+        // Thumb Screw subcategory templates
+        // Four Arm Thumb Screw
+        let four_arm_thumb_template = NamingTemplate {
+            prefix: "4ARM".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("four_arm_thumb_screw".to_string(), four_arm_thumb_template);
+        
+        // Hex Thumb Screw
+        let hex_thumb_template = NamingTemplate {
+            prefix: "HEXTHUMB".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("hex_thumb_screw".to_string(), hex_thumb_template);
+        
+        // Multilobe Thumb Screw
+        let multilobe_thumb_template = NamingTemplate {
+            prefix: "MULTILOBE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("multilobe_thumb_screw".to_string(), multilobe_thumb_template);
+        
+        // Rectangle Thumb Screw
+        let rectangle_thumb_template = NamingTemplate {
+            prefix: "RECTTHUMB".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("rectangle_thumb_screw".to_string(), rectangle_thumb_template);
+        
+        // Round Thumb Screw
+        let round_thumb_template = NamingTemplate {
+            prefix: "ROUNDTHUMB".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("round_thumb_screw".to_string(), round_thumb_template);
+        
+        // Spade Thumb Screw
+        let spade_thumb_template = NamingTemplate {
+            prefix: "SPADE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("spade_thumb_screw".to_string(), spade_thumb_template);
+        
+        // Two Arm Thumb Screw
+        let two_arm_thumb_template = NamingTemplate {
+            prefix: "2ARM".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("two_arm_thumb_screw".to_string(), two_arm_thumb_template);
+        
+        // Wing Thumb Screw
+        let wing_thumb_template = NamingTemplate {
+            prefix: "WINGTHUMB".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("wing_thumb_screw".to_string(), wing_thumb_template);
+        
+        // T-Slot Screw
+        let t_slot_template = NamingTemplate {
+            prefix: "TSLOT".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("t_slot_screw".to_string(), t_slot_template);
+        
+        // Rounded head subcategory templates
+        // Binding Head Screw
+        let binding_head_template = NamingTemplate {
+            prefix: "BINDING".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("binding_head_screw".to_string(), binding_head_template);
+        
+        // Carriage Head Screw
+        let carriage_head_template = NamingTemplate {
+            prefix: "CARRIAGE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("carriage_head_screw".to_string(), carriage_head_template);
+        
+        // Cheese Head Screw
+        let cheese_head_template = NamingTemplate {
+            prefix: "CHEESE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("cheese_head_screw".to_string(), cheese_head_template);
+        
+        // Fillister Head Screw
+        let fillister_head_template = NamingTemplate {
+            prefix: "FILLISTER".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("fillister_head_screw".to_string(), fillister_head_template);
+        
+        // Pancake Head Screw
+        let pancake_head_template = NamingTemplate {
+            prefix: "PANCAKE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("pancake_head_screw".to_string(), pancake_head_template);
+        
+        // Round Head Screw
+        let round_head_template = NamingTemplate {
+            prefix: "ROUND".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("round_head_screw".to_string(), round_head_template);
+        
+        // Truss Head Screw
+        let truss_head_template = NamingTemplate {
+            prefix: "TRUSS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("truss_head_screw".to_string(), truss_head_template);
         
         // Washer template
         let mut washer_abbrevs = HashMap::new();
@@ -328,15 +718,101 @@ impl NameGenerator {
         let category_lower = product.product_category.to_lowercase();
         let _detail_lower = product.detail_description.to_lowercase();
         
-        // Check for specific screw types
+        // Check for specific screw head types (order matters - more specific first)
         if family_lower.contains("button head") && family_lower.contains("screw") {
             "button_head_screw".to_string()
-        } else if family_lower.contains("flat head") && family_lower.contains("screw") {
-            "flat_head_screw".to_string()
+        } else if family_lower.contains("high socket head") && family_lower.contains("screw") {
+            "high_socket_head_screw".to_string()
+        } else if family_lower.contains("low socket head") && family_lower.contains("screw") {
+            "low_socket_head_screw".to_string()
+        } else if family_lower.contains("ultra low socket head") && family_lower.contains("screw") {
+            "ultra_low_socket_head_screw".to_string()
+        } else if family_lower.contains("standard socket head") && family_lower.contains("screw") {
+            "standard_socket_head_screw".to_string()
         } else if family_lower.contains("socket head") && family_lower.contains("screw") {
             "socket_head_screw".to_string()
+        } else if family_lower.contains("narrow flat head") && family_lower.contains("screw") {
+            "narrow_flat_head_screw".to_string()
+        } else if family_lower.contains("standard flat head") && family_lower.contains("screw") {
+            "standard_flat_head_screw".to_string()
+        } else if family_lower.contains("undercut flat head") && family_lower.contains("screw") {
+            "undercut_flat_head_screw".to_string()
+        } else if family_lower.contains("wide flat head") && family_lower.contains("screw") {
+            "wide_flat_head_screw".to_string()
+        } else if family_lower.contains("flat head") && family_lower.contains("screw") {
+            "flat_head_screw".to_string()
         } else if family_lower.contains("pan head") && family_lower.contains("screw") {
             "pan_head_screw".to_string()
+        } else if family_lower.contains("hex head") && family_lower.contains("screw") {
+            "hex_head_screw".to_string()
+        } else if family_lower.contains("standard oval head") && family_lower.contains("screw") {
+            "standard_oval_head_screw".to_string()
+        } else if family_lower.contains("undercut oval head") && family_lower.contains("screw") {
+            "undercut_oval_head_screw".to_string()
+        } else if family_lower.contains("oval head") && family_lower.contains("screw") {
+            "oval_head_screw".to_string()
+        } else if family_lower.contains("square head") && family_lower.contains("screw") {
+            "square_head_screw".to_string()
+        } else if family_lower.contains("binding head") && family_lower.contains("screw") {
+            "binding_head_screw".to_string()
+        } else if family_lower.contains("carriage head") && family_lower.contains("screw") {
+            "carriage_head_screw".to_string()
+        } else if family_lower.contains("cheese head") && family_lower.contains("screw") {
+            "cheese_head_screw".to_string()
+        } else if family_lower.contains("fillister head") && family_lower.contains("screw") {
+            "fillister_head_screw".to_string()
+        } else if family_lower.contains("pancake head") && family_lower.contains("screw") {
+            "pancake_head_screw".to_string()
+        } else if family_lower.contains("round head") && family_lower.contains("screw") {
+            "round_head_screw".to_string()
+        } else if family_lower.contains("truss head") && family_lower.contains("screw") {
+            "truss_head_screw".to_string()
+        } else if family_lower.contains("rounded head") && family_lower.contains("screw") {  // More specific than just "rounded"
+            "rounded_head_screw".to_string()
+        } else if family_lower.contains("12-point") && family_lower.contains("screw") {
+            "12_point_head_screw".to_string()
+        } else if family_lower.contains("t-handle") && family_lower.contains("screw") {
+            "t_handle_screw".to_string()
+        } else if family_lower.contains("t-slot") && family_lower.contains("screw") {
+            "t_slot_screw".to_string()
+        } else if family_lower.contains("l-handle") && family_lower.contains("screw") {
+            "l_handle_screw".to_string()
+        } else if family_lower.contains("domed") && family_lower.contains("screw") {
+            "domed_head_screw".to_string()
+        } else if family_lower.contains("headless") && family_lower.contains("screw") {
+            "headless_screw".to_string()
+        } else if family_lower.contains("pentagon") && family_lower.contains("screw") {
+            "pentagon_head_screw".to_string()
+        } else if family_lower.contains("four arm thumb") && family_lower.contains("screw") {
+            "four_arm_thumb_screw".to_string()
+        } else if family_lower.contains("hex thumb") && family_lower.contains("screw") {
+            "hex_thumb_screw".to_string()
+        } else if family_lower.contains("multilobe thumb") && family_lower.contains("screw") {
+            "multilobe_thumb_screw".to_string()
+        } else if family_lower.contains("rectangle thumb") && family_lower.contains("screw") {
+            "rectangle_thumb_screw".to_string()
+        } else if family_lower.contains("round thumb") && family_lower.contains("screw") {
+            "round_thumb_screw".to_string()
+        } else if family_lower.contains("spade thumb") && family_lower.contains("screw") {
+            "spade_thumb_screw".to_string()
+        } else if family_lower.contains("two arm thumb") && family_lower.contains("screw") {
+            "two_arm_thumb_screw".to_string()
+        } else if family_lower.contains("wing thumb") && family_lower.contains("screw") {
+            "wing_thumb_screw".to_string()
+        } else if family_lower.contains("thumb") && family_lower.contains("screw") {
+            "thumb_screw".to_string()
+        } else if family_lower.contains("hook") && family_lower.contains("screw") {
+            "hook_screw".to_string()
+        } else if family_lower.contains("ring") && family_lower.contains("screw") {
+            "ring_screw".to_string()
+        } else if family_lower.contains("eye") && family_lower.contains("screw") {
+            "eye_screw".to_string()
+        } else if family_lower.contains("knob") && family_lower.contains("screw") {
+            "knob_screw".to_string()
+        } else if family_lower.contains("threaded") && family_lower.contains("screw") {
+            "threaded_screw".to_string()
+        } else if family_lower.contains("tee") && family_lower.contains("screw") {
+            "tee_screw".to_string()
         } else if category_lower.contains("screw") || family_lower.contains("screw") {
             "generic_screw".to_string()
         } else if category_lower.contains("washer") || family_lower.contains("washer") {

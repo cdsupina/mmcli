@@ -198,9 +198,17 @@ mmc name 91831A005
 | Type | Template | Example Input | Generated Name |
 |------|----------|---------------|----------------|
 | Button Head Screw | `BHS-[Material]-[Thread]-[Length]-[Drive]` | 316 SS Button Head Hex, 8-32 x 1/4" | `BHS-SS316-8-32-0.25-HEX` |
-| Flat Head Screw | `FHS-[Material]-[Thread]-[Length]-[Drive]` | 18-8 SS Flat Head Phillips, M6 x 20mm | `FHS-SS188-M6-20-PH` |
 | Socket Head Screw | `SHS-[Material]-[Thread]-[Length]-[Drive]` | Steel Socket Head Hex, 1/4-20 x 1" | `SHS-Steel-1/4-20-1-HEX` |
+| Flat Head Screw | `FHS-[Material]-[Thread]-[Length]-[Drive]` | 18-8 SS Flat Head Phillips, M6 x 20mm | `FHS-SS188-M6-20-PH` |
 | Pan Head Screw | `PHS-[Material]-[Thread]-[Length]-[Drive]` | Brass Pan Head Phillips, 6-32 x 0.5" | `PHS-Brass-6-32-0.5-PH` |
+| Hex Head Screw | `HHS-[Material]-[Thread]-[Length]` | SS Hex Head Screw, 1/4-20 x 1" | `HHS-SS-1/4-20-1` |
+| Rounded Head Screw | `RHS-[Material]-[Thread]-[Length]-[Drive]` | Steel Rounded Head Phillips, 8-32 x 0.5" | `RHS-Steel-8-32-0.5-PH` |
+| Thumb Screw | `THUMB-[Material]-[Thread]-[Length]` | Brass Thumb Screw, M6 x 20mm | `THUMB-Brass-M6-20` |
+| Eye Screw | `EYE-[Material]-[Thread]-[Length]` | Steel Eye Screw, 1/4-20 x 2" | `EYE-Steel-1/4-20-2` |
+| Hook Screw | `HOOK-[Material]-[Thread]-[Length]` | SS Hook Screw, 8-32 x 1" | `HOOK-SS-8-32-1` |
+
+*Note: Supports 20+ head types including T-Handle, Pentagon, Oval, Square, Knob, Ring, and specialty types. See code for complete list.*
+
 | Generic Screw | `SCREW-[Material]-[Thread]-[Length]` | Brass Machine Screw, 6-32 x 0.5" | `SCREW-Brass-6-32-0.5` |
 
 #### Nuts
