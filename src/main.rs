@@ -61,7 +61,7 @@ enum Commands {
         product: String,
     },
     /// Get product information
-    Product {
+    Info {
         /// Product number
         product: String,
     },
@@ -314,7 +314,7 @@ async fn main() -> Result<()> {
         Commands::Remove { product } => {
             client.remove_product(&product).await?;
         }
-        Commands::Product { product } => {
+        Commands::Info { product } => {
             client.get_product(&product).await?;
         }
         Commands::Price { product } => {
