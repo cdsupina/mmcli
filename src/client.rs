@@ -1,9 +1,10 @@
 use anyhow::{Context, Result};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 use dirs::{home_dir, config_dir};
 use tokio::fs;
+use tokio::io::AsyncWriteExt;
 use native_tls::{Identity, TlsConnector};
 use std::fs as std_fs;
 use std::io::{self, Write};
@@ -44,6 +45,26 @@ pub struct Credentials {
     pub password: String,
     pub certificate_path: Option<String>,
     pub certificate_password: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct LinkItem {
+    #[serde(rename = "Key")]
+    pub key: String,
+    #[serde(rename = "Value")]
+    pub value: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ProductResponse {
+    #[serde(rename = "Links")]
+    pub links: Option<Vec<LinkItem>>,
+}
+
+pub struct ProductLinks {
+    pub images: Vec<String>,
+    pub cad: Vec<String>,
+    pub datasheets: Vec<String>,
 }
 
 pub struct McmasterClient {
@@ -624,5 +645,301 @@ certificate_password = "certificate_password"
             }
         }
         None
+    }
+
+    // Helper method to get product links
+    async fn get_product_links(&self, product: &str) -> Result<ProductLinks> {
+        self.ensure_authenticated()?;
+        
+        let url = format!("{}/v1/products/{}", BASE_URL, product);
+        let response = self
+            .client
+            .get(&url)
+            .bearer_auth(self.token.as_ref().unwrap())
+            .send()
+            .await
+            .context("Failed to get product information")?;
+
+        if response.status().is_success() {
+            let product_data: ProductResponse = response
+                .json()
+                .await
+                .context("Failed to parse product response")?;
+            
+            if let Some(link_items) = product_data.links {
+                let mut images = Vec::new();
+                let mut cad = Vec::new();
+                let mut datasheets = Vec::new();
+                
+                for link in link_items {
+                    match link.key.as_str() {
+                        "Image" => images.push(link.value),
+                        key if key.contains("DWG") || key.contains("STEP") || key.contains("DXF") || 
+                              key.contains("EDRW") || key.contains("SLDDRW") || key.contains("IGES") || 
+                              key.contains("SAT") || key.contains("SLDPRT") || key.contains("Solidworks") => {
+                            cad.push(link.value)
+                        },
+                        "Datasheet" | "Data Sheet" => datasheets.push(link.value),
+                        _ => {} // Ignore other link types like "Price", "ProductDetail"
+                    }
+                }
+                
+                Ok(ProductLinks {
+                    images,
+                    cad,
+                    datasheets,
+                })
+            } else {
+                Err(anyhow::anyhow!("No asset links found for product {}", product))
+            }
+        } else if response.status().as_u16() == 403 {
+            // Product is not in subscription - offer to add it
+            println!("❌ Product {} is not in your subscription.", product);
+            print!("Would you like to add it to your subscription? (Y/n): ");
+            io::stdout().flush().unwrap();
+            
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
+            let input = input.trim().to_lowercase();
+            
+            if input == "y" || input == "yes" || input.is_empty() {
+                println!("Adding product {} to subscription...", product);
+                self.add_product(product).await?;
+                println!("✅ Product added! Getting asset links...");
+                
+                // Retry the request after adding to subscription
+                let url = format!("{}/v1/products/{}", BASE_URL, product);
+                let response = self
+                    .client
+                    .get(&url)
+                    .bearer_auth(self.token.as_ref().unwrap())
+                    .send()
+                    .await
+                    .context("Failed to get product information after adding to subscription")?;
+                
+                if response.status().is_success() {
+                    let product_data: ProductResponse = response
+                        .json()
+                        .await
+                        .context("Failed to parse product response")?;
+                    
+                    if let Some(link_items) = product_data.links {
+                        let mut images = Vec::new();
+                        let mut cad = Vec::new();
+                        let mut datasheets = Vec::new();
+                        
+                        for link in link_items {
+                            match link.key.as_str() {
+                                "Image" => images.push(link.value),
+                                key if key.contains("DWG") || key.contains("STEP") || key.contains("DXF") || 
+                                      key.contains("EDRW") || key.contains("SLDDRW") || key.contains("IGES") || 
+                                      key.contains("SAT") || key.contains("SLDPRT") || key.contains("Solidworks") => {
+                                    cad.push(link.value)
+                                },
+                                "Datasheet" | "Data Sheet" => datasheets.push(link.value),
+                                _ => {} // Ignore other link types like "Price", "ProductDetail"
+                            }
+                        }
+                        
+                        return Ok(ProductLinks {
+                            images,
+                            cad,
+                            datasheets,
+                        });
+                    } else {
+                        return Err(anyhow::anyhow!("No asset links found for product {}", product));
+                    }
+                } else {
+                    let status = response.status();
+                    let response_text = response.text().await.unwrap_or_default();
+                    return Err(anyhow::anyhow!(
+                        "Failed to get product information after adding to subscription. Status: {}. Response: {}",
+                        status, response_text
+                    ));
+                }
+            } else {
+                return Err(anyhow::anyhow!(
+                    "Product {} is not in your subscription. Add it first with: mmc add {}",
+                    product, product
+                ));
+            }
+        } else {
+            let status = response.status();
+            let response_text = response.text().await.unwrap_or_default();
+            return Err(anyhow::anyhow!(
+                "Failed to get product information. Status: {}. Response: {}",
+                status,
+                response_text
+            ));
+        }
+    }
+
+    // Helper method to get default download directory
+    fn get_default_download_dir(product: &str, asset_type: &str) -> Result<PathBuf> {
+        let home = home_dir()
+            .ok_or_else(|| anyhow::anyhow!("Could not find home directory"))?;
+        
+        let mut path = home;
+        path.push("Downloads");
+        path.push("mmc");
+        path.push(product);
+        path.push(asset_type);
+        
+        Ok(path)
+    }
+
+    // Helper method to ensure directory exists
+    async fn ensure_directory_exists(path: &Path) -> Result<()> {
+        if !path.exists() {
+            fs::create_dir_all(path)
+                .await
+                .with_context(|| format!("Failed to create directory: {}", path.display()))?;
+        }
+        Ok(())
+    }
+
+    // Helper method to download a single asset
+    async fn download_asset(&self, asset_path: &str, output_dir: &Path, product: &str) -> Result<String> {
+        let url = format!("{}{}", BASE_URL, asset_path);
+        
+        // Extract filename from path
+        let filename = asset_path
+            .split('/')
+            .last()
+            .unwrap_or("download")
+            .to_string();
+        
+        // Create a better filename with product number
+        let final_filename = if filename.contains(&product) {
+            filename
+        } else {
+            format!("{}_{}", product, filename)
+        };
+        
+        let output_path = output_dir.join(&final_filename);
+        
+        println!("Downloading {}...", final_filename);
+        
+        let response = self
+            .client
+            .get(&url)
+            .bearer_auth(self.token.as_ref().unwrap())
+            .send()
+            .await
+            .with_context(|| format!("Failed to download {}", final_filename))?;
+        
+        if response.status().is_success() {
+            let bytes = response.bytes().await?;
+            let mut file = fs::File::create(&output_path).await
+                .with_context(|| format!("Failed to create file: {}", output_path.display()))?;
+            
+            file.write_all(&bytes).await
+                .with_context(|| format!("Failed to write file: {}", output_path.display()))?;
+            
+            println!("✅ Downloaded {} ({} bytes)", final_filename, bytes.len());
+            Ok(final_filename)
+        } else {
+            Err(anyhow::anyhow!(
+                "Failed to download {}. Status: {}",
+                final_filename,
+                response.status()
+            ))
+        }
+    }
+
+    pub async fn download_images(&self, product: &str, output_dir: Option<&str>) -> Result<()> {
+        let links = self.get_product_links(product).await?;
+        
+        let output_path = if let Some(dir) = output_dir {
+            PathBuf::from(dir)
+        } else {
+            Self::get_default_download_dir(product, "images")?
+        };
+        
+        Self::ensure_directory_exists(&output_path).await?;
+        
+        if links.images.is_empty() {
+            println!("No images available for product {}", product);
+            return Ok(());
+        }
+        
+        println!("Found {} image(s) for product {}", links.images.len(), product);
+        
+        let mut downloaded = 0;
+        for image_path in &links.images {
+            match self.download_asset(image_path, &output_path, product).await {
+                Ok(_) => downloaded += 1,
+                Err(e) => println!("⚠️  Failed to download image: {}", e),
+            }
+        }
+        
+        println!("\n✅ Downloaded {}/{} images to: {}", 
+            downloaded, links.images.len(), output_path.display());
+        
+        Ok(())
+    }
+
+    pub async fn download_cad(&self, product: &str, output_dir: Option<&str>) -> Result<()> {
+        let links = self.get_product_links(product).await?;
+        
+        let output_path = if let Some(dir) = output_dir {
+            PathBuf::from(dir)
+        } else {
+            Self::get_default_download_dir(product, "cad")?
+        };
+        
+        Self::ensure_directory_exists(&output_path).await?;
+        
+        if links.cad.is_empty() {
+            println!("No CAD files available for product {}", product);
+            return Ok(());
+        }
+        
+        println!("Found {} CAD file(s) for product {}", links.cad.len(), product);
+        
+        let mut downloaded = 0;
+        for cad_path in &links.cad {
+            match self.download_asset(cad_path, &output_path, product).await {
+                Ok(_) => downloaded += 1,
+                Err(e) => println!("⚠️  Failed to download CAD file: {}", e),
+            }
+        }
+        
+        println!("\n✅ Downloaded {}/{} CAD files to: {}", 
+            downloaded, links.cad.len(), output_path.display());
+        
+        Ok(())
+    }
+
+    pub async fn download_datasheets(&self, product: &str, output_dir: Option<&str>) -> Result<()> {
+        let links = self.get_product_links(product).await?;
+        
+        let output_path = if let Some(dir) = output_dir {
+            PathBuf::from(dir)
+        } else {
+            Self::get_default_download_dir(product, "datasheets")?
+        };
+        
+        Self::ensure_directory_exists(&output_path).await?;
+        
+        if links.datasheets.is_empty() {
+            println!("No datasheets available for product {}", product);
+            return Ok(());
+        }
+        
+        println!("Found {} datasheet(s) for product {}", links.datasheets.len(), product);
+        
+        let mut downloaded = 0;
+        for datasheet_path in &links.datasheets {
+            match self.download_asset(datasheet_path, &output_path, product).await {
+                Ok(_) => downloaded += 1,
+                Err(e) => println!("⚠️  Failed to download datasheet: {}", e),
+            }
+        }
+        
+        println!("\n✅ Downloaded {}/{} datasheets to: {}", 
+            downloaded, links.datasheets.len(), output_path.display());
+        
+        Ok(())
     }
 }

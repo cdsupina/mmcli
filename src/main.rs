@@ -76,6 +76,30 @@ enum Commands {
         #[arg(short, long, default_value = "01/01/2024")]
         start: String,
     },
+    /// Download product images
+    Image {
+        /// Product number
+        product: String,
+        /// Output directory (default: ~/Downloads/mmc/{product}/images/)
+        #[arg(short, long)]
+        output: Option<String>,
+    },
+    /// Download product CAD files
+    Cad {
+        /// Product number
+        product: String,
+        /// Output directory (default: ~/Downloads/mmc/{product}/cad/)
+        #[arg(short, long)]
+        output: Option<String>,
+    },
+    /// Download product datasheets
+    Datasheet {
+        /// Product number
+        product: String,
+        /// Output directory (default: ~/Downloads/mmc/{product}/datasheets/)
+        #[arg(short, long)]
+        output: Option<String>,
+    },
 }
 
 async fn load_credentials_from_file(path: &str) -> Result<Credentials> {
@@ -271,6 +295,15 @@ async fn main() -> Result<()> {
         }
         Commands::Changes { start } => {
             client.get_changes(&start).await?;
+        }
+        Commands::Image { product, output } => {
+            client.download_images(&product, output.as_deref()).await?;
+        }
+        Commands::Cad { product, output } => {
+            client.download_cad(&product, output.as_deref()).await?;
+        }
+        Commands::Datasheet { product, output } => {
+            client.download_datasheets(&product, output.as_deref()).await?;
         }
     }
 
