@@ -113,11 +113,52 @@ impl NameGenerator {
         screw_abbrevs.insert("Brass".to_string(), "Brass".to_string());
         screw_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
         
-        // Drive style abbreviations
-        screw_abbrevs.insert("Hex".to_string(), "HEX".to_string());
+        // Drive style abbreviations (comprehensive list from McMaster-Carr)
+        screw_abbrevs.insert("4-Flute Spline".to_string(), "4FS".to_string());
+        screw_abbrevs.insert("6-Flute Spline".to_string(), "6FS".to_string());
+        screw_abbrevs.insert("Asymmetrical".to_string(), "ASYM".to_string());
+        screw_abbrevs.insert("Clutch".to_string(), "CLUTCH".to_string());
+        screw_abbrevs.insert("Double Square".to_string(), "DSQUARE".to_string());
+        screw_abbrevs.insert("Drilled Spanner".to_string(), "DSPAN".to_string());
+        screw_abbrevs.insert("External 12-Point".to_string(), "EXT12".to_string());
+        screw_abbrevs.insert("External Hex".to_string(), "EHEX".to_string()); // External hex
+        screw_abbrevs.insert("External Pentagon".to_string(), "EPENT".to_string());
+        screw_abbrevs.insert("External Square".to_string(), "ESQUARE".to_string());
+        screw_abbrevs.insert("Frearson".to_string(), "FREAR".to_string());
+        screw_abbrevs.insert("Hex".to_string(), "HEX".to_string()); // Internal hex (socket)
+        screw_abbrevs.insert("Hex with Pilot Recess".to_string(), "HEXPILOT".to_string());
+        screw_abbrevs.insert("Hi-Torque".to_string(), "HITORQUE".to_string());
+        screw_abbrevs.insert("Microstix".to_string(), "MICRO".to_string());
+        screw_abbrevs.insert("Mortorq®".to_string(), "MORTORQ".to_string());
+        screw_abbrevs.insert("Mortorq® Super".to_string(), "MORTORQS".to_string());
+        screw_abbrevs.insert("No Drive".to_string(), "NODRIVE".to_string());
+        screw_abbrevs.insert("One Way".to_string(), "ONEWAY".to_string());
+        screw_abbrevs.insert("Pentagon".to_string(), "PENT".to_string());
+        screw_abbrevs.insert("Pentalobe".to_string(), "PLOBE".to_string());
         screw_abbrevs.insert("Phillips".to_string(), "PH".to_string());
-        screw_abbrevs.insert("Torx".to_string(), "TX".to_string());
+        screw_abbrevs.insert("Phillips Terminal Screw".to_string(), "PHTERM".to_string());
+        screw_abbrevs.insert("Pozidriv®".to_string(), "PZ".to_string());
+        screw_abbrevs.insert("Pozidriv® Terminal Screw".to_string(), "PZTERM".to_string());
+        screw_abbrevs.insert("RIBE".to_string(), "RIBE".to_string());
         screw_abbrevs.insert("Slotted".to_string(), "SL".to_string());
+        screw_abbrevs.insert("Spring Plunger Driver".to_string(), "SPRING".to_string());
+        screw_abbrevs.insert("Square".to_string(), "SQUARE".to_string());
+        screw_abbrevs.insert("Square/Phillips".to_string(), "SQPH".to_string());
+        screw_abbrevs.insert("Tamper-Resistant Hex".to_string(), "TRHEX".to_string());
+        screw_abbrevs.insert("Tamper-Resistant Pentalobe".to_string(), "TRPLOBE".to_string());
+        screw_abbrevs.insert("Tamper-Resistant Phillips".to_string(), "TRPH".to_string());
+        screw_abbrevs.insert("Tamper-Resistant Square".to_string(), "TRSQUARE".to_string());
+        screw_abbrevs.insert("Tamper-Resistant Torx".to_string(), "TRTX".to_string());
+        screw_abbrevs.insert("Tamper-Resistant Torx Plus".to_string(), "TRTXP".to_string());
+        screw_abbrevs.insert("Torq-Set®".to_string(), "TORQSET".to_string());
+        screw_abbrevs.insert("Torx".to_string(), "TX".to_string());
+        screw_abbrevs.insert("Torx Plus".to_string(), "TXP".to_string());
+        screw_abbrevs.insert("Triangle".to_string(), "TRI".to_string());
+        screw_abbrevs.insert("Tri-Groove".to_string(), "TRIGROOVE".to_string());
+        screw_abbrevs.insert("Tri-Lobe".to_string(), "TRILOBE".to_string());
+        screw_abbrevs.insert("Triple Square".to_string(), "TRISQUARE".to_string());
+        screw_abbrevs.insert("Tri-Wing®".to_string(), "TRIWING".to_string());
+        screw_abbrevs.insert("Wrench Flats".to_string(), "WFLATS".to_string());
         
         // Button Head Screw template
         let bhs_template = NamingTemplate {

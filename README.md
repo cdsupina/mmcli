@@ -232,12 +232,20 @@ mmc name 91831A005
 
 #### Drive Style Abbreviations
 
-| Full Name | Abbreviation |
-|-----------|--------------|
-| Hex | `HEX` |
-| Phillips | `PH` |
-| Torx | `TX` |
-| Slotted | `SL` |
+| Full Name | Abbreviation | Notes |
+|-----------|--------------|-------|
+| External Hex | `EHEX` | External hex head |
+| Hex | `HEX` | Internal hex (Allen/socket) |
+| Phillips | `PH` | Phillips head |
+| Torx | `TX` | Standard Torx |
+| Torx Plus | `TXP` | Torx Plus drive |
+| Slotted | `SL` | Flat/slotted drive |
+| Square | `SQUARE` | Robertson/square drive |
+| Tamper-Resistant Hex | `TRHEX` | Security hex |
+| Tamper-Resistant Torx | `TRTX` | Security Torx |
+| Pozidriv® | `PZ` | Pozidriv drive |
+
+*Note: McMaster-Carr supports 40+ drive styles. See code for complete list.*
 
 ### Dimension Formatting
 
