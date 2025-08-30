@@ -10,6 +10,76 @@ use std::fs as std_fs;
 use std::io::{self, Write};
 use crate::OutputFormat;
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum ProductField {
+    PartNumber,
+    DetailDescription,
+    FamilyDescription,
+    Category,
+    Status,
+    Specification(String),
+    AllSpecs,
+    BasicInfo,
+}
+
+impl ProductField {
+    pub fn parse_fields(fields_str: &str) -> Vec<ProductField> {
+        if fields_str == "all" {
+            return vec![
+                ProductField::PartNumber,
+                ProductField::DetailDescription,
+                ProductField::FamilyDescription,
+                ProductField::Category,
+                ProductField::Status,
+                ProductField::AllSpecs,
+            ];
+        }
+
+        if fields_str == "basic" {
+            return vec![
+                ProductField::PartNumber,
+                ProductField::DetailDescription,
+                ProductField::FamilyDescription,
+                ProductField::Category,
+                ProductField::Status,
+            ];
+        }
+
+        if fields_str == "specs" {
+            return vec![ProductField::AllSpecs];
+        }
+
+        fields_str
+            .split(',')
+            .map(|s| s.trim())
+            .map(|field| match field {
+                "part-number" | "partnumber" => ProductField::PartNumber,
+                "detail-description" | "detail" | "description" => ProductField::DetailDescription,
+                "family-description" | "family" => ProductField::FamilyDescription,
+                "category" | "product-category" => ProductField::Category,
+                "status" | "product-status" => ProductField::Status,
+                "specs" | "specifications" => ProductField::AllSpecs,
+                "basic" => ProductField::BasicInfo,
+                _ => {
+                    // Convert kebab-case to proper specification name
+                    let spec_name = field.replace('-', " ");
+                    let spec_name = spec_name.split_whitespace()
+                        .map(|word| {
+                            let mut chars = word.chars();
+                            match chars.next() {
+                                None => String::new(),
+                                Some(first) => first.to_uppercase().chain(chars).collect(),
+                            }
+                        })
+                        .collect::<Vec<String>>()
+                        .join(" ");
+                    ProductField::Specification(spec_name)
+                }
+            })
+            .collect()
+    }
+}
+
 const BASE_URL: &str = "https://api.mcmaster.com";
 
 #[derive(Debug, Serialize)]
@@ -482,7 +552,7 @@ impl McmasterClient {
         Ok(())
     }
 
-    pub async fn get_product(&self, product: &str, output_format: OutputFormat) -> Result<()> {
+    pub async fn get_product(&self, product: &str, output_format: OutputFormat, fields_str: &str) -> Result<()> {
         self.ensure_authenticated()?;
         
         let url = format!("{}/v1/products/{}", BASE_URL, product);
@@ -496,12 +566,13 @@ impl McmasterClient {
 
         if response.status().is_success() {
             let response_text = response.text().await.context("Failed to get response text")?;
+            let fields = ProductField::parse_fields(fields_str);
             
             match output_format {
                 OutputFormat::Human => {
                     // Try to parse as structured product data for clean display
                     if let Ok(product_detail) = serde_json::from_str::<ProductDetail>(&response_text) {
-                        println!("{}", self.format_product_output(&product_detail));
+                        println!("{}", self.format_product_output(&product_detail, &fields));
                     } else {
                         // Fallback to pretty-printed JSON if parsing fails
                         let product_data: serde_json::Value = serde_json::from_str(&response_text)
@@ -510,9 +581,10 @@ impl McmasterClient {
                     }
                 },
                 OutputFormat::Json => {
-                    // For JSON output, try to parse and re-serialize for clean formatting
+                    // For JSON output, try to parse and create filtered output
                     if let Ok(product_detail) = serde_json::from_str::<ProductDetail>(&response_text) {
-                        println!("{}", serde_json::to_string_pretty(&product_detail)?);
+                        let filtered_json = self.create_filtered_json(&product_detail, &fields)?;
+                        println!("{}", serde_json::to_string_pretty(&filtered_json)?);
                     } else {
                         // Fallback to original response if parsing fails
                         let product_data: serde_json::Value = serde_json::from_str(&response_text)
@@ -1001,38 +1073,146 @@ certificate_password = "certificate_password"
         }
     }
 
-    fn format_product_output(&self, product: &ProductDetail) -> String {
+    fn format_product_output(&self, product: &ProductDetail, fields: &[ProductField]) -> String {
         let mut output = String::new();
         
-        // Header with part number and status
-        output.push_str(&format!("🔧 {} ({})\n", product.part_number, product.product_status));
-        
-        // Description
-        output.push_str(&format!("   {}\n", product.detail_description));
-        output.push_str(&format!("   {}\n", product.family_description));
-        output.push_str(&format!("   Category: {}\n", product.product_category));
-        
-        // All specifications
-        if !product.specifications.is_empty() {
-            output.push_str("\n📋 Specifications:\n");
-            
-            // Show important specs first
-            let important_specs = ["Thread Size", "Length", "Material", "Drive Style", "Drive Size", "Head Diameter"];
-            for spec_name in &important_specs {
-                if let Some(spec) = product.specifications.iter().find(|s| s.attribute == *spec_name) {
-                    output.push_str(&format!("   {}: {}\n", spec.attribute, spec.values.join(", ")));
-                }
+        // Always show part number as header if it's included
+        if fields.iter().any(|f| matches!(f, ProductField::PartNumber)) {
+            output.push_str(&format!("🔧 {}", product.part_number));
+            if fields.iter().any(|f| matches!(f, ProductField::Status)) {
+                output.push_str(&format!(" ({})", product.product_status));
             }
+            output.push('\n');
+        }
+        
+        // Show selected basic fields
+        let mut has_descriptions = false;
+        for field in fields {
+            match field {
+                ProductField::DetailDescription => {
+                    output.push_str(&format!("   {}\n", product.detail_description));
+                    has_descriptions = true;
+                },
+                ProductField::FamilyDescription => {
+                    output.push_str(&format!("   {}\n", product.family_description));
+                    has_descriptions = true;
+                },
+                ProductField::Category => {
+                    output.push_str(&format!("   Category: {}\n", product.product_category));
+                    has_descriptions = true;
+                },
+                _ => {} // Handle specifications separately
+            }
+        }
+        
+        // Handle specifications
+        let spec_fields: Vec<_> = fields.iter()
+            .filter_map(|f| match f {
+                ProductField::Specification(name) => Some(name.clone()),
+                ProductField::AllSpecs => Some("*".to_string()), // Special marker for all specs
+                _ => None,
+            })
+            .collect();
             
-            // Show all remaining specs
-            for spec in &product.specifications {
-                if !important_specs.contains(&spec.attribute.as_str()) {
-                    output.push_str(&format!("   {}: {}\n", spec.attribute, spec.values.join(", ")));
+        if !spec_fields.is_empty() && !product.specifications.is_empty() {
+            if has_descriptions {
+                output.push('\n');
+            }
+            output.push_str("📋 Specifications:\n");
+            
+            if spec_fields.contains(&"*".to_string()) {
+                // Show all specs with important ones first
+                let important_specs = ["Thread Size", "Length", "Material", "Drive Style", "Drive Size", "Head Diameter"];
+                for spec_name in &important_specs {
+                    if let Some(spec) = product.specifications.iter().find(|s| s.attribute == *spec_name) {
+                        output.push_str(&format!("   {}: {}\n", spec.attribute, spec.values.join(", ")));
+                    }
+                }
+                
+                for spec in &product.specifications {
+                    if !important_specs.contains(&spec.attribute.as_str()) {
+                        output.push_str(&format!("   {}: {}\n", spec.attribute, spec.values.join(", ")));
+                    }
+                }
+            } else {
+                // Show only requested specifications
+                for spec_name in &spec_fields {
+                    if let Some(spec) = product.specifications.iter().find(|s| 
+                        s.attribute.eq_ignore_ascii_case(spec_name) ||
+                        s.attribute.to_lowercase().contains(&spec_name.to_lowercase())
+                    ) {
+                        output.push_str(&format!("   {}: {}\n", spec.attribute, spec.values.join(", ")));
+                    }
                 }
             }
         }
         
         output
+    }
+
+    fn create_filtered_json(&self, product: &ProductDetail, fields: &[ProductField]) -> Result<serde_json::Value> {
+        let mut json_obj = serde_json::Map::new();
+        
+        for field in fields {
+            match field {
+                ProductField::PartNumber => {
+                    json_obj.insert("PartNumber".to_string(), serde_json::Value::String(product.part_number.clone()));
+                },
+                ProductField::DetailDescription => {
+                    json_obj.insert("DetailDescription".to_string(), serde_json::Value::String(product.detail_description.clone()));
+                },
+                ProductField::FamilyDescription => {
+                    json_obj.insert("FamilyDescription".to_string(), serde_json::Value::String(product.family_description.clone()));
+                },
+                ProductField::Category => {
+                    json_obj.insert("ProductCategory".to_string(), serde_json::Value::String(product.product_category.clone()));
+                },
+                ProductField::Status => {
+                    json_obj.insert("ProductStatus".to_string(), serde_json::Value::String(product.product_status.clone()));
+                },
+                ProductField::AllSpecs => {
+                    let specs: Vec<serde_json::Value> = product.specifications.iter()
+                        .map(|spec| serde_json::json!({
+                            "Attribute": spec.attribute,
+                            "Values": spec.values
+                        }))
+                        .collect();
+                    json_obj.insert("Specifications".to_string(), serde_json::Value::Array(specs));
+                },
+                ProductField::Specification(spec_name) => {
+                    if let Some(spec) = product.specifications.iter().find(|s| 
+                        s.attribute.eq_ignore_ascii_case(spec_name) ||
+                        s.attribute.to_lowercase().contains(&spec_name.to_lowercase())
+                    ) {
+                        // Add to a specifications object
+                        let mut specs_obj = if let Some(existing) = json_obj.get_mut("Specifications") {
+                            if let serde_json::Value::Object(ref mut obj) = existing {
+                                obj.clone()
+                            } else {
+                                serde_json::Map::new()
+                            }
+                        } else {
+                            serde_json::Map::new()
+                        };
+                        
+                        specs_obj.insert(spec.attribute.clone(), serde_json::Value::Array(
+                            spec.values.iter().map(|v| serde_json::Value::String(v.clone())).collect()
+                        ));
+                        
+                        json_obj.insert("Specifications".to_string(), serde_json::Value::Object(specs_obj));
+                    }
+                },
+                ProductField::BasicInfo => {
+                    json_obj.insert("PartNumber".to_string(), serde_json::Value::String(product.part_number.clone()));
+                    json_obj.insert("DetailDescription".to_string(), serde_json::Value::String(product.detail_description.clone()));
+                    json_obj.insert("FamilyDescription".to_string(), serde_json::Value::String(product.family_description.clone()));
+                    json_obj.insert("ProductCategory".to_string(), serde_json::Value::String(product.product_category.clone()));
+                    json_obj.insert("ProductStatus".to_string(), serde_json::Value::String(product.product_status.clone()));
+                },
+            }
+        }
+        
+        Ok(serde_json::Value::Object(json_obj))
     }
 
     // Helper method to download a single asset

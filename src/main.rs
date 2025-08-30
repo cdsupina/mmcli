@@ -85,6 +85,9 @@ enum Commands {
         /// Output format
         #[arg(short, long, default_value_t = OutputFormat::Human)]
         output: OutputFormat,
+        /// Comma-separated list of fields to display (default: all)
+        #[arg(short, long, default_value = "all")]
+        fields: String,
     },
     /// Get product price
     Price {
@@ -343,12 +346,12 @@ async fn main() -> Result<()> {
         Commands::Remove { product } => {
             client.remove_product(&product).await?;
         }
-        Commands::Info { product, output } => {
+        Commands::Info { product, output, fields } => {
             // Set quiet mode for JSON output to suppress other messages
             if output == OutputFormat::Json {
                 client.set_quiet_mode(true);
             }
-            client.get_product(&product, output).await?;
+            client.get_product(&product, output, &fields).await?;
         }
         Commands::Price { product } => {
             client.get_price(&product).await?;
