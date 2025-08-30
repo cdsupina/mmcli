@@ -119,9 +119,9 @@ impl NameGenerator {
         screw_abbrevs.insert("Torx".to_string(), "TX".to_string());
         screw_abbrevs.insert("Slotted".to_string(), "SL".to_string());
         
-        // Button Head Cap Screw template
-        let bhcs_template = NamingTemplate {
-            prefix: "BHCS".to_string(),
+        // Button Head Screw template
+        let bhs_template = NamingTemplate {
+            prefix: "BHS".to_string(),
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(), 
@@ -131,11 +131,11 @@ impl NameGenerator {
             spec_abbreviations: screw_abbrevs.clone(),
         };
         
-        self.category_templates.insert("button_head_screw".to_string(), bhcs_template);
+        self.category_templates.insert("button_head_screw".to_string(), bhs_template);
         
-        // Flat Head Cap Screw template
-        let fhcs_template = NamingTemplate {
-            prefix: "FHCS".to_string(),
+        // Flat Head Screw template
+        let fhs_template = NamingTemplate {
+            prefix: "FHS".to_string(),
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(), 
@@ -144,11 +144,11 @@ impl NameGenerator {
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
-        self.category_templates.insert("flat_head_screw".to_string(), fhcs_template);
+        self.category_templates.insert("flat_head_screw".to_string(), fhs_template);
         
-        // Socket Head Cap Screw template
-        let shcs_template = NamingTemplate {
-            prefix: "SHCS".to_string(),
+        // Socket Head Screw template
+        let shs_template = NamingTemplate {
+            prefix: "SHS".to_string(),
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(), 
@@ -157,7 +157,20 @@ impl NameGenerator {
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
-        self.category_templates.insert("socket_head_screw".to_string(), shcs_template);
+        self.category_templates.insert("socket_head_screw".to_string(), shs_template);
+        
+        // Pan Head Screw template
+        let phs_template = NamingTemplate {
+            prefix: "PHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("pan_head_screw".to_string(), phs_template);
         
         // Generic screw template
         let generic_screw_template = NamingTemplate {
@@ -281,6 +294,8 @@ impl NameGenerator {
             "flat_head_screw".to_string()
         } else if family_lower.contains("socket head") && family_lower.contains("screw") {
             "socket_head_screw".to_string()
+        } else if family_lower.contains("pan head") && family_lower.contains("screw") {
+            "pan_head_screw".to_string()
         } else if category_lower.contains("screw") || family_lower.contains("screw") {
             "generic_screw".to_string()
         } else if category_lower.contains("washer") || family_lower.contains("washer") {

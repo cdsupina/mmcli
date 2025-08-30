@@ -185,7 +185,7 @@ McMaster-Carr CLI can generate human-readable, abbreviated technical names for p
 ```bash
 # Generate abbreviated technical name for any part
 mmc name 98164A133
-# Output: BHCS-SS316-8-32-0.25-HEX
+# Output: BHS-SS316-8-32-0.25-HEX
 
 mmc name 91831A005  
 # Output: LOCKNUT-SS188-4-40
@@ -197,9 +197,10 @@ mmc name 91831A005
 
 | Type | Template | Example Input | Generated Name |
 |------|----------|---------------|----------------|
-| Button Head Cap Screw | `BHCS-[Material]-[Thread]-[Length]-[Drive]` | 316 SS Button Head Hex, 8-32 x 1/4" | `BHCS-SS316-8-32-0.25-HEX` |
-| Flat Head Cap Screw | `FHCS-[Material]-[Thread]-[Length]-[Drive]` | 18-8 SS Flat Head Phillips, M6 x 20mm | `FHCS-SS188-M6-20-PH` |
-| Socket Head Cap Screw | `SHCS-[Material]-[Thread]-[Length]-[Drive]` | Steel Socket Head Hex, 1/4-20 x 1" | `SHCS-Steel-1/4-20-1-HEX` |
+| Button Head Screw | `BHS-[Material]-[Thread]-[Length]-[Drive]` | 316 SS Button Head Hex, 8-32 x 1/4" | `BHS-SS316-8-32-0.25-HEX` |
+| Flat Head Screw | `FHS-[Material]-[Thread]-[Length]-[Drive]` | 18-8 SS Flat Head Phillips, M6 x 20mm | `FHS-SS188-M6-20-PH` |
+| Socket Head Screw | `SHS-[Material]-[Thread]-[Length]-[Drive]` | Steel Socket Head Hex, 1/4-20 x 1" | `SHS-Steel-1/4-20-1-HEX` |
+| Pan Head Screw | `PHS-[Material]-[Thread]-[Length]-[Drive]` | Brass Pan Head Phillips, 6-32 x 0.5" | `PHS-Brass-6-32-0.5-PH` |
 | Generic Screw | `SCREW-[Material]-[Thread]-[Length]` | Brass Machine Screw, 6-32 x 0.5" | `SCREW-Brass-6-32-0.5` |
 
 #### Nuts
@@ -257,7 +258,7 @@ For unsupported categories, the system generates fallback names using:
 #### BOM Usage
 ```csv
 Part Number,Description,Generated Name,Quantity
-98164A133,316 SS Button Head Hex Drive Screw,BHCS-SS316-8-32-0.25-HEX,10
+98164A133,316 SS Button Head Hex Drive Screw,BHS-SS316-8-32-0.25-HEX,10
 91831A005,18-8 SS Nylon-Insert Locknut,LOCKNUT-SS188-4-40,10
 ```
 
