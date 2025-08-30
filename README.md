@@ -151,17 +151,126 @@ mmc remove 90128a211
 ### Product Information
 
 ```bash
-# Get detailed product information
-mmc product 90128a211
+# Get detailed product information (human-friendly)
+mmc info 98164A133
 
-# Get product pricing
-mmc price 90128a211
+# Get product information in JSON format (scriptable)
+mmc info 98164A133 --output json
+
+# Get specific fields only
+mmc info 98164A133 --fields part-number,material,thread-size
+
+# Get product pricing (human-friendly)
+mmc price 98164A133
+
+# Get pricing in JSON format
+mmc price 98164A133 --output json
+
+# Generate human-readable part name
+mmc name 98164A133
 
 # List recent changes (requires start date)
 mmc changes -s "01/01/2024"
 
 # List changes from a specific date with time
 mmc changes -s "08/20/2025 10:30"
+```
+
+## Name Generation
+
+McMaster-Carr CLI can generate human-readable, abbreviated technical names for parts. This makes parts easier to remember, communicate, and use in BOMs or CAD systems.
+
+### Usage
+
+```bash
+# Generate abbreviated technical name for any part
+mmc name 98164A133
+# Output: BHCS-SS316-8-32-0.25-HEX
+
+mmc name 91831A005  
+# Output: LOCKNUT-SS188-4-40
+```
+
+### Supported Categories
+
+#### Screws & Bolts
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Button Head Cap Screw | `BHCS-[Material]-[Thread]-[Length]-[Drive]` | 316 SS Button Head Hex, 8-32 x 1/4" | `BHCS-SS316-8-32-0.25-HEX` |
+| Flat Head Cap Screw | `FHCS-[Material]-[Thread]-[Length]-[Drive]` | 18-8 SS Flat Head Phillips, M6 x 20mm | `FHCS-SS188-M6-20-PH` |
+| Socket Head Cap Screw | `SHCS-[Material]-[Thread]-[Length]-[Drive]` | Steel Socket Head Hex, 1/4-20 x 1" | `SHCS-Steel-1/4-20-1-HEX` |
+| Generic Screw | `SCREW-[Material]-[Thread]-[Length]` | Brass Machine Screw, 6-32 x 0.5" | `SCREW-Brass-6-32-0.5` |
+
+#### Nuts
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Locknut | `LOCKNUT-[Material]-[Thread]` | 18-8 SS Nylon-Insert Locknut, 4-40 | `LOCKNUT-SS188-4-40` |
+| Hex Nut | `HEXNUT-[Material]-[Thread]-[Height]` | 316 SS Hex Nut, 1/4-20, 7/32" H | `HEXNUT-SS316-1/4-20-7/32` |
+| Wing Nut | `WINGNUT-[Material]-[Thread]` | Brass Wing Nut, 8-32 | `WINGNUT-Brass-8-32` |
+| Cap Nut | `CAPNUT-[Material]-[Thread]-[Height]` | SS Cap Nut, M8, 12mm H | `CAPNUT-SS-M8-12` |
+| Generic Nut | `NUT-[Material]-[Thread]` | Steel Nut, 5/16-18 | `NUT-Steel-5/16-18` |
+
+#### Washers
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Washer | `WASHER-[Material]-[ID]-[OD]` | 316 SS Flat Washer, 1/4" ID, 5/8" OD | `WASHER-SS316-0.25-0.625` |
+
+#### Material Abbreviations
+
+| Full Name | Abbreviation | Notes |
+|-----------|--------------|-------|
+| 316 Stainless Steel | `SS316` | Marine grade, high corrosion resistance |
+| 18-8 Stainless Steel | `SS188` | Standard grade, good corrosion resistance |
+| Stainless Steel (generic) | `SS` | When specific grade not specified |
+| Steel | `Steel` | Carbon/alloy steel |
+| Brass | `Brass` | Brass alloy |
+| Aluminum | `Al` | Aluminum alloy |
+
+#### Drive Style Abbreviations
+
+| Full Name | Abbreviation |
+|-----------|--------------|
+| Hex | `HEX` |
+| Phillips | `PH` |
+| Torx | `TX` |
+| Slotted | `SL` |
+
+### Dimension Formatting
+
+- **Fractions**: Automatically converted to decimals (`1/4"` → `0.25`)
+- **Inches**: Quote marks removed for cleaner names (`0.25"` → `0.25`)
+- **Metric**: Preserved as-is (`M6`, `20mm`)
+- **Thread Sizes**: Preserved as-is (`8-32`, `1/4-20`, `M6x1.0`)
+
+### Fallback Naming
+
+For unsupported categories, the system generates fallback names using:
+- Key words from the family description
+- Part number as suffix
+- Example: `BALL-BEARING-STEEL-12345A678`
+
+### Integration Examples
+
+#### BOM Usage
+```csv
+Part Number,Description,Generated Name,Quantity
+98164A133,316 SS Button Head Hex Drive Screw,BHCS-SS316-8-32-0.25-HEX,10
+91831A005,18-8 SS Nylon-Insert Locknut,LOCKNUT-SS188-4-40,10
+```
+
+#### Scripting
+```bash
+# Generate names for a list of parts
+for part in 98164A133 91831A005; do
+  echo "$part: $(mmc name $part)"
+done
+
+# Create part name lookup table
+mmc name 98164A133 > part_names.txt
+echo "98164A133 -> $(mmc name 98164A133)"
 ```
 
 ### Session Management
