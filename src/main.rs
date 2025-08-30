@@ -93,6 +93,9 @@ enum Commands {
     Price {
         /// Product number
         product: String,
+        /// Output format
+        #[arg(short, long, default_value_t = OutputFormat::Human)]
+        output: OutputFormat,
     },
     /// List changes since a date (MM/dd/yyyy or MM/dd/yyyy HH:mm)
     Changes {
@@ -268,7 +271,10 @@ async fn main() -> Result<()> {
     };
     
     // Check if JSON output is requested to suppress verbose output
-    let json_output = matches!(cli.command, Commands::Info { output: OutputFormat::Json, .. });
+    let json_output = matches!(cli.command, 
+        Commands::Info { output: OutputFormat::Json, .. } |
+        Commands::Price { output: OutputFormat::Json, .. }
+    );
     
     let mut client = if json_output {
         // For JSON output, create client without verbose messages
@@ -353,8 +359,12 @@ async fn main() -> Result<()> {
             }
             client.get_product(&product, output, &fields).await?;
         }
-        Commands::Price { product } => {
-            client.get_price(&product).await?;
+        Commands::Price { product, output } => {
+            // Set quiet mode for JSON output to suppress other messages
+            if output == OutputFormat::Json {
+                client.set_quiet_mode(true);
+            }
+            client.get_price(&product, output).await?;
         }
         Commands::Changes { start } => {
             client.get_changes(&start).await?;

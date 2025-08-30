@@ -197,7 +197,7 @@ pub struct ProductInfo {
     pub family_description: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct PriceInfo {
     #[serde(rename = "Amount")]
     pub amount: f64,
@@ -663,7 +663,7 @@ impl McmasterClient {
         Ok(())
     }
 
-    pub async fn get_price(&self, product: &str) -> Result<()> {
+    pub async fn get_price(&self, product: &str, output_format: OutputFormat) -> Result<()> {
         self.ensure_authenticated()?;
         
         let url = format!("{}/v1/products/{}/price", BASE_URL, product);
@@ -681,7 +681,14 @@ impl McmasterClient {
                 .await
                 .context("Failed to parse price response")?;
             
-            self.format_price_output(product, &price_data);
+            match output_format {
+                OutputFormat::Human => {
+                    self.format_price_output(product, &price_data);
+                },
+                OutputFormat::Json => {
+                    println!("{}", serde_json::to_string_pretty(&price_data)?);
+                }
+            }
         } else if response.status().as_u16() == 403 {
             // Product is not in subscription - offer to add it
             println!("❌ Product {} is not in your subscription.", product);
@@ -713,7 +720,14 @@ impl McmasterClient {
                         .await
                         .context("Failed to parse price response")?;
                     
-                    self.format_price_output(product, &price_data);
+                    match output_format {
+                        OutputFormat::Human => {
+                            self.format_price_output(product, &price_data);
+                        },
+                        OutputFormat::Json => {
+                            println!("{}", serde_json::to_string_pretty(&price_data)?);
+                        }
+                    }
                     return Ok(());
                 } else {
                     let status = response.status();
