@@ -896,18 +896,30 @@ certificate_password = "certificate_password"
     async fn download_asset(&self, asset_path: &str, output_dir: &Path, product: &str) -> Result<String> {
         let url = format!("{}{}", BASE_URL, asset_path);
         
-        // Extract filename from path
-        let filename = asset_path
+        // Extract file extension from original filename
+        let original_filename = asset_path
             .split('/')
             .last()
-            .unwrap_or("download")
-            .to_string();
+            .unwrap_or("download");
         
-        // Create a better filename with product number
-        let final_filename = if filename.contains(&product) {
-            filename
+        let extension = if let Some(dot_pos) = original_filename.rfind('.') {
+            &original_filename[dot_pos..].to_lowercase()
         } else {
-            format!("{}_{}", product, filename)
+            ""
+        };
+        
+        // Generate clean filename: product.ext or product_variant.ext
+        let final_filename = if asset_path.contains("NO%20THREADS") || asset_path.contains("NO THREADS") {
+            format!("{}_no_threads{}", product, extension)
+        } else if asset_path.contains("3D_") || asset_path.contains("3-D") {
+            // For 3D PDFs or other 3D variants, add _3d suffix
+            if extension == ".pdf" && (asset_path.contains("3D_") || asset_path.contains("3-D")) {
+                format!("{}_3d{}", product, extension)
+            } else {
+                format!("{}{}", product, extension)
+            }
+        } else {
+            format!("{}{}", product, extension)
         };
         
         let output_path = output_dir.join(&final_filename);
