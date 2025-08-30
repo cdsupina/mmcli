@@ -116,6 +116,16 @@ pub struct ProductLinks {
     pub datasheets: Vec<String>,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct ProductInfo {
+    #[serde(rename = "PartNumber")]
+    pub part_number: Option<String>,
+    #[serde(rename = "DetailDescription")]
+    pub detail_description: Option<String>,
+    #[serde(rename = "FamilyDescription")]
+    pub family_description: Option<String>,
+}
+
 pub struct McmasterClient {
     client: Client,
     token: Option<String>,
@@ -343,18 +353,35 @@ impl McmasterClient {
             .await
             .context("Failed to add product")?;
 
-        println!("Add product response status: {}", response.status());
-        let response_text = response.text().await.context("Failed to get response text")?;
-        println!("Add product response: {}", response_text);
-
-        // Try to parse as JSON to see if it's product data or error
-        if let Ok(product_data) = serde_json::from_str::<serde_json::Value>(&response_text) {
-            println!("Product {} added to subscription", product);
-            println!("{}", serde_json::to_string_pretty(&product_data)?);
+        if response.status().is_success() {
+            let response_text = response.text().await.context("Failed to get response text")?;
+            
+            // Try to parse product info for clean display
+            if let Ok(product_info) = serde_json::from_str::<ProductInfo>(&response_text) {
+                println!("✅ Added {} to subscription", product);
+                
+                // Build description line
+                let mut description_parts = Vec::new();
+                if let Some(detail) = &product_info.detail_description {
+                    description_parts.push(detail.as_str());
+                }
+                if let Some(family) = &product_info.family_description {
+                    description_parts.push(family.as_str());
+                }
+                
+                if !description_parts.is_empty() {
+                    println!("   {}", description_parts.join(" - "));
+                }
+            } else {
+                // Fallback if we can't parse the response
+                println!("✅ Product {} added to subscription", product);
+            }
         } else {
+            let status = response.status();
+            let error_text = response.text().await.unwrap_or_default();
             return Err(anyhow::anyhow!(
-                "Unexpected response format for add product: {}",
-                response_text
+                "Failed to add product {}. Status: {}. Response: {}",
+                product, status, error_text
             ));
         }
 
