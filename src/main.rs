@@ -1,11 +1,29 @@
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 use anyhow::{Context, Result};
 use std::path::PathBuf;
 use dirs::{home_dir, config_dir};
 use tokio::fs;
+use std::fmt;
 
 mod client;
 use client::{McmasterClient, Credentials};
+
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Debug)]
+enum OutputFormat {
+    /// Human-friendly output with formatting and emojis (default)
+    Human,
+    /// Machine-readable JSON output
+    Json,
+}
+
+impl fmt::Display for OutputFormat {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            OutputFormat::Human => write!(f, "human"),
+            OutputFormat::Json => write!(f, "json"),
+        }
+    }
+}
 
 #[derive(Parser)]
 #[command(name = "mmc")]
@@ -64,6 +82,9 @@ enum Commands {
     Info {
         /// Product number
         product: String,
+        /// Output format
+        #[arg(short, long, default_value_t = OutputFormat::Human)]
+        output: OutputFormat,
     },
     /// Get product price
     Price {
@@ -243,7 +264,15 @@ async fn main() -> Result<()> {
         load_default_credentials().await.ok()
     };
     
-    let mut client = McmasterClient::new_with_credentials(credentials)?;
+    // Check if JSON output is requested to suppress verbose output
+    let json_output = matches!(cli.command, Commands::Info { output: OutputFormat::Json, .. });
+    
+    let mut client = if json_output {
+        // For JSON output, create client without verbose messages
+        McmasterClient::new_with_credentials_quiet(credentials)?
+    } else {
+        McmasterClient::new_with_credentials(credentials)?
+    };
 
     // Load existing token if available
     client.load_token().await?;
@@ -314,8 +343,12 @@ async fn main() -> Result<()> {
         Commands::Remove { product } => {
             client.remove_product(&product).await?;
         }
-        Commands::Info { product } => {
-            client.get_product(&product).await?;
+        Commands::Info { product, output } => {
+            // Set quiet mode for JSON output to suppress other messages
+            if output == OutputFormat::Json {
+                client.set_quiet_mode(true);
+            }
+            client.get_product(&product, output).await?;
         }
         Commands::Price { product } => {
             client.get_price(&product).await?;

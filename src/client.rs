@@ -8,6 +8,7 @@ use tokio::io::AsyncWriteExt;
 use native_tls::{Identity, TlsConnector};
 use std::fs as std_fs;
 use std::io::{self, Write};
+use crate::OutputFormat;
 
 const BASE_URL: &str = "https://api.mcmaster.com";
 
@@ -136,7 +137,7 @@ pub struct PriceInfo {
     pub unit_of_measure: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ProductDetail {
     #[serde(rename = "PartNumber")]
     pub part_number: String,
@@ -152,7 +153,7 @@ pub struct ProductDetail {
     pub specifications: Vec<Specification>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Specification {
     #[serde(rename = "Attribute")]
     pub attribute: String,
@@ -164,10 +165,19 @@ pub struct McmasterClient {
     client: Client,
     token: Option<String>,
     credentials: Option<Credentials>,
+    quiet_mode: bool, // For suppressing output when in JSON mode
 }
 
 impl McmasterClient {
     pub fn new_with_credentials(credentials: Option<Credentials>) -> Result<Self> {
+        Self::new_with_credentials_internal(credentials, false)
+    }
+
+    pub fn new_with_credentials_quiet(credentials: Option<Credentials>) -> Result<Self> {
+        Self::new_with_credentials_internal(credentials, true)
+    }
+
+    fn new_with_credentials_internal(credentials: Option<Credentials>, quiet: bool) -> Result<Self> {
         let mut client_builder = Client::builder();
 
         // Try to find and load certificate
@@ -177,12 +187,14 @@ impl McmasterClient {
                 Some(PathBuf::from(explicit_path))
             } else {
                 // Try to find certificate in default locations
-                Self::find_default_certificate()
+                Self::find_default_certificate_quiet(quiet)
             };
 
             if let Some(cert_path) = cert_path {
                 if cert_path.exists() {
-                    println!("Loading client certificate: {}", cert_path.display());
+                    if !quiet {
+                        println!("Loading client certificate: {}", cert_path.display());
+                    }
                     
                     // Read the PKCS12 file
                     let cert_data = std_fs::read(&cert_path)
@@ -207,7 +219,9 @@ impl McmasterClient {
                         .context("Failed to build TLS connector")?;
                     
                     client_builder = client_builder.use_preconfigured_tls(tls_connector);
-                    println!("Client certificate loaded successfully");
+                    if !quiet {
+                        println!("Client certificate loaded successfully");
+                    }
                 } else if creds.certificate_path.is_some() {
                     // Explicit path was provided but file doesn't exist
                     return Err(anyhow::anyhow!("Certificate file not found: {}", cert_path.display()));
@@ -230,7 +244,12 @@ impl McmasterClient {
             client,
             token: None,
             credentials,
+            quiet_mode: quiet,
         })
+    }
+
+    pub fn set_quiet_mode(&mut self, quiet: bool) {
+        self.quiet_mode = quiet;
     }
 
     pub async fn login(&mut self, username: String, password: String) -> Result<()> {
@@ -463,7 +482,7 @@ impl McmasterClient {
         Ok(())
     }
 
-    pub async fn get_product(&self, product: &str) -> Result<()> {
+    pub async fn get_product(&self, product: &str, output_format: OutputFormat) -> Result<()> {
         self.ensure_authenticated()?;
         
         let url = format!("{}/v1/products/{}", BASE_URL, product);
@@ -478,14 +497,29 @@ impl McmasterClient {
         if response.status().is_success() {
             let response_text = response.text().await.context("Failed to get response text")?;
             
-            // Try to parse as structured product data for clean display
-            if let Ok(product_detail) = serde_json::from_str::<ProductDetail>(&response_text) {
-                println!("{}", self.format_product_output(&product_detail));
-            } else {
-                // Fallback to pretty-printed JSON if parsing fails
-                let product_data: serde_json::Value = serde_json::from_str(&response_text)
-                    .context("Failed to parse product response")?;
-                println!("{}", serde_json::to_string_pretty(&product_data)?);
+            match output_format {
+                OutputFormat::Human => {
+                    // Try to parse as structured product data for clean display
+                    if let Ok(product_detail) = serde_json::from_str::<ProductDetail>(&response_text) {
+                        println!("{}", self.format_product_output(&product_detail));
+                    } else {
+                        // Fallback to pretty-printed JSON if parsing fails
+                        let product_data: serde_json::Value = serde_json::from_str(&response_text)
+                            .context("Failed to parse product response")?;
+                        println!("{}", serde_json::to_string_pretty(&product_data)?);
+                    }
+                },
+                OutputFormat::Json => {
+                    // For JSON output, try to parse and re-serialize for clean formatting
+                    if let Ok(product_detail) = serde_json::from_str::<ProductDetail>(&response_text) {
+                        println!("{}", serde_json::to_string_pretty(&product_detail)?);
+                    } else {
+                        // Fallback to original response if parsing fails
+                        let product_data: serde_json::Value = serde_json::from_str(&response_text)
+                            .context("Failed to parse product response")?;
+                        println!("{}", serde_json::to_string_pretty(&product_data)?);
+                    }
+                }
             }
         } else if response.status().as_u16() == 403 {
             // Product is not in subscription - offer to add it
@@ -763,9 +797,15 @@ certificate_password = "certificate_password"
     }
 
     fn find_default_certificate() -> Option<PathBuf> {
+        Self::find_default_certificate_quiet(false)
+    }
+
+    fn find_default_certificate_quiet(quiet: bool) -> Option<PathBuf> {
         for location in Self::get_default_cert_locations() {
             if location.exists() {
-                println!("Found certificate at: {}", location.display());
+                if !quiet {
+                    println!("Found certificate at: {}", location.display());
+                }
                 return Some(location);
             }
         }
