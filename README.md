@@ -1,4 +1,4 @@
-# McMaster-Carr CLI (mmcli)
+# McMaster-Carr CLI (mmc)
 
 A command-line interface for the McMaster-Carr Product Information API. This tool allows you to authenticate, manage product subscriptions, and retrieve product data from McMaster-Carr's API using client certificate authentication.
 
@@ -42,15 +42,15 @@ openssl pkcs12 -export -in certificate.pem -out certificate_new.pfx -passout pas
 
 **Why this is needed:** Original PFX files often use RC2-40-CBC encryption which is deprecated and not supported by modern OpenSSL versions.
 
-**Recommended:** Copy the converted certificate to `~/.config/mmcli/certificate.pfx` for automatic discovery:
+**Recommended:** Copy the converted certificate to `~/.config/mmc/certificate.pfx` for automatic discovery:
 
 ```bash
 # Use the built-in command to copy certificate to default location
-mmcli init-cert certificate_new.pfx
+mmc init-cert certificate_new.pfx
 
 # Or manually copy
-mkdir -p ~/.config/mmcli
-cp certificate_new.pfx ~/.config/mmcli/certificate.pfx
+mkdir -p ~/.config/mmc
+cp certificate_new.pfx ~/.config/mmc/certificate.pfx
 ```
 
 ### 2. Credentials Setup
@@ -58,14 +58,14 @@ cp certificate_new.pfx ~/.config/mmcli/certificate.pfx
 Create a credentials file to store your authentication information:
 
 ```bash
-# Generate a template in XDG config directory (~/.config/mmcli/credentials.toml)
-mmcli init-credentials
+# Generate a template in XDG config directory (~/.config/mmc/credentials.toml)
+mmc init-credentials
 
 # Or specify a custom path
-mmcli init-credentials -p ./my-credentials.toml
+mmc init-credentials -p ./my-credentials.toml
 
 # For JSON format in XDG config directory
-mmcli init-credentials --json
+mmc init-credentials --json
 ```
 
 Edit the generated file with your actual credentials:
@@ -77,11 +77,11 @@ password = "your_password"
 
 # Certificate settings (optional - will auto-discover if not specified)
 # Default locations checked:
-#   ~/.config/mmcli/certificate.pfx
-#   ~/.config/mmcli/certificate.p12  
+#   ~/.config/mmc/certificate.pfx
+#   ~/.config/mmc/certificate.p12  
 #   ~/.mmcli/certificate.pfx (legacy)
 #   ~/.mmcli/certificate.p12 (legacy)
-certificate_path = "~/.config/mmcli/certificate.pfx"
+certificate_path = "~/.config/mmc/certificate.pfx"
 certificate_password = "certificate_password"
 ```
 
@@ -90,7 +90,7 @@ certificate_password = "certificate_password"
 {
   "username": "your@email.com",
   "password": "your_password",
-  "certificate_path": "~/.config/mmcli/certificate.pfx",
+  "certificate_path": "~/.config/mmc/certificate.pfx",
   "certificate_password": "certificate_password"
 }
 ```
@@ -101,13 +101,13 @@ username = "your@email.com"
 password = "your_password"
 certificate_password = "certificate_password"
 ```
-*Place your certificate at `~/.config/mmcli/certificate.pfx` and omit certificate_path*
+*Place your certificate at `~/.config/mmc/certificate.pfx` and omit certificate_path*
 
 ### 3. Directory Structure
 
 **Recommended XDG Standard Setup:**
 ```
-~/.config/mmcli/
+~/.config/mmc/
 ├── credentials.toml           # Your credentials
 ├── certificate.pfx            # Your converted certificate (auto-discovered)
 └── token                      # Auth token (auto-generated)
@@ -128,47 +128,47 @@ mmcli/
 ### Authentication
 
 ```bash
-# Login with default credentials (~/.config/mmcli/credentials.toml)
-mmcli login
+# Login with default credentials (~/.config/mmc/credentials.toml)
+mmc login
 
 # Login with custom credentials file
-mmcli -c credentials.toml login
+mmc -c credentials.toml login
 
 # Login with username/password directly (requires credentials file for certificate)
-mmcli login -u username -p password
+mmc login -u username -p password
 ```
 
 ### Product Management
 
 ```bash
 # Add product to subscription (required before accessing product data)
-mmcli add 90128a211
+mmc add 90128a211
 
 # Remove product from subscription
-mmcli remove 90128a211
+mmc remove 90128a211
 ```
 
 ### Product Information
 
 ```bash
 # Get detailed product information
-mmcli product 90128a211
+mmc product 90128a211
 
 # Get product pricing
-mmcli price 90128a211
+mmc price 90128a211
 
 # List recent changes (requires start date)
-mmcli changes -s "01/01/2024"
+mmc changes -s "01/01/2024"
 
 # List changes from a specific date with time
-mmcli changes -s "08/20/2025 10:30"
+mmc changes -s "08/20/2025 10:30"
 ```
 
 ### Session Management
 
 ```bash
 # Logout (invalidates current token)
-mmcli logout
+mmc logout
 ```
 
 ## Working Examples
@@ -182,35 +182,35 @@ openssl pkcs12 -in original.pfx -out temp.pem -nodes -legacy
 openssl pkcs12 -export -in temp.pem -out certificate.pfx -passout pass:YOUR_PASSWORD
 
 # 2. Copy certificate to default location
-mmcli init-cert certificate.pfx
+mmc init-cert certificate.pfx
 
 # 3. Generate credentials template
-mmcli init-credentials
+mmc init-credentials
 
-# 4. Edit ~/.config/mmcli/credentials.toml with your credentials
+# 4. Edit ~/.config/mmc/credentials.toml with your credentials
 # (certificate_path is optional - will auto-discover)
 
 # 5. Login (once per day, token lasts 24 hours)
-mmcli login
+mmc login
 ```
 
 ### Daily Usage (No Flags Needed!)
 ```bash
 # Add parts to subscription
-mmcli add 90128a211  # M4x0.7mm Socket Head Screws
-mmcli add 92141A008  # #6 Stainless Steel Washers  
-mmcli add 92141A029  # 1/4" Stainless Steel Washers
+mmc add 90128a211  # M4x0.7mm Socket Head Screws
+mmc add 92141A008  # #6 Stainless Steel Washers  
+mmc add 92141A029  # 1/4" Stainless Steel Washers
 
 # Get detailed product information
-mmcli product 90128a211
+mmc product 90128a211
 # Returns: specifications, CAD links, material properties, etc.
 
 # Check pricing
-mmcli price 92141A008
+mmc price 92141A008
 # Returns: $1.53 per pack of 100 washers
 
 # Monitor changes since start of year
-mmcli changes -s "01/01/2024"
+mmc changes -s "01/01/2024"
 # Returns: list of part numbers that have been updated
 ```
 
@@ -218,8 +218,8 @@ mmcli changes -s "01/01/2024"
 
 ### Default Locations (XDG Standard)
 
-- **Credentials**: `~/.config/mmcli/credentials.toml` or `~/.config/mmcli/credentials.json`
-- **Auth Token**: `~/.config/mmcli/token`
+- **Credentials**: `~/.config/mmc/credentials.toml` or `~/.config/mmc/credentials.json`
+- **Auth Token**: `~/.config/mmc/token`
 - **Legacy Support**: Falls back to `~/.mmcli/` for backward compatibility
 
 ### Global Options
@@ -255,7 +255,7 @@ The CLI interacts with McMaster-Carr's Product Information API:
 
 - 🔒 All credential files are excluded from git via `.gitignore`
 - 🗂️ Certificates stored in `certs/` directory (also git-ignored)
-- 🔑 Tokens stored locally in `~/.config/mmcli/` directory (XDG standard)
+- 🔑 Tokens stored locally in `~/.config/mmc/` directory (XDG standard)
 - 🛡️ Uses TLS with client certificate authentication
 
 ## Troubleshooting
@@ -278,7 +278,7 @@ The CLI interacts with McMaster-Carr's Product Information API:
 
 **Error: `Not authenticated`**
 - Token expired (tokens last 24 hours)
-- Run `mmcli login` to get a new token
+- Run `mmc login` to get a new token
 
 ### SSL Issues
 

@@ -238,7 +238,7 @@ impl McmasterClient {
         // Use XDG config directory first
         if let Some(config_dir) = config_dir() {
             let mut path = config_dir;
-            path.push("mmcli");
+            path.push("mmc");
             path.push("token");
             return Some(path);
         }
@@ -443,7 +443,7 @@ impl McmasterClient {
             serde_json::to_string_pretty(&Credentials {
                 username: "your_username".to_string(),
                 password: "your_password".to_string(),
-                certificate_path: Some("~/.config/mmcli/certificate.pfx".to_string()),
+                certificate_path: Some("~/.config/mmc/certificate.pfx".to_string()),
                 certificate_password: Some("certificate_password".to_string()),
             })?
         } else if path.ends_with(".toml") {
@@ -454,11 +454,11 @@ password = "your_password"
 
 # Certificate settings (optional - will auto-discover if not specified)
 # Default locations checked:
-#   ~/.config/mmcli/certificate.pfx
-#   ~/.config/mmcli/certificate.p12  
+#   ~/.config/mmc/certificate.pfx
+#   ~/.config/mmc/certificate.p12  
 #   ~/.mmcli/certificate.pfx (legacy)
 #   ~/.mmcli/certificate.p12 (legacy)
-certificate_path = "~/.config/mmcli/certificate.pfx"
+certificate_path = "~/.config/mmc/certificate.pfx"
 certificate_password = "certificate_password"
 "#)
         } else {
@@ -471,7 +471,7 @@ certificate_password = "certificate_password"
 
         println!("Credentials template saved to: {}", path);
         println!("Please edit the file with your actual credentials.");
-        println!("Certificate will be auto-discovered from ~/.config/mmcli/certificate.pfx if certificate_path is not specified.");
+        println!("Certificate will be auto-discovered from ~/.config/mmc/certificate.pfx if certificate_path is not specified.");
         Ok(())
     }
 
@@ -482,7 +482,7 @@ certificate_password = "certificate_password"
         // XDG config directory locations (preferred)
         if let Some(config_dir) = config_dir() {
             let mut cert_path = config_dir;
-            cert_path.push("mmcli");
+            cert_path.push("mmc");
             
             // Try different common extensions
             for ext in &["pfx", "p12"] {

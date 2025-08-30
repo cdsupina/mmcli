@@ -8,7 +8,7 @@ mod client;
 use client::{McmasterClient, Credentials};
 
 #[derive(Parser)]
-#[command(name = "mmcli")]
+#[command(name = "mmc")]
 #[command(about = "A CLI for McMaster-Carr API")]
 #[command(version)]
 struct Cli {
@@ -35,7 +35,7 @@ enum Commands {
     Logout,
     /// Generate credentials file template
     InitCredentials {
-        /// Path for credentials file (default: ~/.mmcli/credentials.toml)
+        /// Path for credentials file (default: ~/.config/mmc/credentials.toml)
         #[arg(short, long)]
         path: Option<String>,
         /// Use JSON format instead of TOML
@@ -102,10 +102,10 @@ async fn load_credentials_from_file(path: &str) -> Result<Credentials> {
 }
 
 async fn load_default_credentials() -> Result<Credentials> {
-    // Try XDG config directory first (~/.config/mmcli/)
+    // Try XDG config directory first (~/.config/mmc/)
     if let Some(config_dir) = config_dir() {
         let mut creds_path = config_dir;
-        creds_path.push("mmcli");
+        creds_path.push("mmc");
         creds_path.push("credentials.toml");
         
         if creds_path.exists() {
@@ -136,7 +136,7 @@ async fn load_default_credentials() -> Result<Credentials> {
         }
     }
 
-    Err(anyhow::anyhow!("No default credentials file found in ~/.config/mmcli/ or ~/.mmcli/"))
+    Err(anyhow::anyhow!("No default credentials file found in ~/.config/mmc/ or ~/.mmcli/"))
 }
 
 async fn init_certificate(source_path: &str, _password: Option<&str>) -> Result<()> {
@@ -148,7 +148,7 @@ async fn init_certificate(source_path: &str, _password: Option<&str>) -> Result<
     // Get the default certificate location
     let target_dir = if let Some(config_dir) = config_dir() {
         let mut path = config_dir;
-        path.push("mmcli");
+        path.push("mmc");
         path
     } else {
         return Err(anyhow::anyhow!("Could not determine config directory"));
@@ -224,7 +224,7 @@ async fn main() -> Result<()> {
                     // Use XDG config directory by default
                     if let Some(config_dir) = config_dir() {
                         let mut default_path = config_dir;
-                        default_path.push("mmcli");
+                        default_path.push("mmc");
                         if json {
                             default_path.push("credentials.json");
                         } else {
