@@ -61,9 +61,58 @@ pub struct ProductResponse {
     pub links: Option<Vec<LinkItem>>,
 }
 
+#[derive(Debug, Clone)]
+pub struct CadFile {
+    pub format: CadFormat,
+    pub url: String,
+    pub key: String, // Original API key like "2-D DWG", "3-D STEP"
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum CadFormat {
+    Dwg,
+    Step,
+    Dxf,
+    Iges,
+    Solidworks,
+    Sat,
+    Edrw,
+    Pdf,
+}
+
+impl CadFormat {
+    fn from_api_key(key: &str) -> Option<Self> {
+        match key {
+            k if k.contains("DWG") => Some(CadFormat::Dwg),
+            k if k.contains("STEP") => Some(CadFormat::Step),
+            k if k.contains("DXF") => Some(CadFormat::Dxf),
+            k if k.contains("IGES") => Some(CadFormat::Iges),
+            k if k.contains("SLDPRT") || k.contains("SLDDRW") || k.contains("Solidworks") => Some(CadFormat::Solidworks),
+            k if k.contains("SAT") => Some(CadFormat::Sat),
+            k if k.contains("EDRW") => Some(CadFormat::Edrw),
+            k if k.contains("PDF") => Some(CadFormat::Pdf),
+            _ => None,
+        }
+    }
+    
+    fn matches_filter(&self, filter: &str) -> bool {
+        match filter {
+            "dwg" => matches!(self, CadFormat::Dwg),
+            "step" => matches!(self, CadFormat::Step),
+            "dxf" => matches!(self, CadFormat::Dxf),
+            "iges" => matches!(self, CadFormat::Iges),
+            "solidworks" => matches!(self, CadFormat::Solidworks),
+            "sat" => matches!(self, CadFormat::Sat),
+            "edrw" => matches!(self, CadFormat::Edrw),
+            "pdf" => matches!(self, CadFormat::Pdf),
+            _ => false,
+        }
+    }
+}
+
 pub struct ProductLinks {
     pub images: Vec<String>,
-    pub cad: Vec<String>,
+    pub cad: Vec<CadFile>,
     pub datasheets: Vec<String>,
 }
 
@@ -674,10 +723,14 @@ certificate_password = "certificate_password"
                 for link in link_items {
                     match link.key.as_str() {
                         "Image" => images.push(link.value),
-                        key if key.contains("DWG") || key.contains("STEP") || key.contains("DXF") || 
-                              key.contains("EDRW") || key.contains("SLDDRW") || key.contains("IGES") || 
-                              key.contains("SAT") || key.contains("SLDPRT") || key.contains("Solidworks") => {
-                            cad.push(link.value)
+                        key if CadFormat::from_api_key(key).is_some() => {
+                            if let Some(format) = CadFormat::from_api_key(key) {
+                                cad.push(CadFile {
+                                    format,
+                                    url: link.value,
+                                    key: link.key,
+                                });
+                            }
                         },
                         "Datasheet" | "Data Sheet" => datasheets.push(link.value),
                         _ => {} // Ignore other link types like "Price", "ProductDetail"
@@ -731,10 +784,14 @@ certificate_password = "certificate_password"
                         for link in link_items {
                             match link.key.as_str() {
                                 "Image" => images.push(link.value),
-                                key if key.contains("DWG") || key.contains("STEP") || key.contains("DXF") || 
-                                      key.contains("EDRW") || key.contains("SLDDRW") || key.contains("IGES") || 
-                                      key.contains("SAT") || key.contains("SLDPRT") || key.contains("Solidworks") => {
-                                    cad.push(link.value)
+                                key if CadFormat::from_api_key(key).is_some() => {
+                                    if let Some(format) = CadFormat::from_api_key(key) {
+                                        cad.push(CadFile {
+                                            format,
+                                            url: link.value,
+                                            key: link.key,
+                                        });
+                                    }
                                 },
                                 "Datasheet" | "Data Sheet" => datasheets.push(link.value),
                                 _ => {} // Ignore other link types like "Price", "ProductDetail"
@@ -879,7 +936,7 @@ certificate_password = "certificate_password"
         Ok(())
     }
 
-    pub async fn download_cad(&self, product: &str, output_dir: Option<&str>) -> Result<()> {
+    pub async fn download_cad(&self, product: &str, output_dir: Option<&str>, formats: &[&str], download_all: bool) -> Result<()> {
         let links = self.get_product_links(product).await?;
         
         let output_path = if let Some(dir) = output_dir {
@@ -895,18 +952,43 @@ certificate_password = "certificate_password"
             return Ok(());
         }
         
-        println!("Found {} CAD file(s) for product {}", links.cad.len(), product);
+        // Filter CAD files based on requested formats
+        let files_to_download: Vec<&CadFile> = if download_all {
+            links.cad.iter().collect()
+        } else {
+            links.cad.iter()
+                .filter(|cad_file| formats.iter().any(|&format| cad_file.format.matches_filter(format)))
+                .collect()
+        };
+        
+        if files_to_download.is_empty() {
+            if !download_all {
+                println!("No CAD files found matching the requested formats: {}", formats.join(", "));
+                println!("Available formats for product {}: {:?}", product, 
+                    links.cad.iter().map(|f| &f.key).collect::<Vec<_>>());
+            }
+            return Ok(());
+        }
+        
+        if !download_all && !formats.is_empty() {
+            println!("Found {} CAD file(s) matching requested formats [{}] for product {}", 
+                files_to_download.len(), formats.join(", "), product);
+        } else {
+            println!("Found {} CAD file(s) for product {}", files_to_download.len(), product);
+        }
         
         let mut downloaded = 0;
-        for cad_path in &links.cad {
-            match self.download_asset(cad_path, &output_path, product).await {
-                Ok(_) => downloaded += 1,
-                Err(e) => println!("⚠️  Failed to download CAD file: {}", e),
+        for cad_file in files_to_download {
+            match self.download_asset(&cad_file.url, &output_path, product).await {
+                Ok(filename) => {
+                    println!("  📁 {} ({})", filename, cad_file.key);
+                    downloaded += 1;
+                }
+                Err(e) => println!("⚠️  Failed to download {}: {}", cad_file.key, e),
             }
         }
         
-        println!("\n✅ Downloaded {}/{} CAD files to: {}", 
-            downloaded, links.cad.len(), output_path.display());
+        println!("\n✅ Downloaded {} CAD files to: {}", downloaded, output_path.display());
         
         Ok(())
     }

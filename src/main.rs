@@ -91,6 +91,33 @@ enum Commands {
         /// Output directory (default: ~/Downloads/mmc/{product}/cad/)
         #[arg(short, long)]
         output: Option<String>,
+        /// Download DWG files
+        #[arg(long)]
+        dwg: bool,
+        /// Download STEP files
+        #[arg(long)]
+        step: bool,
+        /// Download DXF files
+        #[arg(long)]
+        dxf: bool,
+        /// Download IGES files
+        #[arg(long)]
+        iges: bool,
+        /// Download SolidWorks files (SLDPRT, SLDDRW)
+        #[arg(long)]
+        solidworks: bool,
+        /// Download SAT files
+        #[arg(long)]
+        sat: bool,
+        /// Download EDRW files
+        #[arg(long)]
+        edrw: bool,
+        /// Download PDF files
+        #[arg(long)]
+        pdf: bool,
+        /// Download all available CAD formats (default if no specific formats specified)
+        #[arg(long)]
+        all: bool,
     },
     /// Download product datasheets
     Datasheet {
@@ -299,8 +326,22 @@ async fn main() -> Result<()> {
         Commands::Image { product, output } => {
             client.download_images(&product, output.as_deref()).await?;
         }
-        Commands::Cad { product, output } => {
-            client.download_cad(&product, output.as_deref()).await?;
+        Commands::Cad { product, output, dwg, step, dxf, iges, solidworks, sat, edrw, pdf, all } => {
+            // Collect selected formats
+            let mut formats = Vec::new();
+            if dwg { formats.push("dwg"); }
+            if step { formats.push("step"); }
+            if dxf { formats.push("dxf"); }
+            if iges { formats.push("iges"); }
+            if solidworks { formats.push("solidworks"); }
+            if sat { formats.push("sat"); }
+            if edrw { formats.push("edrw"); }
+            if pdf { formats.push("pdf"); }
+            
+            // If no specific formats selected or --all is specified, download all
+            let download_all = all || formats.is_empty();
+            
+            client.download_cad(&product, output.as_deref(), &formats, download_all).await?;
         }
         Commands::Datasheet { product, output } => {
             client.download_datasheets(&product, output.as_deref()).await?;
