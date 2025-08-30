@@ -154,6 +154,11 @@ enum Commands {
         #[arg(short, long)]
         output: Option<String>,
     },
+    /// Generate human-readable name for product
+    Name {
+        /// Product number
+        product: String,
+    },
 }
 
 async fn load_credentials_from_file(path: &str) -> Result<Credentials> {
@@ -391,6 +396,9 @@ async fn main() -> Result<()> {
         }
         Commands::Datasheet { product, output } => {
             client.download_datasheets(&product, output.as_deref()).await?;
+        }
+        Commands::Name { product } => {
+            client.generate_name(&product).await?;
         }
     }
 

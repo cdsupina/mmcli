@@ -8,6 +8,7 @@ use tokio::io::AsyncWriteExt;
 use native_tls::{Identity, TlsConnector};
 use std::fs as std_fs;
 use std::io::{self, Write};
+use std::collections::HashMap;
 use crate::OutputFormat;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -77,6 +78,202 @@ impl ProductField {
                 }
             })
             .collect()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct NamingTemplate {
+    pub prefix: String,                           // BHCS, FW, BB
+    pub key_specs: Vec<String>,                  // ["Material", "Thread Size", "Length"]
+    pub spec_abbreviations: HashMap<String, String>, // "316 Stainless Steel" -> "SS316"
+}
+
+pub struct NameGenerator {
+    category_templates: HashMap<String, NamingTemplate>,
+}
+
+impl NameGenerator {
+    pub fn new() -> Self {
+        let mut generator = NameGenerator {
+            category_templates: HashMap::new(),
+        };
+        generator.init_templates();
+        generator
+    }
+
+    fn init_templates(&mut self) {
+        // Initialize screw templates
+        let mut screw_abbrevs = HashMap::new();
+        
+        // Material abbreviations
+        screw_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
+        screw_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
+        screw_abbrevs.insert("Steel".to_string(), "Steel".to_string());
+        screw_abbrevs.insert("Brass".to_string(), "Brass".to_string());
+        screw_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
+        
+        // Drive style abbreviations
+        screw_abbrevs.insert("Hex".to_string(), "HEX".to_string());
+        screw_abbrevs.insert("Phillips".to_string(), "PH".to_string());
+        screw_abbrevs.insert("Torx".to_string(), "TX".to_string());
+        screw_abbrevs.insert("Slotted".to_string(), "SL".to_string());
+        
+        // Button Head Cap Screw template
+        let bhcs_template = NamingTemplate {
+            prefix: "BHCS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        
+        self.category_templates.insert("button_head_screw".to_string(), bhcs_template);
+        
+        // Flat Head Cap Screw template
+        let fhcs_template = NamingTemplate {
+            prefix: "FHCS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("flat_head_screw".to_string(), fhcs_template);
+        
+        // Socket Head Cap Screw template
+        let shcs_template = NamingTemplate {
+            prefix: "SHCS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("socket_head_screw".to_string(), shcs_template);
+        
+        // Generic screw template
+        let generic_screw_template = NamingTemplate {
+            prefix: "SCREW".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("generic_screw".to_string(), generic_screw_template);
+        
+        // Washer template
+        let mut washer_abbrevs = HashMap::new();
+        washer_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
+        washer_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
+        washer_abbrevs.insert("Steel".to_string(), "Steel".to_string());
+        washer_abbrevs.insert("Brass".to_string(), "Brass".to_string());
+        
+        let washer_template = NamingTemplate {
+            prefix: "WASHER".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Inside Diameter".to_string(),
+                "Outside Diameter".to_string(),
+            ],
+            spec_abbreviations: washer_abbrevs,
+        };
+        self.category_templates.insert("washer".to_string(), washer_template);
+    }
+
+    pub fn generate_name(&self, product: &ProductDetail) -> String {
+        // Determine category/template based on product data
+        let template_key = self.determine_category(product);
+        
+        if let Some(template) = self.category_templates.get(&template_key) {
+            self.apply_template(product, template)
+        } else {
+            // Fallback to basic naming if no template matches
+            self.generate_fallback_name(product)
+        }
+    }
+
+    fn determine_category(&self, product: &ProductDetail) -> String {
+        let family_lower = product.family_description.to_lowercase();
+        let category_lower = product.product_category.to_lowercase();
+        let _detail_lower = product.detail_description.to_lowercase();
+        
+        // Check for specific screw types
+        if family_lower.contains("button head") && family_lower.contains("screw") {
+            "button_head_screw".to_string()
+        } else if family_lower.contains("flat head") && family_lower.contains("screw") {
+            "flat_head_screw".to_string()
+        } else if family_lower.contains("socket head") && family_lower.contains("screw") {
+            "socket_head_screw".to_string()
+        } else if category_lower.contains("screw") || family_lower.contains("screw") {
+            "generic_screw".to_string()
+        } else if category_lower.contains("washer") || family_lower.contains("washer") {
+            "washer".to_string()
+        } else {
+            "unknown".to_string()
+        }
+    }
+
+    fn apply_template(&self, product: &ProductDetail, template: &NamingTemplate) -> String {
+        let mut name_parts = vec![template.prefix.clone()];
+        
+        for spec_name in &template.key_specs {
+            if let Some(spec) = product.specifications.iter()
+                .find(|s| s.attribute.eq_ignore_ascii_case(spec_name)) {
+                
+                let value = spec.values.first().unwrap_or(&"".to_string()).clone();
+                
+                // Apply abbreviation if available
+                let abbreviated = template.spec_abbreviations.get(&value)
+                    .cloned()
+                    .unwrap_or_else(|| self.abbreviate_value(&value));
+                
+                if !abbreviated.is_empty() {
+                    name_parts.push(abbreviated);
+                }
+            }
+        }
+        
+        name_parts.join("-")
+    }
+
+    fn abbreviate_value(&self, value: &str) -> String {
+        // Handle common dimension formats
+        if value.contains("\"") {
+            // Convert fractions to decimals for consistency
+            if value == "1/4\"" {
+                return "0.25".to_string();
+            } else if value == "1/2\"" {
+                return "0.5".to_string();
+            } else if value == "3/4\"" {
+                return "0.75".to_string();
+            }
+            // Remove quotes and return
+            value.replace("\"", "").to_string()
+        } else {
+            // Return as-is for thread sizes and other values
+            value.to_string()
+        }
+    }
+
+    fn generate_fallback_name(&self, product: &ProductDetail) -> String {
+        // Simple fallback based on family description
+        let family_words: Vec<&str> = product.family_description
+            .split_whitespace()
+            .take(3)
+            .collect();
+        
+        format!("{}-{}", 
+            family_words.join("-").to_uppercase(),
+            product.part_number)
     }
 }
 
@@ -236,6 +433,7 @@ pub struct McmasterClient {
     token: Option<String>,
     credentials: Option<Credentials>,
     quiet_mode: bool, // For suppressing output when in JSON mode
+    name_generator: NameGenerator,
 }
 
 impl McmasterClient {
@@ -315,6 +513,7 @@ impl McmasterClient {
             token: None,
             credentials,
             quiet_mode: quiet,
+            name_generator: NameGenerator::new(),
         })
     }
 
@@ -1227,6 +1426,42 @@ certificate_password = "certificate_password"
         }
         
         Ok(serde_json::Value::Object(json_obj))
+    }
+
+    pub async fn generate_name(&self, product: &str) -> Result<()> {
+        self.ensure_authenticated()?;
+        
+        let url = format!("{}/v1/products/{}", BASE_URL, product);
+        let response = self
+            .client
+            .get(&url)
+            .bearer_auth(self.token.as_ref().unwrap())
+            .send()
+            .await
+            .context("Failed to get product")?;
+
+        if response.status().is_success() {
+            let response_text = response.text().await.context("Failed to get response text")?;
+            
+            if let Ok(product_detail) = serde_json::from_str::<ProductDetail>(&response_text) {
+                let human_name = self.name_generator.generate_name(&product_detail);
+                println!("{}", human_name);
+            } else {
+                return Err(anyhow::anyhow!("Failed to parse product data for name generation"));
+            }
+        } else if response.status().as_u16() == 403 {
+            println!("❌ Product {} is not in your subscription.", product);
+            return Err(anyhow::anyhow!("Product not in subscription. Add it first with: mmc add {}", product));
+        } else {
+            let status = response.status();
+            let error_text = response.text().await.unwrap_or_default();
+            return Err(anyhow::anyhow!(
+                "Failed to get product {}. Status: {}. Response: {}",
+                product, status, error_text
+            ));
+        }
+
+        Ok(())
     }
 
     // Helper method to download a single asset
