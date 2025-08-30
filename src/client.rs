@@ -136,6 +136,30 @@ pub struct PriceInfo {
     pub unit_of_measure: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct ProductDetail {
+    #[serde(rename = "PartNumber")]
+    pub part_number: String,
+    #[serde(rename = "DetailDescription")]
+    pub detail_description: String,
+    #[serde(rename = "FamilyDescription")]
+    pub family_description: String,
+    #[serde(rename = "ProductCategory")]
+    pub product_category: String,
+    #[serde(rename = "ProductStatus")]
+    pub product_status: String,
+    #[serde(rename = "Specifications", default)]
+    pub specifications: Vec<Specification>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Specification {
+    #[serde(rename = "Attribute")]
+    pub attribute: String,
+    #[serde(rename = "Values")]
+    pub values: Vec<String>,
+}
+
 pub struct McmasterClient {
     client: Client,
     token: Option<String>,
@@ -452,12 +476,17 @@ impl McmasterClient {
             .context("Failed to get product")?;
 
         if response.status().is_success() {
-            let product_data: serde_json::Value = response
-                .json()
-                .await
-                .context("Failed to parse product response")?;
+            let response_text = response.text().await.context("Failed to get response text")?;
             
-            println!("{}", serde_json::to_string_pretty(&product_data)?);
+            // Try to parse as structured product data for clean display
+            if let Ok(product_detail) = serde_json::from_str::<ProductDetail>(&response_text) {
+                println!("{}", self.format_product_output(&product_detail));
+            } else {
+                // Fallback to pretty-printed JSON if parsing fails
+                let product_data: serde_json::Value = serde_json::from_str(&response_text)
+                    .context("Failed to parse product response")?;
+                println!("{}", serde_json::to_string_pretty(&product_data)?);
+            }
         } else if response.status().as_u16() == 403 {
             // Product is not in subscription - offer to add it
             println!("❌ Product {} is not in your subscription.", product);
@@ -930,6 +959,40 @@ certificate_password = "certificate_password"
                 println!("   Minimum order: 1 {}", unit.to_lowercase());
             }
         }
+    }
+
+    fn format_product_output(&self, product: &ProductDetail) -> String {
+        let mut output = String::new();
+        
+        // Header with part number and status
+        output.push_str(&format!("🔧 {} ({})\n", product.part_number, product.product_status));
+        
+        // Description
+        output.push_str(&format!("   {}\n", product.detail_description));
+        output.push_str(&format!("   {}\n", product.family_description));
+        output.push_str(&format!("   Category: {}\n", product.product_category));
+        
+        // All specifications
+        if !product.specifications.is_empty() {
+            output.push_str("\n📋 Specifications:\n");
+            
+            // Show important specs first
+            let important_specs = ["Thread Size", "Length", "Material", "Drive Style", "Drive Size", "Head Diameter"];
+            for spec_name in &important_specs {
+                if let Some(spec) = product.specifications.iter().find(|s| s.attribute == *spec_name) {
+                    output.push_str(&format!("   {}: {}\n", spec.attribute, spec.values.join(", ")));
+                }
+            }
+            
+            // Show all remaining specs
+            for spec in &product.specifications {
+                if !important_specs.contains(&spec.attribute.as_str()) {
+                    output.push_str(&format!("   {}: {}\n", spec.attribute, spec.values.join(", ")));
+                }
+            }
+        }
+        
+        output
     }
 
     // Helper method to download a single asset
