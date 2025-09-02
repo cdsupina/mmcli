@@ -151,17 +151,246 @@ mmc remove 90128a211
 ### Product Information
 
 ```bash
-# Get detailed product information
-mmc product 90128a211
+# Get detailed product information (human-friendly)
+mmc info 98164A133
 
-# Get product pricing
-mmc price 90128a211
+# Get product information in JSON format (scriptable)
+mmc info 98164A133 --output json
+
+# Get specific fields only
+mmc info 98164A133 --fields part-number,material,thread-size
+
+# Get product pricing (human-friendly)
+mmc price 98164A133
+
+# Get pricing in JSON format
+mmc price 98164A133 --output json
+
+# Generate human-readable part name
+mmc name 98164A133
 
 # List recent changes (requires start date)
 mmc changes -s "01/01/2024"
 
 # List changes from a specific date with time
 mmc changes -s "08/20/2025 10:30"
+```
+
+## Name Generation
+
+McMaster-Carr CLI can generate human-readable, abbreviated technical names for parts. This makes parts easier to remember, communicate, and use in BOMs or CAD systems.
+
+### Usage
+
+```bash
+# Generate abbreviated technical name for any part
+mmc name 98164A133
+# Output: BHS-SS316-8x32-0.25-HEX
+
+mmc name 90480A005  
+# Output: HN-S-4x40-ZP
+```
+
+### Supported Categories
+
+#### Screws & Bolts
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Button Head Screw | `BHS-[Material]-[Thread]-[Length]-[Drive]-[Finish]` | 316 SS Button Head Hex, 8x32 x 0.25" | `BHS-SS316-8x32-0.25-HEX` |
+| Socket Head Screw | `SHS-[Material]-[Thread]-[Length]-[Drive]-[Finish]` | Steel Socket Head Hex, 1/4x20 x 1" | `SHS-Steel-1/4x20-1-HEX` |
+| Flat Head Screw | `FHS-[Material]-[Thread]-[Length]-[Drive]-[Finish]` | 18-8 SS Flat Head Phillips, M6x1.0 x 20mm | `FHS-SS188-M6x1.0-20-PH` |
+| Pan Head Screw | `PHS-[Material]-[Thread]-[Length]-[Drive]-[Finish]` | Brass Pan Head Phillips, 6x32 x 0.5" | `PHS-Brass-6x32-0.5-PH` |
+| Hex Head Screw | `HHS-[Material]-[Thread]-[Length]-[Drive]-[Finish]` | SS Hex Head Screw, 1/4x20 x 1" | `HHS-SS-1/4x20-1-EHEX` |
+| Rounded Head Screw | `RHS-[Material]-[Thread]-[Length]-[Drive]-[Finish]` | Steel Rounded Head Phillips, 8x32 x 0.5" | `RHS-Steel-8x32-0.5-PH` |
+| Thumb Screw | `THUMB-[Material]-[Thread]-[Length]-[Finish]` | Brass Thumb Screw, M6x1.0 x 20mm | `THUMB-Brass-M6x1.0-20` |
+| Eye Screw | `EYE-[Material]-[Thread]-[Length]-[Finish]` | Steel Eye Screw, 1/4x20 x 2" | `EYE-Steel-1/4x20-2` |
+| Hook Screw | `HOOK-[Material]-[Thread]-[Length]-[Finish]` | SS Hook Screw, 8x32 x 1" | `HOOK-SS-8x32-1` |
+
+*Note: Supports 20+ head types including T-Handle, Pentagon, Oval, Square, Knob, Ring, and specialty types. See code for complete list.*
+
+| Generic Screw | `SCREW-[Material]-[Thread]-[Length]` | Brass Machine Screw, 6x32 x 0.5" | `SCREW-Brass-6x32-0.5` |
+
+#### Nuts
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Locknut | `LN-[Material]-[Thread]-[Finish]` | 18-8 SS Nylon-Insert Locknut, 4x40 | `LN-SS188-4x40` |
+| Hex Nut | `HN-[Material]-[Thread]-[Finish]` | 316 SS Hex Nut, 1/4x20, Zinc-Plated | `HN-SS316-1/4x20-ZP` |
+| Wing Nut | `WN-[Material]-[Thread]-[Finish]` | Brass Wing Nut, 8x32 | `WN-Brass-8x32` |
+| Cap Nut | `CN-[Material]-[Thread]-[Finish]` | SS Cap Nut, M8x1.25 | `CN-SS-M8x1.25` |
+| Generic Nut | `N-[Material]-[Thread]-[Finish]` | Steel Nut, 5/16x18 | `N-S-5/16x18` |
+
+*Note: Supports 36+ nut types including Flange (FN), Socket (SN), Speed (SPEEDN), Square (SQN), and 11 specialized locking nut types. See code for complete list.*
+
+#### Washers
+
+McMaster-Carr CLI supports 19 different washer types with specific naming patterns:
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Cup Washer | `CW-[Material]-[Screw Size]-[Finish]` | 316 SS Cup Washer for 1/4" Screws | `CW-SS316-1/4` |
+| Curved Washer | `CRVW-[Material]-[Screw Size]-[Finish]` | Steel Curved Washer for 8x32 | `CRVW-Steel-8x32` |
+| Dished Washer | `DW-[Material]-[Screw Size]-[Finish]` | Brass Dished Washer for M6 | `DW-Brass-M6` |
+| Domed Washer | `DMW-[Material]-[Screw Size]-[Finish]` | 18-8 SS Domed Washer for 1/4x20 | `DMW-SS188-1/4x20` |
+| Double Clipped Washer | `DCW-[Material]-[Screw Size]-[Finish]` | Steel Double Clipped for #10 | `DCW-Steel-10` |
+| Clipped Washer | `CLW-[Material]-[Screw Size]-[Finish]` | Steel Clipped Washer for 5/16" | `CLW-Steel-5/16` |
+| Flat Washer | `FW-[Material]-[Screw Size]-[Finish]` | 316 SS Flat Washer for 1/4" | `FW-SS316-1/4` |
+| Hillside Washer | `HW-[Material]-[Screw Size]-[Finish]` | Steel Hillside Washer for M8 | `HW-Steel-M8` |
+| Notched Washer | `NW-[Material]-[Screw Size]-[Finish]` | Aluminum Notched Washer for 6x32 | `NW-Al-6x32` |
+| Perforated Washer | `PW-[Material]-[Screw Size]-[Finish]` | SS Perforated Washer for 1/2" | `PW-SS-1/2` |
+| Pronged Washer | `PRW-[Material]-[Screw Size]-[Finish]` | Steel Pronged Washer for M5 | `PRW-Steel-M5` |
+| Rectangular Washer | `RW-[Material]-[Screw Size]-[Finish]` | Nylon Rectangular for 10x24 | `RW-Nylon-10x24` |
+| Sleeve Washer | `SW-[Material]-[Screw Size]-[Finish]` | Brass Sleeve Washer for 1/4" | `SW-Brass-1/4` |
+| Slotted Washer | `SLW-[Material]-[Screw Size]-[Finish]` | SS Slotted Washer for M6 | `SLW-SS-M6` |
+| Spherical Washer | `SPW-[Material]-[Screw Size]-[Finish]` | Steel Spherical for 5/16" | `SPW-Steel-5/16` |
+| Split Washer (Lock) | `SPLW-[Material]-[Screw Size]-[Finish]` | 18-8 SS Split Lock for 8x32 | `SPLW-SS188-8x32` |
+| Square Washer | `SQW-[Material]-[Screw Size]-[Finish]` | Steel Square Washer for M8 | `SQW-Steel-M8` |
+| Tab Washer | `TW-[Material]-[Screw Size]-[Finish]` | SS Tab Washer for 1/4x20 | `TW-SS-1/4x20` |
+| Tapered Washer | `TPW-[Material]-[Screw Size]-[Finish]` | Steel Tapered for 3/8" | `TPW-Steel-3/8` |
+| Tooth Washer | `TOW-[Material]-[Screw Size]-[Finish]` | SS Tooth Lock Washer for M10 | `TOW-SS-M10` |
+| Wave Washer | `WW-[Material]-[Screw Size]-[Finish]` | Spring Steel Wave for 1/4" | `WW-Steel-1/4` |
+| Wedge Washer | `WDW-[Material]-[Screw Size]-[Finish]` | Steel Wedge Washer for M12 | `WDW-Steel-M12` |
+
+*Note: The system automatically detects washer type from the family description and applies the appropriate template. If no specific type is detected, it defaults to flat washer naming.*
+
+#### Threaded Standoffs
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Male-Female Standoff | `MFSO-[Material]-[Thread]-[Length]-[Finish]` | SS Male-Female Standoff, 4x40 x 0.5" | `MFSO-SS-4x40-0.5` |
+| Female Standoff | `FSO-[Material]-[Thread]-[Length]-[Finish]` | Brass Female Standoff, M6x1.0 x 25mm | `FSO-Brass-M6x1.0-25` |
+| Standoff (Generic) | `SO-[Material]-[Thread]-[Length]-[Finish]` | Aluminum Threaded Standoff, 8x32 x 0.75" | `SO-Al-8x32-0.75` |
+
+*Note: Supports various standoff configurations including male-female, female-only, and specialized types for electronics and mechanical assemblies.*
+
+#### Bearings
+
+McMaster-Carr CLI provides comprehensive bearing support with specialized naming for different bearing types:
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Flanged Sleeve Bearing | `FSB-[Material]-[Shaft Diameter]-[OD]-[Length]` | MDS-Filled Nylon, 1/4" shaft, 3/8" OD, 1/4" long | `FSB-MDSNYL-0.25-0.375-0.25` |
+| Plain Sleeve Bearing | `SB-[Material]-[Shaft Diameter]-[OD]-[Length]` | Bronze SAE 841, 3/8" shaft, 1/2" OD, 1/2" long | `SB-BR841-0.375-0.5-0.5` |
+| Flanged Bearing (generic) | `FB-[Material]-[Shaft Diameter]-[OD]-[Length]` | Steel flanged bearing, 1/2" shaft, 5/8" OD | `FB-STL-0.5-0.625-0.5` |
+| Ball Bearing | `BB-[Material]-[Bore]-[OD]` | Stainless steel ball bearing, 6mm bore, 19mm OD | `BB-SS-6-19` |
+| Linear Bearing | `LB-[Material]-[Shaft Diameter]-[Length]` | Steel linear bearing for 3/8" shaft, 2" long | `LB-STL-0.375-2` |
+| Needle Bearing | `NB-[Material]-[Bore]-[OD]-[Length]` | Steel needle bearing, 1/4" bore, 3/8" OD | `NB-STL-0.25-0.375-0.5` |
+| Roller Bearing | `RB-[Material]-[Bore]-[OD]-[Length]` | Bronze roller bearing, 20mm bore, 35mm OD | `RB-BR-20-35-12` |
+| Generic Bearing | `BRG-[Material]-[Type]` | PTFE bearing assembly | `BRG-PTFE-ASSEMBLY` |
+
+**Special Features:**
+- **Automatic Material Detection**: Combines filler materials (e.g., MDS-Filled Nylon)
+- **Dimension Conversion**: Fractions automatically converted to decimals (1/4" → 0.25)
+- **Metric Support**: Handles both imperial and metric dimensions
+- **Comprehensive Coverage**: Supports plain, flanged, ball, linear, needle, and roller bearings
+
+**Bearing Material Abbreviations:**
+
+| Full Name | Abbreviation | Applications |
+|-----------|--------------|-------------|
+| MDS-Filled Nylon Plastic | `MDSNYL` | Dry-running, self-lubricating applications |
+| Nylon Plastic | `NYL` | Light-duty, corrosion-resistant |
+| Bronze SAE 841 | `BR841` | Oil-impregnated, general purpose |
+| Bronze SAE 863 | `BR863` | High-load applications |
+| Cast Bronze | `CB` | Heavy-duty applications |
+| Oil-Filled Bronze | `OFB` | Self-lubricating bronze |
+| PTFE | `PTFE` | Chemical resistance, low friction |
+| Rulon | `RUL` | Dry-running plastic bearing |
+| Graphite | `GRAPH` | High-temperature applications |
+| Steel-Backed PTFE | `SBPTFE` | High-load PTFE applications |
+| Bronze (generic) | `BR` | General bronze bearings |
+| Steel | `STL` | High-strength applications |
+| Stainless Steel | `SS` | Corrosion-resistant steel |
+
+*Note: The system automatically detects bearing type from product specifications and applies the appropriate template. Filler materials are automatically combined with base materials for accurate naming.*
+
+#### Material Abbreviations
+
+| Full Name | Abbreviation | Notes |
+|-----------|--------------|-------|
+| 316 Stainless Steel | `SS316` | Marine grade, high corrosion resistance |
+| 18-8 Stainless Steel | `SS188` | Standard grade, good corrosion resistance |
+| Stainless Steel (generic) | `SS` | When specific grade not specified |
+| Grade 1 Steel | `SG1` | Low carbon steel |
+| Grade 2 Steel | `SG2` | Low carbon steel |
+| Grade 5 Steel | `SG5` | Medium carbon steel |
+| Grade 8 Steel | `SG8` | High strength alloy steel |
+| Class 8.8 Steel | `S8.8` | Metric medium strength |
+| Class 10.9 Steel | `S10.9` | Metric high strength |
+| Class 12.9 Steel | `S12.9` | Metric very high strength |
+| Steel (generic) | `S` | Carbon/alloy steel when grade not specified |
+| Brass | `Brass` | Brass alloy |
+| Aluminum | `Al` | Aluminum alloy |
+| Copper | `Cu` | Copper alloy |
+| Nylon | `Nylon` | Nylon plastic |
+| Plastic | `Plastic` | Various plastic materials |
+| Rubber | `Rubber` | Rubber materials |
+
+#### Finish Abbreviations
+
+| Full Name | Abbreviation | Notes |
+|-----------|--------------|-------|
+| Zinc Plated | `ZP` | Standard zinc coating |
+| Zinc Yellow-Chromate Plated | `ZYC` | Zinc with yellow chromate |
+| Black Oxide | `BO` | Black oxide coating |
+| Cadmium Plated | `CD` | Cadmium coating |
+| Nickel Plated | `NI` | Nickel coating |
+| Chrome Plated | `CR` | Chrome coating |
+| Galvanized | `GAL` | Hot-dip galvanized |
+| Passivated | `PASS` | Omitted in names (not meaningful info) |
+
+#### Drive Style Abbreviations
+
+| Full Name | Abbreviation | Notes |
+|-----------|--------------|-------|
+| External Hex | `EHEX` | External hex head |
+| Hex | `HEX` | Internal hex (Allen/socket) |
+| Phillips | `PH` | Phillips head |
+| Torx | `TX` | Standard Torx |
+| Torx Plus | `TXP` | Torx Plus drive |
+| Slotted | `SL` | Flat/slotted drive |
+| Square | `SQUARE` | Robertson/square drive |
+| Tamper-Resistant Hex | `TRHEX` | Security hex |
+| Tamper-Resistant Torx | `TRTX` | Security Torx |
+| Pozidriv® | `PZ` | Pozidriv drive |
+
+*Note: McMaster-Carr supports 40+ drive styles. See code for complete list.*
+
+### Dimension Formatting
+
+- **Imperial Lengths**: Fractions automatically converted to decimals (`1/4"` → `0.25`)
+- **Metric Lengths**: mm suffix removed (`20mm` → `20`)
+- **Thread Sizes**: Use "x" separator for size/pitch (`8-32` → `8x32`, `M3 x 0.50mm` → `M3x0.50`)
+- **Washer Sizes**: Preserve fractions for screw compatibility (`1/4"` → `1/4`)
+- **Quote Marks**: Removed for cleaner names (`"` removed)
+
+### Fallback Naming
+
+For unsupported categories, the system generates fallback names using:
+- Key words from the family description
+- Part number as suffix
+- Example: `BALL-BEARING-STEEL-12345A678`
+
+### Integration Examples
+
+#### BOM Usage
+```csv
+Part Number,Description,Generated Name,Quantity
+98164A133,316 SS Button Head Hex Drive Screw,BHS-SS316-8x32-0.25-HEX,10
+90480A005,Low-Strength Steel Hex Nut,HN-S-4x40-ZP,10
+```
+
+#### Scripting
+```bash
+# Generate names for a list of parts
+for part in 98164A133 90480A005; do
+  echo "$part: $(mmc name $part)"
+done
+
+# Create part name lookup table
+mmc name 98164A133 > part_names.txt
+echo "98164A133 -> $(mmc name 98164A133)"
 ```
 
 ### Session Management

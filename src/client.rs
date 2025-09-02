@@ -8,6 +8,7 @@ use tokio::io::AsyncWriteExt;
 use native_tls::{Identity, TlsConnector};
 use std::fs as std_fs;
 use std::io::{self, Write};
+use std::collections::HashMap;
 use crate::OutputFormat;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -77,6 +78,1940 @@ impl ProductField {
                 }
             })
             .collect()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct NamingTemplate {
+    pub prefix: String,                           // BHCS, FW, BB
+    pub key_specs: Vec<String>,                  // ["Material", "Thread Size", "Length"]
+    pub spec_abbreviations: HashMap<String, String>, // "316 Stainless Steel" -> "SS316"
+}
+
+pub struct NameGenerator {
+    category_templates: HashMap<String, NamingTemplate>,
+}
+
+impl NameGenerator {
+    pub fn new() -> Self {
+        let mut generator = NameGenerator {
+            category_templates: HashMap::new(),
+        };
+        generator.init_templates();
+        generator
+    }
+
+    fn init_templates(&mut self) {
+        // Initialize screw templates
+        let mut screw_abbrevs = HashMap::new();
+        
+        // Material abbreviations
+        screw_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
+        screw_abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
+        screw_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
+        screw_abbrevs.insert("Steel".to_string(), "S".to_string());
+        screw_abbrevs.insert("Alloy Steel".to_string(), "S".to_string());
+        
+        // Steel grade abbreviations
+        screw_abbrevs.insert("Grade 1 Steel".to_string(), "SG1".to_string());
+        screw_abbrevs.insert("Grade 2 Steel".to_string(), "SG2".to_string());
+        screw_abbrevs.insert("Grade 5 Steel".to_string(), "SG5".to_string());
+        screw_abbrevs.insert("Grade 8 Steel".to_string(), "SG8".to_string());
+        screw_abbrevs.insert("8.8 Steel".to_string(), "S8.8".to_string());
+        screw_abbrevs.insert("10.9 Steel".to_string(), "S10.9".to_string());
+        screw_abbrevs.insert("12.9 Steel".to_string(), "S12.9".to_string());
+        
+        // Alloy steel grade abbreviations
+        screw_abbrevs.insert("Grade 1 Alloy Steel".to_string(), "SG1".to_string());
+        screw_abbrevs.insert("Grade 2 Alloy Steel".to_string(), "SG2".to_string());
+        screw_abbrevs.insert("Grade 5 Alloy Steel".to_string(), "SG5".to_string());
+        screw_abbrevs.insert("Grade 8 Alloy Steel".to_string(), "SG8".to_string());
+        screw_abbrevs.insert("8.8 Alloy Steel".to_string(), "S8.8".to_string());
+        screw_abbrevs.insert("10.9 Alloy Steel".to_string(), "S10.9".to_string());
+        screw_abbrevs.insert("12.9 Alloy Steel".to_string(), "S12.9".to_string());
+        screw_abbrevs.insert("Brass".to_string(), "Brass".to_string());
+        screw_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
+        
+        // Finish abbreviations for screws
+        screw_abbrevs.insert("Zinc Plated".to_string(), "ZP".to_string());
+        screw_abbrevs.insert("Zinc-Plated".to_string(), "ZP".to_string());
+        screw_abbrevs.insert("Zinc Yellow-Chromate Plated".to_string(), "ZYC".to_string());
+        screw_abbrevs.insert("Zinc Yellow Chromate Plated".to_string(), "ZYC".to_string());
+        screw_abbrevs.insert("Black Oxide".to_string(), "BO".to_string());
+        screw_abbrevs.insert("Black-Oxide".to_string(), "BO".to_string());
+        screw_abbrevs.insert("Passivated".to_string(), "PASS".to_string());
+        screw_abbrevs.insert("Plain".to_string(), "PLAIN".to_string());
+        screw_abbrevs.insert("Unfinished".to_string(), "UF".to_string());
+        screw_abbrevs.insert("Galvanized".to_string(), "GALV".to_string());
+        screw_abbrevs.insert("Cadmium Plated".to_string(), "CD".to_string());
+        screw_abbrevs.insert("Cadmium-Plated".to_string(), "CD".to_string());
+        screw_abbrevs.insert("Nickel Plated".to_string(), "NI".to_string());
+        screw_abbrevs.insert("Nickel-Plated".to_string(), "NI".to_string());
+        screw_abbrevs.insert("Chrome Plated".to_string(), "CR".to_string());
+        screw_abbrevs.insert("Chrome-Plated".to_string(), "CR".to_string());
+        
+        // Drive style abbreviations (comprehensive list from McMaster-Carr)
+        screw_abbrevs.insert("4-Flute Spline".to_string(), "4FS".to_string());
+        screw_abbrevs.insert("6-Flute Spline".to_string(), "6FS".to_string());
+        screw_abbrevs.insert("Asymmetrical".to_string(), "ASYM".to_string());
+        screw_abbrevs.insert("Clutch".to_string(), "CLUTCH".to_string());
+        screw_abbrevs.insert("Double Square".to_string(), "DSQUARE".to_string());
+        screw_abbrevs.insert("Drilled Spanner".to_string(), "DSPAN".to_string());
+        screw_abbrevs.insert("External 12-Point".to_string(), "EXT12".to_string());
+        screw_abbrevs.insert("External Hex".to_string(), "EHEX".to_string()); // External hex
+        screw_abbrevs.insert("External Pentagon".to_string(), "EPENT".to_string());
+        screw_abbrevs.insert("External Square".to_string(), "ESQUARE".to_string());
+        screw_abbrevs.insert("Frearson".to_string(), "FREAR".to_string());
+        screw_abbrevs.insert("Hex".to_string(), "HEX".to_string()); // Internal hex (socket)
+        screw_abbrevs.insert("Hex with Pilot Recess".to_string(), "HEXPILOT".to_string());
+        screw_abbrevs.insert("Hi-Torque".to_string(), "HITORQUE".to_string());
+        screw_abbrevs.insert("Microstix".to_string(), "MICRO".to_string());
+        screw_abbrevs.insert("Mortorq®".to_string(), "MORTORQ".to_string());
+        screw_abbrevs.insert("Mortorq® Super".to_string(), "MORTORQS".to_string());
+        screw_abbrevs.insert("No Drive".to_string(), "NODRIVE".to_string());
+        screw_abbrevs.insert("One Way".to_string(), "ONEWAY".to_string());
+        screw_abbrevs.insert("Pentagon".to_string(), "PENT".to_string());
+        screw_abbrevs.insert("Pentalobe".to_string(), "PLOBE".to_string());
+        screw_abbrevs.insert("Phillips".to_string(), "PH".to_string());
+        screw_abbrevs.insert("Phillips Terminal Screw".to_string(), "PHTERM".to_string());
+        screw_abbrevs.insert("Pozidriv®".to_string(), "PZ".to_string());
+        screw_abbrevs.insert("Pozidriv® Terminal Screw".to_string(), "PZTERM".to_string());
+        screw_abbrevs.insert("RIBE".to_string(), "RIBE".to_string());
+        screw_abbrevs.insert("Slotted".to_string(), "SL".to_string());
+        screw_abbrevs.insert("Spring Plunger Driver".to_string(), "SPRING".to_string());
+        screw_abbrevs.insert("Square".to_string(), "SQUARE".to_string());
+        screw_abbrevs.insert("Square/Phillips".to_string(), "SQPH".to_string());
+        screw_abbrevs.insert("Tamper-Resistant Hex".to_string(), "TRHEX".to_string());
+        screw_abbrevs.insert("Tamper-Resistant Pentalobe".to_string(), "TRPLOBE".to_string());
+        screw_abbrevs.insert("Tamper-Resistant Phillips".to_string(), "TRPH".to_string());
+        screw_abbrevs.insert("Tamper-Resistant Square".to_string(), "TRSQUARE".to_string());
+        screw_abbrevs.insert("Tamper-Resistant Torx".to_string(), "TRTX".to_string());
+        screw_abbrevs.insert("Tamper-Resistant Torx Plus".to_string(), "TRTXP".to_string());
+        screw_abbrevs.insert("Torq-Set®".to_string(), "TORQSET".to_string());
+        screw_abbrevs.insert("Torx".to_string(), "TX".to_string());
+        screw_abbrevs.insert("Torx Plus".to_string(), "TXP".to_string());
+        screw_abbrevs.insert("Triangle".to_string(), "TRI".to_string());
+        screw_abbrevs.insert("Tri-Groove".to_string(), "TRIGROOVE".to_string());
+        screw_abbrevs.insert("Tri-Lobe".to_string(), "TRILOBE".to_string());
+        screw_abbrevs.insert("Triple Square".to_string(), "TRISQUARE".to_string());
+        screw_abbrevs.insert("Tri-Wing®".to_string(), "TRIWING".to_string());
+        screw_abbrevs.insert("Wrench Flats".to_string(), "WFLATS".to_string());
+        
+        // Button Head Screw template
+        let bhs_template = NamingTemplate {
+            prefix: "BHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        
+        self.category_templates.insert("button_head_screw".to_string(), bhs_template);
+        
+        // Flat Head Screw template
+        let fhs_template = NamingTemplate {
+            prefix: "FHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("flat_head_screw".to_string(), fhs_template);
+        
+        // Flat Head subcategory templates  
+        // Narrow Flat Head Screw
+        let narrow_fhs_template = NamingTemplate {
+            prefix: "NFHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("narrow_flat_head_screw".to_string(), narrow_fhs_template);
+        
+        // Standard Flat Head Screw
+        let standard_fhs_template = NamingTemplate {
+            prefix: "SFHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("standard_flat_head_screw".to_string(), standard_fhs_template);
+        
+        // Undercut Flat Head Screw
+        let undercut_fhs_template = NamingTemplate {
+            prefix: "UFHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("undercut_flat_head_screw".to_string(), undercut_fhs_template);
+        
+        // Wide Flat Head Screw
+        let wide_fhs_template = NamingTemplate {
+            prefix: "WFHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("wide_flat_head_screw".to_string(), wide_fhs_template);
+        
+        // Socket Head Screw template
+        let shs_template = NamingTemplate {
+            prefix: "SHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("socket_head_screw".to_string(), shs_template);
+        
+        // Socket Head subcategory templates
+        // High Socket Head Screw
+        let high_shs_template = NamingTemplate {
+            prefix: "HSHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("high_socket_head_screw".to_string(), high_shs_template);
+        
+        // Low Socket Head Screw  
+        let low_shs_template = NamingTemplate {
+            prefix: "LSHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("low_socket_head_screw".to_string(), low_shs_template);
+        
+        // Ultra Low Socket Head Screw
+        let ultra_low_shs_template = NamingTemplate {
+            prefix: "ULSHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("ultra_low_socket_head_screw".to_string(), ultra_low_shs_template);
+        
+        // Standard Socket Head Screw
+        let standard_shs_template = NamingTemplate {
+            prefix: "SSHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("standard_socket_head_screw".to_string(), standard_shs_template);
+        
+        // Pan Head Screw template
+        let phs_template = NamingTemplate {
+            prefix: "PHS".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+                "Drive Style".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("pan_head_screw".to_string(), phs_template);
+        
+        // Generic screw template
+        let generic_screw_template = NamingTemplate {
+            prefix: "SCREW".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(), 
+                "Length".to_string(),
+            ],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("generic_screw".to_string(), generic_screw_template);
+        
+        // All head type templates
+        // 12-Point Head Screw
+        let twelve_point_template = NamingTemplate {
+            prefix: "12PHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("12_point_head_screw".to_string(), twelve_point_template);
+        
+        // Domed Head Screw
+        let domed_template = NamingTemplate {
+            prefix: "DHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("domed_head_screw".to_string(), domed_template);
+        
+        // Eye Screw
+        let eye_template = NamingTemplate {
+            prefix: "EYE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("eye_screw".to_string(), eye_template);
+        
+        // Headless Screw (Set Screw)
+        let headless_template = NamingTemplate {
+            prefix: "HEADLESS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("headless_screw".to_string(), headless_template);
+        
+        // Hex Head Screw
+        let hex_head_template = NamingTemplate {
+            prefix: "HHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("hex_head_screw".to_string(), hex_head_template);
+        
+        // Hook Screw
+        let hook_template = NamingTemplate {
+            prefix: "HOOK".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("hook_screw".to_string(), hook_template);
+        
+        // Knob Screw
+        let knob_template = NamingTemplate {
+            prefix: "KNOB".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("knob_screw".to_string(), knob_template);
+        
+        // L-Handle Screw
+        let l_handle_template = NamingTemplate {
+            prefix: "LHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("l_handle_screw".to_string(), l_handle_template);
+        
+        // Oval Head Screw
+        let oval_template = NamingTemplate {
+            prefix: "OHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("oval_head_screw".to_string(), oval_template);
+        
+        // Oval Head subcategory templates
+        // Standard Oval Head Screw
+        let standard_oval_template = NamingTemplate {
+            prefix: "SOHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("standard_oval_head_screw".to_string(), standard_oval_template);
+        
+        // Undercut Oval Head Screw
+        let undercut_oval_template = NamingTemplate {
+            prefix: "UOHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("undercut_oval_head_screw".to_string(), undercut_oval_template);
+        
+        // Pentagon Head Screw
+        let pentagon_head_template = NamingTemplate {
+            prefix: "PENTHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("pentagon_head_screw".to_string(), pentagon_head_template);
+        
+        // Ring Screw
+        let ring_template = NamingTemplate {
+            prefix: "RING".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("ring_screw".to_string(), ring_template);
+        
+        // Rounded Head Screw
+        let rounded_template = NamingTemplate {
+            prefix: "RHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("rounded_head_screw".to_string(), rounded_template);
+        
+        // Square Head Screw
+        let square_head_template = NamingTemplate {
+            prefix: "SQHS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("square_head_screw".to_string(), square_head_template);
+        
+        // Tee Screw
+        let tee_template = NamingTemplate {
+            prefix: "TEE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("tee_screw".to_string(), tee_template);
+        
+        // T-Handle Screw
+        let t_handle_template = NamingTemplate {
+            prefix: "THS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("t_handle_screw".to_string(), t_handle_template);
+        
+        // Threaded Screw
+        let threaded_template = NamingTemplate {
+            prefix: "THREADED".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("threaded_screw".to_string(), threaded_template);
+        
+        // Thumb Screw
+        let thumb_template = NamingTemplate {
+            prefix: "THUMB".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("thumb_screw".to_string(), thumb_template);
+        
+        // Thumb Screw subcategory templates
+        // Four Arm Thumb Screw
+        let four_arm_thumb_template = NamingTemplate {
+            prefix: "4ARM".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("four_arm_thumb_screw".to_string(), four_arm_thumb_template);
+        
+        // Hex Thumb Screw
+        let hex_thumb_template = NamingTemplate {
+            prefix: "HEXTHUMB".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("hex_thumb_screw".to_string(), hex_thumb_template);
+        
+        // Multilobe Thumb Screw
+        let multilobe_thumb_template = NamingTemplate {
+            prefix: "MULTILOBE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("multilobe_thumb_screw".to_string(), multilobe_thumb_template);
+        
+        // Rectangle Thumb Screw
+        let rectangle_thumb_template = NamingTemplate {
+            prefix: "RECTTHUMB".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("rectangle_thumb_screw".to_string(), rectangle_thumb_template);
+        
+        // Round Thumb Screw
+        let round_thumb_template = NamingTemplate {
+            prefix: "ROUNDTHUMB".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("round_thumb_screw".to_string(), round_thumb_template);
+        
+        // Spade Thumb Screw
+        let spade_thumb_template = NamingTemplate {
+            prefix: "SPADE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("spade_thumb_screw".to_string(), spade_thumb_template);
+        
+        // Two Arm Thumb Screw
+        let two_arm_thumb_template = NamingTemplate {
+            prefix: "2ARM".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("two_arm_thumb_screw".to_string(), two_arm_thumb_template);
+        
+        // Wing Thumb Screw
+        let wing_thumb_template = NamingTemplate {
+            prefix: "WINGTHUMB".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("wing_thumb_screw".to_string(), wing_thumb_template);
+        
+        // T-Slot Screw
+        let t_slot_template = NamingTemplate {
+            prefix: "TSLOT".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("t_slot_screw".to_string(), t_slot_template);
+        
+        // Rounded head subcategory templates
+        // Binding Head Screw
+        let binding_head_template = NamingTemplate {
+            prefix: "BINDING".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("binding_head_screw".to_string(), binding_head_template);
+        
+        // Carriage Head Screw
+        let carriage_head_template = NamingTemplate {
+            prefix: "CARRIAGE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("carriage_head_screw".to_string(), carriage_head_template);
+        
+        // Cheese Head Screw
+        let cheese_head_template = NamingTemplate {
+            prefix: "CHEESE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("cheese_head_screw".to_string(), cheese_head_template);
+        
+        // Fillister Head Screw
+        let fillister_head_template = NamingTemplate {
+            prefix: "FILLISTER".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("fillister_head_screw".to_string(), fillister_head_template);
+        
+        // Pancake Head Screw
+        let pancake_head_template = NamingTemplate {
+            prefix: "PANCAKE".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("pancake_head_screw".to_string(), pancake_head_template);
+        
+        // Round Head Screw
+        let round_head_template = NamingTemplate {
+            prefix: "ROUND".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("round_head_screw".to_string(), round_head_template);
+        
+        // Truss Head Screw
+        let truss_head_template = NamingTemplate {
+            prefix: "TRUSS".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+            spec_abbreviations: screw_abbrevs.clone(),
+        };
+        self.category_templates.insert("truss_head_screw".to_string(), truss_head_template);
+        
+        // Washer templates - comprehensive support for all washer types
+        let mut washer_abbrevs = HashMap::new();
+        washer_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
+        washer_abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
+        washer_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
+        washer_abbrevs.insert("Steel".to_string(), "S".to_string());
+        washer_abbrevs.insert("Alloy Steel".to_string(), "S".to_string());
+        
+        // Steel grade abbreviations for washers
+        washer_abbrevs.insert("Grade 1 Steel".to_string(), "SG1".to_string());
+        washer_abbrevs.insert("Grade 2 Steel".to_string(), "SG2".to_string());
+        washer_abbrevs.insert("Grade 5 Steel".to_string(), "SG5".to_string());
+        washer_abbrevs.insert("Grade 8 Steel".to_string(), "SG8".to_string());
+        washer_abbrevs.insert("8.8 Steel".to_string(), "S8.8".to_string());
+        washer_abbrevs.insert("10.9 Steel".to_string(), "S10.9".to_string());
+        washer_abbrevs.insert("12.9 Steel".to_string(), "S12.9".to_string());
+        
+        // Alloy steel grade abbreviations for washers
+        washer_abbrevs.insert("Grade 1 Alloy Steel".to_string(), "SG1".to_string());
+        washer_abbrevs.insert("Grade 2 Alloy Steel".to_string(), "SG2".to_string());
+        washer_abbrevs.insert("Grade 5 Alloy Steel".to_string(), "SG5".to_string());
+        washer_abbrevs.insert("Grade 8 Alloy Steel".to_string(), "SG8".to_string());
+        washer_abbrevs.insert("8.8 Alloy Steel".to_string(), "S8.8".to_string());
+        washer_abbrevs.insert("10.9 Alloy Steel".to_string(), "S10.9".to_string());
+        washer_abbrevs.insert("12.9 Alloy Steel".to_string(), "S12.9".to_string());
+        washer_abbrevs.insert("Brass".to_string(), "Brass".to_string());
+        washer_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
+        washer_abbrevs.insert("Copper".to_string(), "Cu".to_string());
+        washer_abbrevs.insert("Nylon".to_string(), "Nylon".to_string());
+        washer_abbrevs.insert("Plastic".to_string(), "Plastic".to_string());
+        washer_abbrevs.insert("Rubber".to_string(), "Rubber".to_string());
+        
+        // Screw size abbreviations for washers
+        washer_abbrevs.insert("No. 0".to_string(), "0".to_string());
+        washer_abbrevs.insert("No. 1".to_string(), "1".to_string());
+        washer_abbrevs.insert("No. 2".to_string(), "2".to_string());
+        washer_abbrevs.insert("No. 3".to_string(), "3".to_string());
+        washer_abbrevs.insert("No. 4".to_string(), "4".to_string());
+        washer_abbrevs.insert("No. 5".to_string(), "5".to_string());
+        washer_abbrevs.insert("No. 6".to_string(), "6".to_string());
+        washer_abbrevs.insert("No. 8".to_string(), "8".to_string());
+        washer_abbrevs.insert("No. 10".to_string(), "10".to_string());
+        washer_abbrevs.insert("No. 12".to_string(), "12".to_string());
+        washer_abbrevs.insert("No. 14".to_string(), "14".to_string());
+        
+        // Finish abbreviations for washers
+        washer_abbrevs.insert("Zinc Plated".to_string(), "ZP".to_string());
+        washer_abbrevs.insert("Zinc Yellow-Chromate Plated".to_string(), "ZYC".to_string());
+        washer_abbrevs.insert("Black Oxide".to_string(), "BO".to_string());
+        washer_abbrevs.insert("Black-Oxide".to_string(), "BO".to_string());
+        washer_abbrevs.insert("Passivated".to_string(), "PASS".to_string());
+        washer_abbrevs.insert("Plain".to_string(), "PLAIN".to_string());
+        washer_abbrevs.insert("Unfinished".to_string(), "UF".to_string());
+        washer_abbrevs.insert("Galvanized".to_string(), "GALV".to_string());
+        washer_abbrevs.insert("Cadmium Plated".to_string(), "CD".to_string());
+        washer_abbrevs.insert("Nickel Plated".to_string(), "NI".to_string());
+        washer_abbrevs.insert("Chrome Plated".to_string(), "CR".to_string());
+        
+        // Cup Washer
+        let cup_washer_template = NamingTemplate {
+            prefix: "CW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("cup_washer".to_string(), cup_washer_template);
+        
+        // Curved Washer
+        let curved_washer_template = NamingTemplate {
+            prefix: "CRVW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("curved_washer".to_string(), curved_washer_template);
+        
+        // Dished Washer
+        let dished_washer_template = NamingTemplate {
+            prefix: "DW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("dished_washer".to_string(), dished_washer_template);
+        
+        // Domed Washer
+        let domed_washer_template = NamingTemplate {
+            prefix: "DMW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("domed_washer".to_string(), domed_washer_template);
+        
+        // Double Clipped Washer
+        let double_clipped_washer_template = NamingTemplate {
+            prefix: "DCW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("double_clipped_washer".to_string(), double_clipped_washer_template);
+        
+        // Clipped Washer (single clipped)
+        let clipped_washer_template = NamingTemplate {
+            prefix: "CLW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("clipped_washer".to_string(), clipped_washer_template);
+        
+        // Flat Washer (default/standard)
+        let flat_washer_template = NamingTemplate {
+            prefix: "FW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("flat_washer".to_string(), flat_washer_template);
+        
+        // Hillside Washer
+        let hillside_washer_template = NamingTemplate {
+            prefix: "HW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("hillside_washer".to_string(), hillside_washer_template);
+        
+        // Notched Washer
+        let notched_washer_template = NamingTemplate {
+            prefix: "NW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("notched_washer".to_string(), notched_washer_template);
+        
+        // Perforated Washer
+        let perforated_washer_template = NamingTemplate {
+            prefix: "PW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("perforated_washer".to_string(), perforated_washer_template);
+        
+        // Pronged Washer
+        let pronged_washer_template = NamingTemplate {
+            prefix: "PRW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("pronged_washer".to_string(), pronged_washer_template);
+        
+        // Rectangular Washer
+        let rectangular_washer_template = NamingTemplate {
+            prefix: "RW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("rectangular_washer".to_string(), rectangular_washer_template);
+        
+        // Sleeve Washer
+        let sleeve_washer_template = NamingTemplate {
+            prefix: "SW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("sleeve_washer".to_string(), sleeve_washer_template);
+        
+        // Slotted Washer
+        let slotted_washer_template = NamingTemplate {
+            prefix: "SLW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("slotted_washer".to_string(), slotted_washer_template);
+        
+        // Spherical Washer
+        let spherical_washer_template = NamingTemplate {
+            prefix: "SPW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("spherical_washer".to_string(), spherical_washer_template);
+        
+        // Split Washer (Lock Washer)
+        let split_washer_template = NamingTemplate {
+            prefix: "SPLW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("split_washer".to_string(), split_washer_template);
+        
+        // Square Washer
+        let square_washer_template = NamingTemplate {
+            prefix: "SQW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("square_washer".to_string(), square_washer_template);
+        
+        // Tab Washer
+        let tab_washer_template = NamingTemplate {
+            prefix: "TW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("tab_washer".to_string(), tab_washer_template);
+        
+        // Tapered Washer
+        let tapered_washer_template = NamingTemplate {
+            prefix: "TPW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("tapered_washer".to_string(), tapered_washer_template);
+        
+        // Tooth Washer
+        let tooth_washer_template = NamingTemplate {
+            prefix: "TOW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("tooth_washer".to_string(), tooth_washer_template);
+        
+        // Wave Washer
+        let wave_washer_template = NamingTemplate {
+            prefix: "WW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("wave_washer".to_string(), wave_washer_template);
+        
+        // Wedge Washer
+        let wedge_washer_template = NamingTemplate {
+            prefix: "WDW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("wedge_washer".to_string(), wedge_washer_template);
+        
+        // Nut templates
+        let mut nut_abbrevs = HashMap::new();
+        nut_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
+        nut_abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
+        nut_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
+        nut_abbrevs.insert("Steel".to_string(), "S".to_string());
+        nut_abbrevs.insert("Alloy Steel".to_string(), "S".to_string());
+        
+        // Steel grade abbreviations for nuts
+        nut_abbrevs.insert("Grade 1 Steel".to_string(), "SG1".to_string());
+        nut_abbrevs.insert("Grade 2 Steel".to_string(), "SG2".to_string());
+        nut_abbrevs.insert("Grade 5 Steel".to_string(), "SG5".to_string());
+        nut_abbrevs.insert("Grade 8 Steel".to_string(), "SG8".to_string());
+        nut_abbrevs.insert("8.8 Steel".to_string(), "S8.8".to_string());
+        nut_abbrevs.insert("10.9 Steel".to_string(), "S10.9".to_string());
+        nut_abbrevs.insert("12.9 Steel".to_string(), "S12.9".to_string());
+        
+        // Alloy steel grade abbreviations for nuts
+        nut_abbrevs.insert("Grade 1 Alloy Steel".to_string(), "SG1".to_string());
+        nut_abbrevs.insert("Grade 2 Alloy Steel".to_string(), "SG2".to_string());
+        nut_abbrevs.insert("Grade 5 Alloy Steel".to_string(), "SG5".to_string());
+        nut_abbrevs.insert("Grade 8 Alloy Steel".to_string(), "SG8".to_string());
+        nut_abbrevs.insert("8.8 Alloy Steel".to_string(), "S8.8".to_string());
+        nut_abbrevs.insert("10.9 Alloy Steel".to_string(), "S10.9".to_string());
+        nut_abbrevs.insert("12.9 Alloy Steel".to_string(), "S12.9".to_string());
+        nut_abbrevs.insert("Brass".to_string(), "Brass".to_string());
+        nut_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
+        
+        // Finish abbreviations for nuts
+        nut_abbrevs.insert("Zinc Plated".to_string(), "ZP".to_string());
+        nut_abbrevs.insert("Zinc-Plated".to_string(), "ZP".to_string());
+        nut_abbrevs.insert("Zinc Yellow-Chromate Plated".to_string(), "ZYC".to_string());
+        nut_abbrevs.insert("Zinc Yellow Chromate Plated".to_string(), "ZYC".to_string());
+        nut_abbrevs.insert("Black Oxide".to_string(), "BO".to_string());
+        nut_abbrevs.insert("Black-Oxide".to_string(), "BO".to_string());
+        nut_abbrevs.insert("Passivated".to_string(), "PASS".to_string());
+        nut_abbrevs.insert("Plain".to_string(), "PLAIN".to_string());
+        nut_abbrevs.insert("Unfinished".to_string(), "UF".to_string());
+        nut_abbrevs.insert("Galvanized".to_string(), "GALV".to_string());
+        nut_abbrevs.insert("Cadmium Plated".to_string(), "CD".to_string());
+        nut_abbrevs.insert("Cadmium-Plated".to_string(), "CD".to_string());
+        nut_abbrevs.insert("Nickel Plated".to_string(), "NI".to_string());
+        nut_abbrevs.insert("Nickel-Plated".to_string(), "NI".to_string());
+        nut_abbrevs.insert("Chrome Plated".to_string(), "CR".to_string());
+        nut_abbrevs.insert("Chrome-Plated".to_string(), "CR".to_string());
+        
+        // Locknut template (nylon-insert, prevailing torque, etc.)
+        let locknut_template = NamingTemplate {
+            prefix: "LN".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("locknut".to_string(), locknut_template);
+        
+        // Hex nut template
+        let hex_nut_template = NamingTemplate {
+            prefix: "HN".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("hex_nut".to_string(), hex_nut_template);
+        
+        // Wing nut template
+        let wing_nut_template = NamingTemplate {
+            prefix: "WN".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("wing_nut".to_string(), wing_nut_template);
+        
+        // Cap nut template
+        let cap_nut_template = NamingTemplate {
+            prefix: "CN".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("cap_nut".to_string(), cap_nut_template);
+        
+        // Generic nut template
+        let generic_nut_template = NamingTemplate {
+            prefix: "N".to_string(),
+            key_specs: vec![
+                "Material".to_string(),
+                "Thread Size".to_string(),
+                "Finish".to_string(),
+            ],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("generic_nut".to_string(), generic_nut_template);
+        
+        // Comprehensive nut type templates
+        
+        // Adhesive Mount Nut
+        let adhesive_mount_nut_template = NamingTemplate {
+            prefix: "AMN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("adhesive_mount_nut".to_string(), adhesive_mount_nut_template);
+        
+        // Clip On Nut
+        let clip_on_nut_template = NamingTemplate {
+            prefix: "CON".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("clip_on_nut".to_string(), clip_on_nut_template);
+        
+        // Coupling Nut
+        let coupling_nut_template = NamingTemplate {
+            prefix: "COUP".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("coupling_nut".to_string(), coupling_nut_template);
+        
+        // Dowel Nut
+        let dowel_nut_template = NamingTemplate {
+            prefix: "DN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("dowel_nut".to_string(), dowel_nut_template);
+        
+        // Externally Threaded Nut
+        let ext_threaded_nut_template = NamingTemplate {
+            prefix: "ETN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("externally_threaded_nut".to_string(), ext_threaded_nut_template);
+        
+        // Flange Nut
+        let flange_nut_template = NamingTemplate {
+            prefix: "FN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("flange_nut".to_string(), flange_nut_template);
+        
+        // Panel Nut
+        let panel_nut_template = NamingTemplate {
+            prefix: "PN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("panel_nut".to_string(), panel_nut_template);
+        
+        // Press Fit Nut
+        let press_fit_nut_template = NamingTemplate {
+            prefix: "PFN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("press_fit_nut".to_string(), press_fit_nut_template);
+        
+        // Push Button Nut
+        let push_button_nut_template = NamingTemplate {
+            prefix: "PBN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("push_button_nut".to_string(), push_button_nut_template);
+        
+        // Push Nut
+        let push_nut_template = NamingTemplate {
+            prefix: "PUSHN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("push_nut".to_string(), push_nut_template);
+        
+        // Rivet Mount Nut
+        let rivet_mount_nut_template = NamingTemplate {
+            prefix: "RMN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("rivet_mount_nut".to_string(), rivet_mount_nut_template);
+        
+        // Rivet Nut
+        let rivet_nut_template = NamingTemplate {
+            prefix: "RN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("rivet_nut".to_string(), rivet_nut_template);
+        
+        // Round Nut
+        let round_nut_template = NamingTemplate {
+            prefix: "ROUNDN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("round_nut".to_string(), round_nut_template);
+        
+        // Screw Mount Nut
+        let screw_mount_nut_template = NamingTemplate {
+            prefix: "SMN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("screw_mount_nut".to_string(), screw_mount_nut_template);
+        
+        // Snap In Nut
+        let snap_in_nut_template = NamingTemplate {
+            prefix: "SIN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("snap_in_nut".to_string(), snap_in_nut_template);
+        
+        // Socket Nut
+        let socket_nut_template = NamingTemplate {
+            prefix: "SN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("socket_nut".to_string(), socket_nut_template);
+        
+        // Speed Nut
+        let speed_nut_template = NamingTemplate {
+            prefix: "SPEEDN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("speed_nut".to_string(), speed_nut_template);
+        
+        // Square Nut
+        let square_nut_template = NamingTemplate {
+            prefix: "SQN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("square_nut".to_string(), square_nut_template);
+        
+        // Tamper Resistant Nut
+        let tamper_resistant_nut_template = NamingTemplate {
+            prefix: "TRN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("tamper_resistant_nut".to_string(), tamper_resistant_nut_template);
+        
+        // Threadless Nut
+        let threadless_nut_template = NamingTemplate {
+            prefix: "TLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("threadless_nut".to_string(), threadless_nut_template);
+        
+        // Thumb Nut
+        let thumb_nut_template = NamingTemplate {
+            prefix: "THUMBN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("thumb_nut".to_string(), thumb_nut_template);
+        
+        // Tube End Nut
+        let tube_end_nut_template = NamingTemplate {
+            prefix: "TEN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("tube_end_nut".to_string(), tube_end_nut_template);
+        
+        // Twist Close Nut
+        let twist_close_nut_template = NamingTemplate {
+            prefix: "TCN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("twist_close_nut".to_string(), twist_close_nut_template);
+        
+        // Weld Nut
+        let weld_nut_template = NamingTemplate {
+            prefix: "WELD".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("weld_nut".to_string(), weld_nut_template);
+        
+        // With Pilot Hole Nut
+        let with_pilot_hole_nut_template = NamingTemplate {
+            prefix: "WPHN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("with_pilot_hole_nut".to_string(), with_pilot_hole_nut_template);
+        
+        // Locking nut specific types (these will override the generic locknut when detected)
+        
+        // Cotter Pin Locknut
+        let cotter_pin_locknut_template = NamingTemplate {
+            prefix: "CPLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("cotter_pin_locknut".to_string(), cotter_pin_locknut_template);
+        
+        // Distorted Thread Locknut
+        let distorted_thread_locknut_template = NamingTemplate {
+            prefix: "DTLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("distorted_thread_locknut".to_string(), distorted_thread_locknut_template);
+        
+        // Flex-Top Locknut
+        let flex_top_locknut_template = NamingTemplate {
+            prefix: "FTLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("flex_top_locknut".to_string(), flex_top_locknut_template);
+        
+        // Lock Washer Locknut
+        let lock_washer_locknut_template = NamingTemplate {
+            prefix: "LWLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("lock_washer_locknut".to_string(), lock_washer_locknut_template);
+        
+        // Nylon Insert Locknut (keep existing LN for most common type)
+        let nylon_insert_locknut_template = NamingTemplate {
+            prefix: "LN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("nylon_insert_locknut".to_string(), nylon_insert_locknut_template);
+        
+        // Serrations Locknut
+        let serrations_locknut_template = NamingTemplate {
+            prefix: "SRLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("serrations_locknut".to_string(), serrations_locknut_template);
+        
+        // Spring-Stop Locknut
+        let spring_stop_locknut_template = NamingTemplate {
+            prefix: "SSLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("spring_stop_locknut".to_string(), spring_stop_locknut_template);
+        
+        // Steel Insert Locknut
+        let steel_insert_locknut_template = NamingTemplate {
+            prefix: "SILN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("steel_insert_locknut".to_string(), steel_insert_locknut_template);
+        
+        // Thread Forming Locknut
+        let thread_forming_locknut_template = NamingTemplate {
+            prefix: "TFLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("thread_forming_locknut".to_string(), thread_forming_locknut_template);
+        
+        // Threadlocker Locknut
+        let threadlocker_locknut_template = NamingTemplate {
+            prefix: "TLLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("threadlocker_locknut".to_string(), threadlocker_locknut_template);
+        
+        // Two-Piece Clamp Locknut
+        let two_piece_clamp_locknut_template = NamingTemplate {
+            prefix: "2PCLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("two_piece_clamp_locknut".to_string(), two_piece_clamp_locknut_template);
+        
+        // Threaded Standoff templates
+        let mut standoff_abbrevs = HashMap::new();
+        
+        // Material abbreviations for standoffs
+        standoff_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
+        standoff_abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
+        standoff_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
+        standoff_abbrevs.insert("Steel".to_string(), "S".to_string());
+        standoff_abbrevs.insert("Alloy Steel".to_string(), "S".to_string());
+        standoff_abbrevs.insert("Brass".to_string(), "Brass".to_string());
+        standoff_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
+        standoff_abbrevs.insert("Nylon".to_string(), "Nylon".to_string());
+        
+        // Steel grade abbreviations for standoffs
+        standoff_abbrevs.insert("Grade 1 Steel".to_string(), "SG1".to_string());
+        standoff_abbrevs.insert("Grade 2 Steel".to_string(), "SG2".to_string());
+        standoff_abbrevs.insert("Grade 5 Steel".to_string(), "SG5".to_string());
+        standoff_abbrevs.insert("Grade 8 Steel".to_string(), "SG8".to_string());
+        standoff_abbrevs.insert("8.8 Steel".to_string(), "S8.8".to_string());
+        standoff_abbrevs.insert("10.9 Steel".to_string(), "S10.9".to_string());
+        standoff_abbrevs.insert("12.9 Steel".to_string(), "S12.9".to_string());
+        standoff_abbrevs.insert("Grade 1 Alloy Steel".to_string(), "SG1".to_string());
+        standoff_abbrevs.insert("Grade 2 Alloy Steel".to_string(), "SG2".to_string());
+        standoff_abbrevs.insert("Grade 5 Alloy Steel".to_string(), "SG5".to_string());
+        standoff_abbrevs.insert("Grade 8 Alloy Steel".to_string(), "SG8".to_string());
+        standoff_abbrevs.insert("8.8 Alloy Steel".to_string(), "S8.8".to_string());
+        standoff_abbrevs.insert("10.9 Alloy Steel".to_string(), "S10.9".to_string());
+        standoff_abbrevs.insert("12.9 Alloy Steel".to_string(), "S12.9".to_string());
+        
+        // Finish abbreviations for standoffs
+        standoff_abbrevs.insert("Zinc Plated".to_string(), "ZP".to_string());
+        standoff_abbrevs.insert("Zinc-Plated".to_string(), "ZP".to_string());
+        standoff_abbrevs.insert("Zinc Yellow-Chromate Plated".to_string(), "ZYC".to_string());
+        standoff_abbrevs.insert("Zinc Yellow Chromate Plated".to_string(), "ZYC".to_string());
+        standoff_abbrevs.insert("Black Oxide".to_string(), "BO".to_string());
+        standoff_abbrevs.insert("Black-Oxide".to_string(), "BO".to_string());
+        standoff_abbrevs.insert("Cadmium Plated".to_string(), "CD".to_string());
+        standoff_abbrevs.insert("Cadmium-Plated".to_string(), "CD".to_string());
+        standoff_abbrevs.insert("Nickel Plated".to_string(), "NI".to_string());
+        standoff_abbrevs.insert("Nickel-Plated".to_string(), "NI".to_string());
+        standoff_abbrevs.insert("Chrome Plated".to_string(), "CR".to_string());
+        standoff_abbrevs.insert("Chrome-Plated".to_string(), "CR".to_string());
+        standoff_abbrevs.insert("Galvanized".to_string(), "GAL".to_string());
+        
+        // Male-Female Threaded Hex Standoff
+        let male_female_hex_standoff_template = NamingTemplate {
+            prefix: "MFSO".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: standoff_abbrevs.clone(),
+        };
+        self.category_templates.insert("male_female_hex_standoff".to_string(), male_female_hex_standoff_template);
+        
+        // Female Threaded Hex Standoff
+        let female_hex_standoff_template = NamingTemplate {
+            prefix: "FSO".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: standoff_abbrevs.clone(),
+        };
+        self.category_templates.insert("female_hex_standoff".to_string(), female_hex_standoff_template);
+        
+        // Generic Threaded Standoff (fallback)
+        let generic_standoff_template = NamingTemplate {
+            prefix: "SO".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            spec_abbreviations: standoff_abbrevs,
+        };
+        self.category_templates.insert("generic_standoff".to_string(), generic_standoff_template);
+        
+        // Bearing templates
+        let mut bearing_abbrevs = HashMap::new();
+        
+        // Material abbreviations for bearings
+        bearing_abbrevs.insert("MDS-Filled Nylon Plastic".to_string(), "MDSNYL".to_string());
+        bearing_abbrevs.insert("MDS-Filled Nylon".to_string(), "MDSNYL".to_string());
+        bearing_abbrevs.insert("Nylon Plastic".to_string(), "NYL".to_string());
+        bearing_abbrevs.insert("Bronze SAE 841".to_string(), "BR841".to_string());
+        bearing_abbrevs.insert("Bronze SAE 863".to_string(), "BR863".to_string());
+        bearing_abbrevs.insert("Cast Bronze".to_string(), "CB".to_string());
+        bearing_abbrevs.insert("Oil-Filled Bronze".to_string(), "OFB".to_string());
+        bearing_abbrevs.insert("PTFE".to_string(), "PTFE".to_string());
+        bearing_abbrevs.insert("Rulon".to_string(), "RUL".to_string());
+        bearing_abbrevs.insert("Graphite".to_string(), "GRAPH".to_string());
+        bearing_abbrevs.insert("Steel-Backed PTFE".to_string(), "SBPTFE".to_string());
+        bearing_abbrevs.insert("Bronze".to_string(), "BR".to_string());
+        bearing_abbrevs.insert("Steel".to_string(), "STL".to_string());
+        bearing_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
+        bearing_abbrevs.insert("Aluminum".to_string(), "AL".to_string());
+        bearing_abbrevs.insert("Plastic".to_string(), "PL".to_string());
+        
+        // Flanged Sleeve Bearing
+        let flanged_sleeve_bearing_template = NamingTemplate {
+            prefix: "FSB".to_string(),
+            key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "OD".to_string(), "Length".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("flanged_sleeve_bearing".to_string(), flanged_sleeve_bearing_template);
+        
+        // Plain Sleeve Bearing
+        let sleeve_bearing_template = NamingTemplate {
+            prefix: "SB".to_string(),
+            key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "OD".to_string(), "Length".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("sleeve_bearing".to_string(), sleeve_bearing_template);
+        
+        // Flanged Bearing (generic)
+        let flanged_bearing_template = NamingTemplate {
+            prefix: "FB".to_string(),
+            key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "OD".to_string(), "Length".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("flanged_bearing".to_string(), flanged_bearing_template);
+        
+        // Ball Bearing
+        let ball_bearing_template = NamingTemplate {
+            prefix: "BB".to_string(),
+            key_specs: vec!["Material".to_string(), "Bore".to_string(), "OD".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("ball_bearing".to_string(), ball_bearing_template);
+        
+        // Linear Bearing
+        let linear_bearing_template = NamingTemplate {
+            prefix: "LB".to_string(),
+            key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "Length".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("linear_bearing".to_string(), linear_bearing_template);
+        
+        // Needle Bearing
+        let needle_bearing_template = NamingTemplate {
+            prefix: "NB".to_string(),
+            key_specs: vec!["Material".to_string(), "Bore".to_string(), "OD".to_string(), "Length".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("needle_bearing".to_string(), needle_bearing_template);
+        
+        // Roller Bearing
+        let roller_bearing_template = NamingTemplate {
+            prefix: "RB".to_string(),
+            key_specs: vec!["Material".to_string(), "Bore".to_string(), "OD".to_string(), "Length".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("roller_bearing".to_string(), roller_bearing_template);
+        
+        // Generic Bearing (fallback)
+        let generic_bearing_template = NamingTemplate {
+            prefix: "BRG".to_string(),
+            key_specs: vec!["Material".to_string(), "Type".to_string()],
+            spec_abbreviations: bearing_abbrevs,
+        };
+        self.category_templates.insert("generic_bearing".to_string(), generic_bearing_template);
+    }
+
+    pub fn generate_name(&self, product: &ProductDetail) -> String {
+        // Determine category/template based on product data
+        let template_key = self.determine_category(product);
+        
+        if let Some(template) = self.category_templates.get(&template_key) {
+            self.apply_template(product, template)
+        } else {
+            // Fallback to basic naming if no template matches
+            self.generate_fallback_name(product)
+        }
+    }
+
+    fn determine_category(&self, product: &ProductDetail) -> String {
+        let family_lower = product.family_description.to_lowercase();
+        let category_lower = product.product_category.to_lowercase();
+        let _detail_lower = product.detail_description.to_lowercase();
+        
+        // Check for specific screw head types (order matters - more specific first)
+        if family_lower.contains("button head") && family_lower.contains("screw") {
+            "button_head_screw".to_string()
+        } else if family_lower.contains("high socket head") && family_lower.contains("screw") {
+            "high_socket_head_screw".to_string()
+        } else if family_lower.contains("low socket head") && family_lower.contains("screw") {
+            "low_socket_head_screw".to_string()
+        } else if family_lower.contains("ultra low socket head") && family_lower.contains("screw") {
+            "ultra_low_socket_head_screw".to_string()
+        } else if family_lower.contains("standard socket head") && family_lower.contains("screw") {
+            "standard_socket_head_screw".to_string()
+        } else if family_lower.contains("socket head") && family_lower.contains("screw") {
+            "socket_head_screw".to_string()
+        } else if family_lower.contains("narrow flat head") && family_lower.contains("screw") {
+            "narrow_flat_head_screw".to_string()
+        } else if family_lower.contains("standard flat head") && family_lower.contains("screw") {
+            "standard_flat_head_screw".to_string()
+        } else if family_lower.contains("undercut flat head") && family_lower.contains("screw") {
+            "undercut_flat_head_screw".to_string()
+        } else if family_lower.contains("wide flat head") && family_lower.contains("screw") {
+            "wide_flat_head_screw".to_string()
+        } else if family_lower.contains("flat head") && family_lower.contains("screw") {
+            "flat_head_screw".to_string()
+        } else if family_lower.contains("pan head") && family_lower.contains("screw") {
+            "pan_head_screw".to_string()
+        } else if family_lower.contains("hex head") && family_lower.contains("screw") {
+            "hex_head_screw".to_string()
+        } else if family_lower.contains("standard oval head") && family_lower.contains("screw") {
+            "standard_oval_head_screw".to_string()
+        } else if family_lower.contains("undercut oval head") && family_lower.contains("screw") {
+            "undercut_oval_head_screw".to_string()
+        } else if family_lower.contains("oval head") && family_lower.contains("screw") {
+            "oval_head_screw".to_string()
+        } else if family_lower.contains("square head") && family_lower.contains("screw") {
+            "square_head_screw".to_string()
+        } else if family_lower.contains("binding head") && family_lower.contains("screw") {
+            "binding_head_screw".to_string()
+        } else if family_lower.contains("carriage head") && family_lower.contains("screw") {
+            "carriage_head_screw".to_string()
+        } else if family_lower.contains("cheese head") && family_lower.contains("screw") {
+            "cheese_head_screw".to_string()
+        } else if family_lower.contains("fillister head") && family_lower.contains("screw") {
+            "fillister_head_screw".to_string()
+        } else if family_lower.contains("pancake head") && family_lower.contains("screw") {
+            "pancake_head_screw".to_string()
+        } else if family_lower.contains("round head") && family_lower.contains("screw") {
+            "round_head_screw".to_string()
+        } else if family_lower.contains("truss head") && family_lower.contains("screw") {
+            "truss_head_screw".to_string()
+        } else if family_lower.contains("rounded head") && family_lower.contains("screw") {  // More specific than just "rounded"
+            "rounded_head_screw".to_string()
+        } else if family_lower.contains("12-point") && family_lower.contains("screw") {
+            "12_point_head_screw".to_string()
+        } else if family_lower.contains("t-handle") && family_lower.contains("screw") {
+            "t_handle_screw".to_string()
+        } else if family_lower.contains("t-slot") && family_lower.contains("screw") {
+            "t_slot_screw".to_string()
+        } else if family_lower.contains("l-handle") && family_lower.contains("screw") {
+            "l_handle_screw".to_string()
+        } else if family_lower.contains("domed") && family_lower.contains("screw") {
+            "domed_head_screw".to_string()
+        } else if family_lower.contains("headless") && family_lower.contains("screw") {
+            "headless_screw".to_string()
+        } else if family_lower.contains("pentagon") && family_lower.contains("screw") {
+            "pentagon_head_screw".to_string()
+        } else if family_lower.contains("four arm thumb") && family_lower.contains("screw") {
+            "four_arm_thumb_screw".to_string()
+        } else if family_lower.contains("hex thumb") && family_lower.contains("screw") {
+            "hex_thumb_screw".to_string()
+        } else if family_lower.contains("multilobe thumb") && family_lower.contains("screw") {
+            "multilobe_thumb_screw".to_string()
+        } else if family_lower.contains("rectangle thumb") && family_lower.contains("screw") {
+            "rectangle_thumb_screw".to_string()
+        } else if family_lower.contains("round thumb") && family_lower.contains("screw") {
+            "round_thumb_screw".to_string()
+        } else if family_lower.contains("spade thumb") && family_lower.contains("screw") {
+            "spade_thumb_screw".to_string()
+        } else if family_lower.contains("two arm thumb") && family_lower.contains("screw") {
+            "two_arm_thumb_screw".to_string()
+        } else if family_lower.contains("wing thumb") && family_lower.contains("screw") {
+            "wing_thumb_screw".to_string()
+        } else if family_lower.contains("thumb") && family_lower.contains("screw") {
+            "thumb_screw".to_string()
+        } else if family_lower.contains("hook") && family_lower.contains("screw") {
+            "hook_screw".to_string()
+        } else if family_lower.contains("ring") && family_lower.contains("screw") {
+            "ring_screw".to_string()
+        } else if family_lower.contains("eye") && family_lower.contains("screw") {
+            "eye_screw".to_string()
+        } else if family_lower.contains("knob") && family_lower.contains("screw") {
+            "knob_screw".to_string()
+        } else if family_lower.contains("threaded") && family_lower.contains("screw") {
+            "threaded_screw".to_string()
+        } else if family_lower.contains("tee") && family_lower.contains("screw") {
+            "tee_screw".to_string()
+        } else if category_lower.contains("screw") || family_lower.contains("screw") {
+            "generic_screw".to_string()
+        } else if category_lower.contains("washer") || family_lower.contains("washer") {
+            // Determine specific washer type
+            if family_lower.contains("cup") {
+                "cup_washer".to_string()
+            } else if family_lower.contains("curved") {
+                "curved_washer".to_string()
+            } else if family_lower.contains("dished") {
+                "dished_washer".to_string()
+            } else if family_lower.contains("domed") {
+                "domed_washer".to_string()
+            } else if family_lower.contains("double clipped") {
+                "double_clipped_washer".to_string()
+            } else if family_lower.contains("clipped") {
+                "clipped_washer".to_string()
+            } else if family_lower.contains("flat") {
+                "flat_washer".to_string()
+            } else if family_lower.contains("hillside") {
+                "hillside_washer".to_string()
+            } else if family_lower.contains("notched") {
+                "notched_washer".to_string()
+            } else if family_lower.contains("perforated") {
+                "perforated_washer".to_string()
+            } else if family_lower.contains("pronged") {
+                "pronged_washer".to_string()
+            } else if family_lower.contains("rectangular") {
+                "rectangular_washer".to_string()
+            } else if family_lower.contains("sleeve") {
+                "sleeve_washer".to_string()
+            } else if family_lower.contains("slotted") {
+                "slotted_washer".to_string()
+            } else if family_lower.contains("spherical") {
+                "spherical_washer".to_string()
+            } else if family_lower.contains("split") {
+                "split_washer".to_string()
+            } else if family_lower.contains("square") {
+                "square_washer".to_string()
+            } else if family_lower.contains("tab") {
+                "tab_washer".to_string()
+            } else if family_lower.contains("tapered") {
+                "tapered_washer".to_string()
+            } else if family_lower.contains("tooth") {
+                "tooth_washer".to_string()
+            } else if family_lower.contains("wave") {
+                "wave_washer".to_string()
+            } else if family_lower.contains("wedge") {
+                "wedge_washer".to_string()
+            } else {
+                "flat_washer".to_string() // Default to flat washer
+            }
+        } else if category_lower.contains("nuts") || category_lower.contains("nut") || family_lower.contains("nut") {
+            // Determine specific nut type (more specific types first)
+            
+            // Locking nut sub-types (most specific first)
+            if family_lower.contains("cotter pin") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "cotter_pin_locknut".to_string()
+            } else if family_lower.contains("distorted thread") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "distorted_thread_locknut".to_string()
+            } else if family_lower.contains("flex-top") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "flex_top_locknut".to_string()
+            } else if family_lower.contains("lock washer") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "lock_washer_locknut".to_string()
+            } else if family_lower.contains("nylon insert") || family_lower.contains("nylon-insert") {
+                "nylon_insert_locknut".to_string()
+            } else if family_lower.contains("serrations") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "serrations_locknut".to_string()
+            } else if family_lower.contains("spring-stop") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "spring_stop_locknut".to_string()
+            } else if family_lower.contains("steel insert") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "steel_insert_locknut".to_string()
+            } else if family_lower.contains("thread forming") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "thread_forming_locknut".to_string()
+            } else if family_lower.contains("threadlocker") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "threadlocker_locknut".to_string()
+            } else if family_lower.contains("two-piece clamp") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "two_piece_clamp_locknut".to_string()
+            } else if family_lower.contains("locknut") || family_lower.contains("lock nut") || 
+                     family_lower.contains("prevailing torque") {
+                "locknut".to_string()
+            
+            // Other nut types
+            } else if family_lower.contains("adhesive mount") {
+                "adhesive_mount_nut".to_string()
+            } else if family_lower.contains("clip on") || family_lower.contains("clip-on") {
+                "clip_on_nut".to_string()
+            } else if family_lower.contains("coupling") {
+                "coupling_nut".to_string()
+            } else if family_lower.contains("dowel") {
+                "dowel_nut".to_string()
+            } else if family_lower.contains("externally threaded") {
+                "externally_threaded_nut".to_string()
+            } else if family_lower.contains("flange") {
+                "flange_nut".to_string()
+            } else if family_lower.contains("hex nut") || family_lower.contains("hexnut") {
+                "hex_nut".to_string()
+            } else if family_lower.contains("panel") {
+                "panel_nut".to_string()
+            } else if family_lower.contains("press fit") || family_lower.contains("press-fit") {
+                "press_fit_nut".to_string()
+            } else if family_lower.contains("push button") {
+                "push_button_nut".to_string()
+            } else if family_lower.contains("push nut") {
+                "push_nut".to_string()
+            } else if family_lower.contains("rivet mount") {
+                "rivet_mount_nut".to_string()
+            } else if family_lower.contains("rivet nut") {
+                "rivet_nut".to_string()
+            } else if family_lower.contains("round nut") {
+                "round_nut".to_string()
+            } else if family_lower.contains("screw mount") {
+                "screw_mount_nut".to_string()
+            } else if family_lower.contains("snap in") || family_lower.contains("snap-in") {
+                "snap_in_nut".to_string()
+            } else if family_lower.contains("socket nut") {
+                "socket_nut".to_string()
+            } else if family_lower.contains("speed") {
+                "speed_nut".to_string()
+            } else if family_lower.contains("square") {
+                "square_nut".to_string()
+            } else if family_lower.contains("tamper resistant") || family_lower.contains("tamper-resistant") {
+                "tamper_resistant_nut".to_string()
+            } else if family_lower.contains("threadless") {
+                "threadless_nut".to_string()
+            } else if family_lower.contains("thumb") {
+                "thumb_nut".to_string()
+            } else if family_lower.contains("tube end") {
+                "tube_end_nut".to_string()
+            } else if family_lower.contains("twist close") || family_lower.contains("twist-close") {
+                "twist_close_nut".to_string()
+            } else if family_lower.contains("weld") {
+                "weld_nut".to_string()
+            } else if family_lower.contains("with pilot hole") {
+                "with_pilot_hole_nut".to_string()
+            } else if family_lower.contains("wing nut") || family_lower.contains("wingnut") {
+                "wing_nut".to_string()
+            } else if family_lower.contains("cap nut") || family_lower.contains("capnut") {
+                "cap_nut".to_string()
+            } else {
+                "generic_nut".to_string()
+            }
+        } else if category_lower.contains("standoffs") || category_lower.contains("standoff") || 
+                  family_lower.contains("standoff") || family_lower.contains("spacer") {
+            // Determine specific standoff type
+            if family_lower.contains("male-female") || family_lower.contains("male female") {
+                "male_female_hex_standoff".to_string()
+            } else if family_lower.contains("female") && family_lower.contains("threaded") {
+                "female_hex_standoff".to_string()
+            } else {
+                "generic_standoff".to_string()
+            }
+        } else if category_lower.contains("bearing") || family_lower.contains("bearing") {
+            // Determine specific bearing type
+            let plain_type = product.specifications.iter()
+                .find(|s| s.attribute.eq_ignore_ascii_case("Plain Bearing Type"))
+                .and_then(|s| s.values.first())
+                .map(|v| v.as_str())
+                .unwrap_or("");
+                
+            if family_lower.contains("flanged") || plain_type.eq_ignore_ascii_case("Flanged") {
+                if family_lower.contains("sleeve") || family_lower.contains("plain") {
+                    "flanged_sleeve_bearing".to_string()
+                } else {
+                    "flanged_bearing".to_string()
+                }
+            } else if family_lower.contains("sleeve") || family_lower.contains("plain") {
+                "sleeve_bearing".to_string()
+            } else if family_lower.contains("ball") {
+                "ball_bearing".to_string()
+            } else if family_lower.contains("linear") {
+                "linear_bearing".to_string()
+            } else if family_lower.contains("needle") {
+                "needle_bearing".to_string()
+            } else if family_lower.contains("roller") {
+                "roller_bearing".to_string()
+            } else {
+                "generic_bearing".to_string()
+            }
+        } else {
+            "unknown".to_string()
+        }
+    }
+
+    fn apply_template(&self, product: &ProductDetail, template: &NamingTemplate) -> String {
+        let mut name_parts = vec![template.prefix.clone()];
+        let mut extracted_finish: Option<String> = None;
+        
+        for spec_name in &template.key_specs {
+            if let Some(spec) = product.specifications.iter()
+                .find(|s| s.attribute.eq_ignore_ascii_case(spec_name)) {
+                
+                let value = spec.values.first().unwrap_or(&"".to_string()).clone();
+                
+                // Special handling for Material that might include finish
+                if spec_name.eq_ignore_ascii_case("Material") {
+                    let (material, finish) = self.parse_material_and_finish(&value);
+                    
+                    // Special handling for bearings with filler material
+                    let final_material = if template.prefix.ends_with("B") && (template.prefix.starts_with("FSB") || template.prefix.starts_with("SB") || template.prefix.starts_with("BB")) {
+                        // Check for filler material for bearings
+                        if let Some(filler_spec) = product.specifications.iter()
+                            .find(|s| s.attribute.eq_ignore_ascii_case("Filler Material")) {
+                            if let Some(filler_value) = filler_spec.values.first() {
+                                if !filler_value.is_empty() && filler_value != "None" && filler_value != "Not Specified" {
+                                    // Combine filler with base material
+                                    format!("{}-Filled {}", filler_value, material)
+                                } else {
+                                    material
+                                }
+                            } else {
+                                material
+                            }
+                        } else {
+                            material
+                        }
+                    } else if material.eq_ignore_ascii_case("Steel") || material.eq_ignore_ascii_case("Alloy Steel") {
+                        // Check for steel grade to make steel more descriptive
+                        self.get_steel_grade_material(product, &material)
+                    } else {
+                        material
+                    };
+                    
+                    // Add material abbreviation
+                    let material_abbrev = template.spec_abbreviations.get(&final_material)
+                        .cloned()
+                        .unwrap_or_else(|| self.abbreviate_value(&final_material));
+                    if !material_abbrev.is_empty() {
+                        name_parts.push(material_abbrev);
+                    }
+                    
+                    // Store extracted finish for later use
+                    extracted_finish = finish;
+                } else if spec_name.eq_ignore_ascii_case("Finish") {
+                    // Check if we have a separate finish spec, or use the extracted one
+                    let finish_value = if !value.is_empty() {
+                        value.clone()
+                    } else {
+                        extracted_finish.clone().unwrap_or_default()
+                    };
+                    
+                    if !finish_value.is_empty() {
+                        let finish_abbrev = template.spec_abbreviations.get(&finish_value)
+                            .cloned()
+                            .unwrap_or_else(|| self.abbreviate_value(&finish_value));
+                        // Skip passivated finish as it doesn't add meaningful information
+                        if !finish_abbrev.is_empty() && finish_abbrev != "PASS" {
+                            name_parts.push(finish_abbrev);
+                        }
+                    }
+                } else if spec_name.eq_ignore_ascii_case("Length") {
+                    // Special handling for Length - convert fractions to decimals for screws
+                    let length_value = self.convert_length_to_decimal(&value);
+                    let abbreviated = template.spec_abbreviations.get(&length_value)
+                        .cloned()
+                        .unwrap_or(length_value);
+                    
+                    if !abbreviated.is_empty() {
+                        name_parts.push(abbreviated);
+                    }
+                } else if spec_name.eq_ignore_ascii_case("For Shaft Diameter") || spec_name.eq_ignore_ascii_case("OD") {
+                    // Special handling for bearing dimensions - convert fractions to decimals
+                    let dimension_value = self.convert_length_to_decimal(&value);
+                    let abbreviated = template.spec_abbreviations.get(&dimension_value)
+                        .cloned()
+                        .unwrap_or(dimension_value);
+                    
+                    if !abbreviated.is_empty() {
+                        name_parts.push(abbreviated);
+                    }
+                } else if spec_name.eq_ignore_ascii_case("Thread Size") {
+                    // Special handling for Thread Size - extract pitch for metric threads
+                    let thread_value = self.extract_thread_with_pitch(product, &value);
+                    let abbreviated = template.spec_abbreviations.get(&thread_value)
+                        .cloned()
+                        .unwrap_or_else(|| self.abbreviate_value(&thread_value));
+                    
+                    if !abbreviated.is_empty() {
+                        name_parts.push(abbreviated);
+                    }
+                } else {
+                    // Normal handling for other specs
+                    let abbreviated = template.spec_abbreviations.get(&value)
+                        .cloned()
+                        .unwrap_or_else(|| self.abbreviate_value(&value));
+                    
+                    if !abbreviated.is_empty() {
+                        name_parts.push(abbreviated);
+                    }
+                }
+            } else if spec_name.eq_ignore_ascii_case("Finish") && extracted_finish.is_some() {
+                // Handle case where there's no "Finish" attribute but we extracted finish from material
+                let finish_value = extracted_finish.clone().unwrap();
+                let finish_abbrev = template.spec_abbreviations.get(&finish_value)
+                    .cloned()
+                    .unwrap_or_else(|| self.abbreviate_value(&finish_value));
+                // Skip passivated finish as it doesn't add meaningful information
+                if !finish_abbrev.is_empty() && finish_abbrev != "PASS" {
+                    name_parts.push(finish_abbrev);
+                }
+            }
+        }
+        
+        name_parts.join("-")
+    }
+
+    fn parse_material_and_finish(&self, material_value: &str) -> (String, Option<String>) {
+        // Common finish prefixes that can appear in material specifications
+        let finish_prefixes = [
+            "Black-Oxide ", "Black Oxide ", "Zinc Plated ", "Zinc-Plated ", 
+            "Zinc Yellow-Chromate Plated ", "Zinc Yellow Chromate Plated ",
+            "Galvanized ", "Cadmium Plated ", "Cadmium-Plated ", 
+            "Nickel Plated ", "Nickel-Plated ", "Chrome Plated ", "Chrome-Plated ",
+            "Passivated ", "Plain ", "Unfinished "
+        ];
+        
+        for prefix in &finish_prefixes {
+            if material_value.starts_with(prefix) {
+                let finish = prefix.trim().to_string();
+                let material = material_value.strip_prefix(prefix).unwrap_or(material_value).to_string();
+                return (material, Some(finish));
+            }
+        }
+        
+        // No finish prefix found, return the whole value as material
+        (material_value.to_string(), None)
+    }
+
+    fn convert_length_to_decimal(&self, value: &str) -> String {
+        // Convert common fractions to decimals for screw lengths
+        if value.contains("\"") {
+            let clean_value = value.replace("\"", "").replace(" ", "-"); // Convert space format to hyphen format
+            match clean_value.as_str() {
+                "1/8" => "0.125".to_string(),
+                "3/16" => "0.1875".to_string(),
+                "1/4" => "0.25".to_string(),
+                "5/16" => "0.3125".to_string(),
+                "3/8" => "0.375".to_string(),
+                "7/16" => "0.4375".to_string(),
+                "1/2" => "0.5".to_string(),
+                "9/16" => "0.5625".to_string(),
+                "5/8" => "0.625".to_string(),
+                "11/16" => "0.6875".to_string(),
+                "3/4" => "0.75".to_string(),
+                "13/16" => "0.8125".to_string(),
+                "7/8" => "0.875".to_string(),
+                "15/16" => "0.9375".to_string(),
+                "1-1/8" => "1.125".to_string(),
+                "1-1/4" => "1.25".to_string(),
+                "1-3/8" => "1.375".to_string(),
+                "1-1/2" => "1.5".to_string(),
+                "1-5/8" => "1.625".to_string(),
+                "1-3/4" => "1.75".to_string(),
+                "1-7/8" => "1.875".to_string(),
+                "2-1/4" => "2.25".to_string(),
+                "2-1/2" => "2.5".to_string(),
+                "2-3/4" => "2.75".to_string(),
+                "3-1/4" => "3.25".to_string(),
+                "3-1/2" => "3.5".to_string(),
+                "3-3/4" => "3.75".to_string(),
+                _ => clean_value, // Return as-is if not in our conversion table
+            }
+        } else if value.contains("mm") {
+            // Handle metric lengths - remove "mm" and extra spaces
+            value.replace("mm", "").trim().to_string()
+        } else {
+            // Return as-is for already decimal values
+            value.to_string()
+        }
+    }
+
+    fn get_steel_grade_material(&self, product: &ProductDetail, original_material: &str) -> String {
+        // Look for "Fastener Strength Grade/Class" specification to get more descriptive steel naming
+        if let Some(grade_spec) = product.specifications.iter()
+            .find(|s| s.attribute.eq_ignore_ascii_case("Fastener Strength Grade/Class") || 
+                     s.attribute.contains("Grade") || 
+                     s.attribute.contains("Strength")) 
+        {
+            if let Some(grade_value) = grade_spec.values.first() {
+                // Determine if we should use Steel or Alloy Steel suffix based on original material
+                let steel_suffix = if original_material.eq_ignore_ascii_case("Alloy Steel") {
+                    "Alloy Steel"
+                } else {
+                    "Steel"
+                };
+                
+                // Extract grade number from various formats
+                if grade_value.contains("Grade 5") || grade_value.contains("grade 5") {
+                    return format!("Grade 5 {}", steel_suffix);
+                } else if grade_value.contains("Grade 8") || grade_value.contains("grade 8") {
+                    return format!("Grade 8 {}", steel_suffix);
+                } else if grade_value.contains("Grade 2") || grade_value.contains("grade 2") {
+                    return format!("Grade 2 {}", steel_suffix);
+                } else if grade_value.contains("Grade 1") || grade_value.contains("grade 1") {
+                    return format!("Grade 1 {}", steel_suffix);
+                } else if grade_value.contains("10.9") {
+                    return format!("10.9 {}", steel_suffix);
+                } else if grade_value.contains("12.9") {
+                    return format!("12.9 {}", steel_suffix);
+                } else if grade_value.contains("8.8") {
+                    return format!("8.8 {}", steel_suffix);
+                }
+            }
+        }
+        
+        // Fallback to original material if no grade found
+        original_material.to_string()
+    }
+
+    fn extract_thread_with_pitch(&self, product: &ProductDetail, thread_size: &str) -> String {
+        // For metric threads, try to extract pitch from detail description
+        if thread_size.starts_with("M") {
+            // Look for pattern like "M3 x 0.50 mm Thread" in detail description
+            if let Some(captures) = regex::Regex::new(r"(M\d+(?:\.\d+)?)\s*x\s*(\d+\.?\d*)\s*mm\s*Thread")
+                .ok()
+                .and_then(|re| re.captures(&product.detail_description)) 
+            {
+                if let (Some(size), Some(pitch)) = (captures.get(1), captures.get(2)) {
+                    return format!("{}x{}", size.as_str(), pitch.as_str());
+                }
+            }
+        } else if thread_size.contains("-") {
+            // For customary threads like "8-32", convert hyphen to "x"
+            return thread_size.replace("-", "x");
+        }
+        
+        // For threads without pitch info, return as-is
+        thread_size.to_string()
+    }
+
+    fn abbreviate_value(&self, value: &str) -> String {
+        // Handle common dimension formats
+        if value.contains("\"") {
+            // Keep fractions as-is, just remove quotes (for non-length specs like washers)
+            value.replace("\"", "").to_string()
+        } else {
+            // Return as-is for thread sizes and other values
+            value.to_string()
+        }
+    }
+
+    fn generate_fallback_name(&self, product: &ProductDetail) -> String {
+        // Simple fallback based on family description
+        let family_words: Vec<&str> = product.family_description
+            .split_whitespace()
+            .take(3)
+            .collect();
+        
+        format!("{}-{}", 
+            family_words.join("-").to_uppercase(),
+            product.part_number)
     }
 }
 
@@ -236,6 +2171,7 @@ pub struct McmasterClient {
     token: Option<String>,
     credentials: Option<Credentials>,
     quiet_mode: bool, // For suppressing output when in JSON mode
+    name_generator: NameGenerator,
 }
 
 impl McmasterClient {
@@ -315,6 +2251,7 @@ impl McmasterClient {
             token: None,
             credentials,
             quiet_mode: quiet,
+            name_generator: NameGenerator::new(),
         })
     }
 
@@ -1227,6 +3164,91 @@ certificate_password = "certificate_password"
         }
         
         Ok(serde_json::Value::Object(json_obj))
+    }
+
+    pub async fn generate_name(&self, product: &str) -> Result<()> {
+        self.ensure_authenticated()?;
+        
+        let url = format!("{}/v1/products/{}", BASE_URL, product);
+        let response = self
+            .client
+            .get(&url)
+            .bearer_auth(self.token.as_ref().unwrap())
+            .send()
+            .await
+            .context("Failed to get product")?;
+
+        if response.status().is_success() {
+            let response_text = response.text().await.context("Failed to get response text")?;
+            
+            if let Ok(product_detail) = serde_json::from_str::<ProductDetail>(&response_text) {
+                // Print descriptions for verification
+                println!("{}", product_detail.family_description);
+                println!("{}", product_detail.detail_description);
+                let human_name = self.name_generator.generate_name(&product_detail);
+                println!("{}", human_name);
+            } else {
+                return Err(anyhow::anyhow!("Failed to parse product data for name generation"));
+            }
+        } else if response.status().as_u16() == 403 {
+            // Product is not in subscription - offer to add it
+            println!("❌ Product {} is not in your subscription.", product);
+            print!("Would you like to add it to your subscription? (Y/n): ");
+            io::stdout().flush().unwrap();
+            
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
+            let input = input.trim().to_lowercase();
+            
+            if input == "y" || input == "yes" || input.is_empty() {
+                println!("Adding product {} to subscription...", product);
+                self.add_product(product).await?;
+                println!("✅ Product added! Generating name...");
+                
+                // Retry the product request after adding to subscription
+                let url = format!("{}/v1/products/{}", BASE_URL, product);
+                let response = self
+                    .client
+                    .get(&url)
+                    .bearer_auth(self.token.as_ref().unwrap())
+                    .send()
+                    .await
+                    .context("Failed to get product after adding to subscription")?;
+                
+                if response.status().is_success() {
+                    let response_text = response.text().await.context("Failed to get response text")?;
+                    
+                    if let Ok(product_detail) = serde_json::from_str::<ProductDetail>(&response_text) {
+                        // Print descriptions for verification
+                        println!("{}", product_detail.family_description);
+                        println!("{}", product_detail.detail_description);
+                        let human_name = self.name_generator.generate_name(&product_detail);
+                        println!("{}", human_name);
+                    } else {
+                        return Err(anyhow::anyhow!("Failed to parse product data for name generation"));
+                    }
+                } else {
+                    return Err(anyhow::anyhow!(
+                        "Failed to get product {} after adding to subscription. Status: {}",
+                        product, response.status()
+                    ));
+                }
+            } else {
+                return Err(anyhow::anyhow!(
+                    "Product {} is not in your subscription. Add it first with: mmc add {}",
+                    product, product
+                ));
+            }
+        } else {
+            let status = response.status();
+            let error_text = response.text().await.unwrap_or_default();
+            return Err(anyhow::anyhow!(
+                "Failed to get product {}. Status: {}. Response: {}",
+                product, status, error_text
+            ));
+        }
+
+        Ok(())
     }
 
     // Helper method to download a single asset

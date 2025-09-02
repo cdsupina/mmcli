@@ -16,6 +16,7 @@ dirs = "5.0"
 toml = "0.8"
 native-tls = "0.2"
 urlencoding = "2.1"
+regex = "1.0"
 
 [[bin]]
 name = "mmc"
