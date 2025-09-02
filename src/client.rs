@@ -1181,6 +1181,16 @@ impl NameGenerator {
                     if !abbreviated.is_empty() {
                         name_parts.push(abbreviated);
                     }
+                } else if spec_name.eq_ignore_ascii_case("Thread Size") {
+                    // Special handling for Thread Size - extract pitch for metric threads
+                    let thread_value = self.extract_thread_with_pitch(product, &value);
+                    let abbreviated = template.spec_abbreviations.get(&thread_value)
+                        .cloned()
+                        .unwrap_or_else(|| self.abbreviate_value(&thread_value));
+                    
+                    if !abbreviated.is_empty() {
+                        name_parts.push(abbreviated);
+                    }
                 } else {
                     // Normal handling for other specs
                     let abbreviated = template.spec_abbreviations.get(&value)
@@ -1263,10 +1273,34 @@ impl NameGenerator {
                 "3-3/4" => "3.75".to_string(),
                 _ => clean_value, // Return as-is if not in our conversion table
             }
+        } else if value.contains("mm") {
+            // Handle metric lengths - remove "mm" and extra spaces
+            value.replace("mm", "").trim().to_string()
         } else {
-            // Return as-is for metric or already decimal values
+            // Return as-is for already decimal values
             value.to_string()
         }
+    }
+
+    fn extract_thread_with_pitch(&self, product: &ProductDetail, thread_size: &str) -> String {
+        // For metric threads, try to extract pitch from detail description
+        if thread_size.starts_with("M") {
+            // Look for pattern like "M3 x 0.50 mm Thread" in detail description
+            if let Some(captures) = regex::Regex::new(r"(M\d+(?:\.\d+)?)\s*x\s*(\d+\.?\d*)\s*mm\s*Thread")
+                .ok()
+                .and_then(|re| re.captures(&product.detail_description)) 
+            {
+                if let (Some(size), Some(pitch)) = (captures.get(1), captures.get(2)) {
+                    return format!("{}x{}", size.as_str(), pitch.as_str());
+                }
+            }
+        } else if thread_size.contains("-") {
+            // For customary threads like "8-32", convert hyphen to "x"
+            return thread_size.replace("-", "x");
+        }
+        
+        // For threads without pitch info, return as-is
+        thread_size.to_string()
     }
 
     fn abbreviate_value(&self, value: &str) -> String {
