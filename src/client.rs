@@ -397,7 +397,7 @@ impl NameGenerator {
         // Hex Head Screw
         let hex_head_template = NamingTemplate {
             prefix: "HHS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("hex_head_screw".to_string(), hex_head_template);
