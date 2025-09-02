@@ -1,29 +1,12 @@
-use clap::{Parser, Subcommand, ValueEnum};
+use clap::{Parser, Subcommand};
 use anyhow::{Context, Result};
 use std::path::PathBuf;
 use dirs::{home_dir, config_dir};
 use tokio::fs;
-use std::fmt;
 
-mod client;
-use client::{McmasterClient, Credentials};
+// Import from the new library structure
+use mmcli::{McmasterClient, Credentials, OutputFormat};
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Debug)]
-enum OutputFormat {
-    /// Human-friendly output with formatting and emojis (default)
-    Human,
-    /// Machine-readable JSON output
-    Json,
-}
-
-impl fmt::Display for OutputFormat {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            OutputFormat::Human => write!(f, "human"),
-            OutputFormat::Json => write!(f, "json"),
-        }
-    }
-}
 
 #[derive(Parser)]
 #[command(name = "mmc")]
