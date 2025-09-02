@@ -113,6 +113,24 @@ impl NameGenerator {
         screw_abbrevs.insert("Brass".to_string(), "Brass".to_string());
         screw_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
         
+        // Finish abbreviations for screws
+        screw_abbrevs.insert("Zinc Plated".to_string(), "ZP".to_string());
+        screw_abbrevs.insert("Zinc-Plated".to_string(), "ZP".to_string());
+        screw_abbrevs.insert("Zinc Yellow-Chromate Plated".to_string(), "ZYC".to_string());
+        screw_abbrevs.insert("Zinc Yellow Chromate Plated".to_string(), "ZYC".to_string());
+        screw_abbrevs.insert("Black Oxide".to_string(), "BO".to_string());
+        screw_abbrevs.insert("Black-Oxide".to_string(), "BO".to_string());
+        screw_abbrevs.insert("Passivated".to_string(), "PASS".to_string());
+        screw_abbrevs.insert("Plain".to_string(), "PLAIN".to_string());
+        screw_abbrevs.insert("Unfinished".to_string(), "UF".to_string());
+        screw_abbrevs.insert("Galvanized".to_string(), "GALV".to_string());
+        screw_abbrevs.insert("Cadmium Plated".to_string(), "CD".to_string());
+        screw_abbrevs.insert("Cadmium-Plated".to_string(), "CD".to_string());
+        screw_abbrevs.insert("Nickel Plated".to_string(), "NI".to_string());
+        screw_abbrevs.insert("Nickel-Plated".to_string(), "NI".to_string());
+        screw_abbrevs.insert("Chrome Plated".to_string(), "CR".to_string());
+        screw_abbrevs.insert("Chrome-Plated".to_string(), "CR".to_string());
+        
         // Drive style abbreviations (comprehensive list from McMaster-Carr)
         screw_abbrevs.insert("4-Flute Spline".to_string(), "4FS".to_string());
         screw_abbrevs.insert("6-Flute Spline".to_string(), "6FS".to_string());
@@ -168,6 +186,7 @@ impl NameGenerator {
                 "Thread Size".to_string(), 
                 "Length".to_string(),
                 "Drive Style".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
@@ -182,6 +201,7 @@ impl NameGenerator {
                 "Thread Size".to_string(), 
                 "Length".to_string(),
                 "Drive Style".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
@@ -196,6 +216,7 @@ impl NameGenerator {
                 "Thread Size".to_string(), 
                 "Length".to_string(),
                 "Drive Style".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
@@ -209,6 +230,7 @@ impl NameGenerator {
                 "Thread Size".to_string(), 
                 "Length".to_string(),
                 "Drive Style".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
@@ -222,6 +244,7 @@ impl NameGenerator {
                 "Thread Size".to_string(), 
                 "Length".to_string(),
                 "Drive Style".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
@@ -235,6 +258,7 @@ impl NameGenerator {
                 "Thread Size".to_string(), 
                 "Length".to_string(),
                 "Drive Style".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
@@ -248,6 +272,7 @@ impl NameGenerator {
                 "Thread Size".to_string(), 
                 "Length".to_string(),
                 "Drive Style".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
@@ -262,6 +287,7 @@ impl NameGenerator {
                 "Thread Size".to_string(), 
                 "Length".to_string(),
                 "Drive Style".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
@@ -275,6 +301,7 @@ impl NameGenerator {
                 "Thread Size".to_string(), 
                 "Length".to_string(),
                 "Drive Style".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
@@ -288,6 +315,7 @@ impl NameGenerator {
                 "Thread Size".to_string(), 
                 "Length".to_string(),
                 "Drive Style".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
@@ -301,6 +329,7 @@ impl NameGenerator {
                 "Thread Size".to_string(), 
                 "Length".to_string(),
                 "Drive Style".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
@@ -314,6 +343,7 @@ impl NameGenerator {
                 "Thread Size".to_string(), 
                 "Length".to_string(),
                 "Drive Style".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: screw_abbrevs.clone(),
         };
@@ -335,7 +365,7 @@ impl NameGenerator {
         // 12-Point Head Screw
         let twelve_point_template = NamingTemplate {
             prefix: "12PHS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("12_point_head_screw".to_string(), twelve_point_template);
@@ -343,7 +373,7 @@ impl NameGenerator {
         // Domed Head Screw
         let domed_template = NamingTemplate {
             prefix: "DHS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("domed_head_screw".to_string(), domed_template);
@@ -351,7 +381,7 @@ impl NameGenerator {
         // Eye Screw
         let eye_template = NamingTemplate {
             prefix: "EYE".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("eye_screw".to_string(), eye_template);
@@ -359,7 +389,7 @@ impl NameGenerator {
         // Headless Screw (Set Screw)
         let headless_template = NamingTemplate {
             prefix: "HEADLESS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("headless_screw".to_string(), headless_template);
@@ -367,7 +397,7 @@ impl NameGenerator {
         // Hex Head Screw
         let hex_head_template = NamingTemplate {
             prefix: "HHS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("hex_head_screw".to_string(), hex_head_template);
@@ -375,7 +405,7 @@ impl NameGenerator {
         // Hook Screw
         let hook_template = NamingTemplate {
             prefix: "HOOK".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("hook_screw".to_string(), hook_template);
@@ -383,7 +413,7 @@ impl NameGenerator {
         // Knob Screw
         let knob_template = NamingTemplate {
             prefix: "KNOB".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("knob_screw".to_string(), knob_template);
@@ -391,7 +421,7 @@ impl NameGenerator {
         // L-Handle Screw
         let l_handle_template = NamingTemplate {
             prefix: "LHS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("l_handle_screw".to_string(), l_handle_template);
@@ -399,7 +429,7 @@ impl NameGenerator {
         // Oval Head Screw
         let oval_template = NamingTemplate {
             prefix: "OHS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("oval_head_screw".to_string(), oval_template);
@@ -408,7 +438,7 @@ impl NameGenerator {
         // Standard Oval Head Screw
         let standard_oval_template = NamingTemplate {
             prefix: "SOHS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("standard_oval_head_screw".to_string(), standard_oval_template);
@@ -416,7 +446,7 @@ impl NameGenerator {
         // Undercut Oval Head Screw
         let undercut_oval_template = NamingTemplate {
             prefix: "UOHS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("undercut_oval_head_screw".to_string(), undercut_oval_template);
@@ -424,7 +454,7 @@ impl NameGenerator {
         // Pentagon Head Screw
         let pentagon_head_template = NamingTemplate {
             prefix: "PENTHS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("pentagon_head_screw".to_string(), pentagon_head_template);
@@ -432,7 +462,7 @@ impl NameGenerator {
         // Ring Screw
         let ring_template = NamingTemplate {
             prefix: "RING".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("ring_screw".to_string(), ring_template);
@@ -440,7 +470,7 @@ impl NameGenerator {
         // Rounded Head Screw
         let rounded_template = NamingTemplate {
             prefix: "RHS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("rounded_head_screw".to_string(), rounded_template);
@@ -448,7 +478,7 @@ impl NameGenerator {
         // Square Head Screw
         let square_head_template = NamingTemplate {
             prefix: "SQHS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("square_head_screw".to_string(), square_head_template);
@@ -456,7 +486,7 @@ impl NameGenerator {
         // Tee Screw
         let tee_template = NamingTemplate {
             prefix: "TEE".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("tee_screw".to_string(), tee_template);
@@ -464,7 +494,7 @@ impl NameGenerator {
         // T-Handle Screw
         let t_handle_template = NamingTemplate {
             prefix: "THS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("t_handle_screw".to_string(), t_handle_template);
@@ -472,7 +502,7 @@ impl NameGenerator {
         // Threaded Screw
         let threaded_template = NamingTemplate {
             prefix: "THREADED".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("threaded_screw".to_string(), threaded_template);
@@ -480,7 +510,7 @@ impl NameGenerator {
         // Thumb Screw
         let thumb_template = NamingTemplate {
             prefix: "THUMB".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("thumb_screw".to_string(), thumb_template);
@@ -489,7 +519,7 @@ impl NameGenerator {
         // Four Arm Thumb Screw
         let four_arm_thumb_template = NamingTemplate {
             prefix: "4ARM".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("four_arm_thumb_screw".to_string(), four_arm_thumb_template);
@@ -497,7 +527,7 @@ impl NameGenerator {
         // Hex Thumb Screw
         let hex_thumb_template = NamingTemplate {
             prefix: "HEXTHUMB".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("hex_thumb_screw".to_string(), hex_thumb_template);
@@ -505,7 +535,7 @@ impl NameGenerator {
         // Multilobe Thumb Screw
         let multilobe_thumb_template = NamingTemplate {
             prefix: "MULTILOBE".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("multilobe_thumb_screw".to_string(), multilobe_thumb_template);
@@ -513,7 +543,7 @@ impl NameGenerator {
         // Rectangle Thumb Screw
         let rectangle_thumb_template = NamingTemplate {
             prefix: "RECTTHUMB".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("rectangle_thumb_screw".to_string(), rectangle_thumb_template);
@@ -521,7 +551,7 @@ impl NameGenerator {
         // Round Thumb Screw
         let round_thumb_template = NamingTemplate {
             prefix: "ROUNDTHUMB".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("round_thumb_screw".to_string(), round_thumb_template);
@@ -529,7 +559,7 @@ impl NameGenerator {
         // Spade Thumb Screw
         let spade_thumb_template = NamingTemplate {
             prefix: "SPADE".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("spade_thumb_screw".to_string(), spade_thumb_template);
@@ -537,7 +567,7 @@ impl NameGenerator {
         // Two Arm Thumb Screw
         let two_arm_thumb_template = NamingTemplate {
             prefix: "2ARM".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("two_arm_thumb_screw".to_string(), two_arm_thumb_template);
@@ -545,7 +575,7 @@ impl NameGenerator {
         // Wing Thumb Screw
         let wing_thumb_template = NamingTemplate {
             prefix: "WINGTHUMB".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("wing_thumb_screw".to_string(), wing_thumb_template);
@@ -553,7 +583,7 @@ impl NameGenerator {
         // T-Slot Screw
         let t_slot_template = NamingTemplate {
             prefix: "TSLOT".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("t_slot_screw".to_string(), t_slot_template);
@@ -562,7 +592,7 @@ impl NameGenerator {
         // Binding Head Screw
         let binding_head_template = NamingTemplate {
             prefix: "BINDING".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("binding_head_screw".to_string(), binding_head_template);
@@ -570,7 +600,7 @@ impl NameGenerator {
         // Carriage Head Screw
         let carriage_head_template = NamingTemplate {
             prefix: "CARRIAGE".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("carriage_head_screw".to_string(), carriage_head_template);
@@ -578,7 +608,7 @@ impl NameGenerator {
         // Cheese Head Screw
         let cheese_head_template = NamingTemplate {
             prefix: "CHEESE".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("cheese_head_screw".to_string(), cheese_head_template);
@@ -586,7 +616,7 @@ impl NameGenerator {
         // Fillister Head Screw
         let fillister_head_template = NamingTemplate {
             prefix: "FILLISTER".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("fillister_head_screw".to_string(), fillister_head_template);
@@ -594,7 +624,7 @@ impl NameGenerator {
         // Pancake Head Screw
         let pancake_head_template = NamingTemplate {
             prefix: "PANCAKE".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("pancake_head_screw".to_string(), pancake_head_template);
@@ -602,7 +632,7 @@ impl NameGenerator {
         // Round Head Screw
         let round_head_template = NamingTemplate {
             prefix: "ROUND".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("round_head_screw".to_string(), round_head_template);
@@ -610,7 +640,7 @@ impl NameGenerator {
         // Truss Head Screw
         let truss_head_template = NamingTemplate {
             prefix: "TRUSS".to_string(),
-            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
             spec_abbreviations: screw_abbrevs.clone(),
         };
         self.category_templates.insert("truss_head_screw".to_string(), truss_head_template);
@@ -839,12 +869,31 @@ impl NameGenerator {
         nut_abbrevs.insert("Brass".to_string(), "Brass".to_string());
         nut_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
         
+        // Finish abbreviations for nuts
+        nut_abbrevs.insert("Zinc Plated".to_string(), "ZP".to_string());
+        nut_abbrevs.insert("Zinc-Plated".to_string(), "ZP".to_string());
+        nut_abbrevs.insert("Zinc Yellow-Chromate Plated".to_string(), "ZYC".to_string());
+        nut_abbrevs.insert("Zinc Yellow Chromate Plated".to_string(), "ZYC".to_string());
+        nut_abbrevs.insert("Black Oxide".to_string(), "BO".to_string());
+        nut_abbrevs.insert("Black-Oxide".to_string(), "BO".to_string());
+        nut_abbrevs.insert("Passivated".to_string(), "PASS".to_string());
+        nut_abbrevs.insert("Plain".to_string(), "PLAIN".to_string());
+        nut_abbrevs.insert("Unfinished".to_string(), "UF".to_string());
+        nut_abbrevs.insert("Galvanized".to_string(), "GALV".to_string());
+        nut_abbrevs.insert("Cadmium Plated".to_string(), "CD".to_string());
+        nut_abbrevs.insert("Cadmium-Plated".to_string(), "CD".to_string());
+        nut_abbrevs.insert("Nickel Plated".to_string(), "NI".to_string());
+        nut_abbrevs.insert("Nickel-Plated".to_string(), "NI".to_string());
+        nut_abbrevs.insert("Chrome Plated".to_string(), "CR".to_string());
+        nut_abbrevs.insert("Chrome-Plated".to_string(), "CR".to_string());
+        
         // Locknut template (nylon-insert, prevailing torque, etc.)
         let locknut_template = NamingTemplate {
             prefix: "LOCKNUT".to_string(),
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: nut_abbrevs.clone(),
         };
@@ -856,7 +905,7 @@ impl NameGenerator {
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(),
-                "Height".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: nut_abbrevs.clone(),
         };
@@ -868,6 +917,7 @@ impl NameGenerator {
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: nut_abbrevs.clone(),
         };
@@ -879,7 +929,7 @@ impl NameGenerator {
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(),
-                "Height".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: nut_abbrevs.clone(),
         };
@@ -891,6 +941,7 @@ impl NameGenerator {
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(),
+                "Finish".to_string(),
             ],
             spec_abbreviations: nut_abbrevs,
         };
@@ -1115,7 +1166,8 @@ impl NameGenerator {
                         let finish_abbrev = template.spec_abbreviations.get(&finish_value)
                             .cloned()
                             .unwrap_or_else(|| self.abbreviate_value(&finish_value));
-                        if !finish_abbrev.is_empty() {
+                        // Skip passivated finish as it doesn't add meaningful information
+                        if !finish_abbrev.is_empty() && finish_abbrev != "PASS" {
                             name_parts.push(finish_abbrev);
                         }
                     }
@@ -1135,7 +1187,8 @@ impl NameGenerator {
                 let finish_abbrev = template.spec_abbreviations.get(&finish_value)
                     .cloned()
                     .unwrap_or_else(|| self.abbreviate_value(&finish_value));
-                if !finish_abbrev.is_empty() {
+                // Skip passivated finish as it doesn't add meaningful information
+                if !finish_abbrev.is_empty() && finish_abbrev != "PASS" {
                     name_parts.push(finish_abbrev);
                 }
             }
@@ -1147,8 +1200,10 @@ impl NameGenerator {
     fn parse_material_and_finish(&self, material_value: &str) -> (String, Option<String>) {
         // Common finish prefixes that can appear in material specifications
         let finish_prefixes = [
-            "Black-Oxide ", "Black Oxide ", "Zinc Plated ", "Zinc Yellow-Chromate Plated ",
-            "Galvanized ", "Cadmium Plated ", "Nickel Plated ", "Chrome Plated ",
+            "Black-Oxide ", "Black Oxide ", "Zinc Plated ", "Zinc-Plated ", 
+            "Zinc Yellow-Chromate Plated ", "Zinc Yellow Chromate Plated ",
+            "Galvanized ", "Cadmium Plated ", "Cadmium-Plated ", 
+            "Nickel Plated ", "Nickel-Plated ", "Chrome Plated ", "Chrome-Plated ",
             "Passivated ", "Plain ", "Unfinished "
         ];
         
