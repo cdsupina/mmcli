@@ -30,3 +30,6 @@ certificates/
 
 # User's global config (shouldn't be in project but just in case)
 ~/.config/mmcli/
+
+# Claude Code configuration
+.claude/

@@ -264,6 +264,47 @@ McMaster-Carr CLI supports 19 different washer types with specific naming patter
 
 *Note: Supports various standoff configurations including male-female, female-only, and specialized types for electronics and mechanical assemblies.*
 
+#### Bearings
+
+McMaster-Carr CLI provides comprehensive bearing support with specialized naming for different bearing types:
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Flanged Sleeve Bearing | `FSB-[Material]-[Shaft Diameter]-[OD]-[Length]` | MDS-Filled Nylon, 1/4" shaft, 3/8" OD, 1/4" long | `FSB-MDSNYL-0.25-0.375-0.25` |
+| Plain Sleeve Bearing | `SB-[Material]-[Shaft Diameter]-[OD]-[Length]` | Bronze SAE 841, 3/8" shaft, 1/2" OD, 1/2" long | `SB-BR841-0.375-0.5-0.5` |
+| Flanged Bearing (generic) | `FB-[Material]-[Shaft Diameter]-[OD]-[Length]` | Steel flanged bearing, 1/2" shaft, 5/8" OD | `FB-STL-0.5-0.625-0.5` |
+| Ball Bearing | `BB-[Material]-[Bore]-[OD]` | Stainless steel ball bearing, 6mm bore, 19mm OD | `BB-SS-6-19` |
+| Linear Bearing | `LB-[Material]-[Shaft Diameter]-[Length]` | Steel linear bearing for 3/8" shaft, 2" long | `LB-STL-0.375-2` |
+| Needle Bearing | `NB-[Material]-[Bore]-[OD]-[Length]` | Steel needle bearing, 1/4" bore, 3/8" OD | `NB-STL-0.25-0.375-0.5` |
+| Roller Bearing | `RB-[Material]-[Bore]-[OD]-[Length]` | Bronze roller bearing, 20mm bore, 35mm OD | `RB-BR-20-35-12` |
+| Generic Bearing | `BRG-[Material]-[Type]` | PTFE bearing assembly | `BRG-PTFE-ASSEMBLY` |
+
+**Special Features:**
+- **Automatic Material Detection**: Combines filler materials (e.g., MDS-Filled Nylon)
+- **Dimension Conversion**: Fractions automatically converted to decimals (1/4" → 0.25)
+- **Metric Support**: Handles both imperial and metric dimensions
+- **Comprehensive Coverage**: Supports plain, flanged, ball, linear, needle, and roller bearings
+
+**Bearing Material Abbreviations:**
+
+| Full Name | Abbreviation | Applications |
+|-----------|--------------|-------------|
+| MDS-Filled Nylon Plastic | `MDSNYL` | Dry-running, self-lubricating applications |
+| Nylon Plastic | `NYL` | Light-duty, corrosion-resistant |
+| Bronze SAE 841 | `BR841` | Oil-impregnated, general purpose |
+| Bronze SAE 863 | `BR863` | High-load applications |
+| Cast Bronze | `CB` | Heavy-duty applications |
+| Oil-Filled Bronze | `OFB` | Self-lubricating bronze |
+| PTFE | `PTFE` | Chemical resistance, low friction |
+| Rulon | `RUL` | Dry-running plastic bearing |
+| Graphite | `GRAPH` | High-temperature applications |
+| Steel-Backed PTFE | `SBPTFE` | High-load PTFE applications |
+| Bronze (generic) | `BR` | General bronze bearings |
+| Steel | `STL` | High-strength applications |
+| Stainless Steel | `SS` | Corrosion-resistant steel |
+
+*Note: The system automatically detects bearing type from product specifications and applies the appropriate template. Filler materials are automatically combined with base materials for accurate naming.*
+
 #### Material Abbreviations
 
 | Full Name | Abbreviation | Notes |

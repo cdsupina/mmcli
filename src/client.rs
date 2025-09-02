@@ -1363,6 +1363,91 @@ impl NameGenerator {
             spec_abbreviations: standoff_abbrevs,
         };
         self.category_templates.insert("generic_standoff".to_string(), generic_standoff_template);
+        
+        // Bearing templates
+        let mut bearing_abbrevs = HashMap::new();
+        
+        // Material abbreviations for bearings
+        bearing_abbrevs.insert("MDS-Filled Nylon Plastic".to_string(), "MDSNYL".to_string());
+        bearing_abbrevs.insert("MDS-Filled Nylon".to_string(), "MDSNYL".to_string());
+        bearing_abbrevs.insert("Nylon Plastic".to_string(), "NYL".to_string());
+        bearing_abbrevs.insert("Bronze SAE 841".to_string(), "BR841".to_string());
+        bearing_abbrevs.insert("Bronze SAE 863".to_string(), "BR863".to_string());
+        bearing_abbrevs.insert("Cast Bronze".to_string(), "CB".to_string());
+        bearing_abbrevs.insert("Oil-Filled Bronze".to_string(), "OFB".to_string());
+        bearing_abbrevs.insert("PTFE".to_string(), "PTFE".to_string());
+        bearing_abbrevs.insert("Rulon".to_string(), "RUL".to_string());
+        bearing_abbrevs.insert("Graphite".to_string(), "GRAPH".to_string());
+        bearing_abbrevs.insert("Steel-Backed PTFE".to_string(), "SBPTFE".to_string());
+        bearing_abbrevs.insert("Bronze".to_string(), "BR".to_string());
+        bearing_abbrevs.insert("Steel".to_string(), "STL".to_string());
+        bearing_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
+        bearing_abbrevs.insert("Aluminum".to_string(), "AL".to_string());
+        bearing_abbrevs.insert("Plastic".to_string(), "PL".to_string());
+        
+        // Flanged Sleeve Bearing
+        let flanged_sleeve_bearing_template = NamingTemplate {
+            prefix: "FSB".to_string(),
+            key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "OD".to_string(), "Length".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("flanged_sleeve_bearing".to_string(), flanged_sleeve_bearing_template);
+        
+        // Plain Sleeve Bearing
+        let sleeve_bearing_template = NamingTemplate {
+            prefix: "SB".to_string(),
+            key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "OD".to_string(), "Length".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("sleeve_bearing".to_string(), sleeve_bearing_template);
+        
+        // Flanged Bearing (generic)
+        let flanged_bearing_template = NamingTemplate {
+            prefix: "FB".to_string(),
+            key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "OD".to_string(), "Length".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("flanged_bearing".to_string(), flanged_bearing_template);
+        
+        // Ball Bearing
+        let ball_bearing_template = NamingTemplate {
+            prefix: "BB".to_string(),
+            key_specs: vec!["Material".to_string(), "Bore".to_string(), "OD".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("ball_bearing".to_string(), ball_bearing_template);
+        
+        // Linear Bearing
+        let linear_bearing_template = NamingTemplate {
+            prefix: "LB".to_string(),
+            key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "Length".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("linear_bearing".to_string(), linear_bearing_template);
+        
+        // Needle Bearing
+        let needle_bearing_template = NamingTemplate {
+            prefix: "NB".to_string(),
+            key_specs: vec!["Material".to_string(), "Bore".to_string(), "OD".to_string(), "Length".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("needle_bearing".to_string(), needle_bearing_template);
+        
+        // Roller Bearing
+        let roller_bearing_template = NamingTemplate {
+            prefix: "RB".to_string(),
+            key_specs: vec!["Material".to_string(), "Bore".to_string(), "OD".to_string(), "Length".to_string()],
+            spec_abbreviations: bearing_abbrevs.clone(),
+        };
+        self.category_templates.insert("roller_bearing".to_string(), roller_bearing_template);
+        
+        // Generic Bearing (fallback)
+        let generic_bearing_template = NamingTemplate {
+            prefix: "BRG".to_string(),
+            key_specs: vec!["Material".to_string(), "Type".to_string()],
+            spec_abbreviations: bearing_abbrevs,
+        };
+        self.category_templates.insert("generic_bearing".to_string(), generic_bearing_template);
     }
 
     pub fn generate_name(&self, product: &ProductDetail) -> String {
@@ -1628,6 +1713,33 @@ impl NameGenerator {
             } else {
                 "generic_standoff".to_string()
             }
+        } else if category_lower.contains("bearing") || family_lower.contains("bearing") {
+            // Determine specific bearing type
+            let plain_type = product.specifications.iter()
+                .find(|s| s.attribute.eq_ignore_ascii_case("Plain Bearing Type"))
+                .and_then(|s| s.values.first())
+                .map(|v| v.as_str())
+                .unwrap_or("");
+                
+            if family_lower.contains("flanged") || plain_type.eq_ignore_ascii_case("Flanged") {
+                if family_lower.contains("sleeve") || family_lower.contains("plain") {
+                    "flanged_sleeve_bearing".to_string()
+                } else {
+                    "flanged_bearing".to_string()
+                }
+            } else if family_lower.contains("sleeve") || family_lower.contains("plain") {
+                "sleeve_bearing".to_string()
+            } else if family_lower.contains("ball") {
+                "ball_bearing".to_string()
+            } else if family_lower.contains("linear") {
+                "linear_bearing".to_string()
+            } else if family_lower.contains("needle") {
+                "needle_bearing".to_string()
+            } else if family_lower.contains("roller") {
+                "roller_bearing".to_string()
+            } else {
+                "generic_bearing".to_string()
+            }
         } else {
             "unknown".to_string()
         }
@@ -1647,9 +1759,26 @@ impl NameGenerator {
                 if spec_name.eq_ignore_ascii_case("Material") {
                     let (material, finish) = self.parse_material_and_finish(&value);
                     
-                    // Check for steel grade to make steel more descriptive
-                    let final_material = if material.eq_ignore_ascii_case("Steel") || 
-                                           material.eq_ignore_ascii_case("Alloy Steel") {
+                    // Special handling for bearings with filler material
+                    let final_material = if template.prefix.ends_with("B") && (template.prefix.starts_with("FSB") || template.prefix.starts_with("SB") || template.prefix.starts_with("BB")) {
+                        // Check for filler material for bearings
+                        if let Some(filler_spec) = product.specifications.iter()
+                            .find(|s| s.attribute.eq_ignore_ascii_case("Filler Material")) {
+                            if let Some(filler_value) = filler_spec.values.first() {
+                                if !filler_value.is_empty() && filler_value != "None" && filler_value != "Not Specified" {
+                                    // Combine filler with base material
+                                    format!("{}-Filled {}", filler_value, material)
+                                } else {
+                                    material
+                                }
+                            } else {
+                                material
+                            }
+                        } else {
+                            material
+                        }
+                    } else if material.eq_ignore_ascii_case("Steel") || material.eq_ignore_ascii_case("Alloy Steel") {
+                        // Check for steel grade to make steel more descriptive
                         self.get_steel_grade_material(product, &material)
                     } else {
                         material
@@ -1688,6 +1817,16 @@ impl NameGenerator {
                     let abbreviated = template.spec_abbreviations.get(&length_value)
                         .cloned()
                         .unwrap_or(length_value);
+                    
+                    if !abbreviated.is_empty() {
+                        name_parts.push(abbreviated);
+                    }
+                } else if spec_name.eq_ignore_ascii_case("For Shaft Diameter") || spec_name.eq_ignore_ascii_case("OD") {
+                    // Special handling for bearing dimensions - convert fractions to decimals
+                    let dimension_value = self.convert_length_to_decimal(&value);
+                    let abbreviated = template.spec_abbreviations.get(&dimension_value)
+                        .cloned()
+                        .unwrap_or(dimension_value);
                     
                     if !abbreviated.is_empty() {
                         name_parts.push(abbreviated);
