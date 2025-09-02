@@ -2,14 +2,12 @@
 
 use anyhow::Result;
 use reqwest::{Client, Identity};
-use std::path::PathBuf;
 use std::fs;
 use serde_json;
 
 use crate::config::paths::{expand_path};
 use crate::models::auth::{Credentials, ErrorResponse};
 use crate::models::product::{ProductDetail, PriceInfo};
-use crate::models::api::{ProductResponse, ProductLinks, CadFile, CadFormat};
 use crate::utils::output::{OutputFormat, ProductField};
 use crate::naming::NameGenerator;
 

@@ -1,5 +1,5 @@
 //! McMaster-Carr CLI Library
-//! 
+//!
 //! A comprehensive library for interacting with McMaster-Carr's Product Information API
 //! and generating human-readable technical names for fasteners and components.
 
@@ -12,11 +12,11 @@ pub mod utils;
 // Re-export main types for convenience
 pub use client::McmasterClient;
 pub use models::{
-    auth::{Credentials, LoginRequest, LoginResponse},
-    product::{ProductDetail, Specification, PriceInfo},
     api::ProductInfo,
-    api::{ProductResponse, LinkItem, CadFile, CadFormat},
+    api::{CadFile, CadFormat, LinkItem, ProductResponse},
+    auth::{Credentials, LoginRequest, LoginResponse},
+    product::{PriceInfo, ProductDetail, Specification},
 };
 pub use naming::{NameGenerator, NamingTemplate};
-pub use utils::output::{OutputFormat, ProductField};
 pub use utils::error::ClientError;
+pub use utils::output::{OutputFormat, ProductField};

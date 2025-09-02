@@ -1,14 +1,11 @@
 //! Authentication functionality for McMaster-Carr API
 
 use anyhow::Result;
-use reqwest::Client;
 use std::path::PathBuf;
-use std::fs;
 use tokio::fs as async_fs;
 
 use crate::config::paths::{get_config_dir, get_token_path, find_certificate_path, expand_path};
-use crate::models::auth::{Credentials, LoginRequest, LoginResponse, ErrorResponse};
-use crate::utils::output::OutputFormat;
+use crate::models::auth::{LoginRequest, LoginResponse, ErrorResponse};
 
 /// Authentication-related methods for McmasterClient
 impl super::api::McmasterClient {
