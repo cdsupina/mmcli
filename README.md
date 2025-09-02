@@ -223,9 +223,33 @@ mmc name 91831A005
 
 #### Washers
 
+McMaster-Carr CLI supports 19 different washer types with specific naming patterns:
+
 | Type | Template | Example Input | Generated Name |
 |------|----------|---------------|----------------|
-| Washer | `WASHER-[Material]-[ID]-[OD]` | 316 SS Flat Washer, 1/4" ID, 5/8" OD | `WASHER-SS316-0.25-0.625` |
+| Cup Washer | `CUP-[Material]-[Screw Size]` | 316 SS Cup Washer for 1/4" Screws | `CUP-SS316-1/4` |
+| Curved Washer | `CURVED-[Material]-[Screw Size]` | Steel Curved Washer for 8-32 | `CURVED-Steel-8-32` |
+| Dished Washer | `DISHED-[Material]-[Screw Size]` | Brass Dished Washer for M6 | `DISHED-Brass-M6` |
+| Domed Washer | `DOMED-[Material]-[Screw Size]` | 18-8 SS Domed Washer for 1/4-20 | `DOMED-SS188-1/4-20` |
+| Double Clipped Washer | `DBLCLIP-[Material]-[Screw Size]` | Steel Double Clipped for #10 | `DBLCLIP-Steel-10` |
+| Flat Washer | `FLAT-[Material]-[Screw Size]` | 316 SS Flat Washer for 1/4" | `FLAT-SS316-1/4` |
+| Hillside Washer | `HILLSIDE-[Material]-[Screw Size]` | Steel Hillside Washer for M8 | `HILLSIDE-Steel-M8` |
+| Notched Washer | `NOTCHED-[Material]-[Screw Size]` | Aluminum Notched Washer for 6-32 | `NOTCHED-Al-6-32` |
+| Perforated Washer | `PERF-[Material]-[Screw Size]` | SS Perforated Washer for 1/2" | `PERF-SS-1/2` |
+| Pronged Washer | `PRONGED-[Material]-[Screw Size]` | Steel Pronged Washer for M5 | `PRONGED-Steel-M5` |
+| Rectangular Washer | `RECT-[Material]-[Screw Size]` | Nylon Rectangular for 10-24 | `RECT-Nylon-10-24` |
+| Sleeve Washer | `SLEEVE-[Material]-[Screw Size]` | Brass Sleeve Washer for 1/4" | `SLEEVE-Brass-1/4` |
+| Slotted Washer | `SLOTTED-[Material]-[Screw Size]` | SS Slotted Washer for M6 | `SLOTTED-SS-M6` |
+| Spherical Washer | `SPHERE-[Material]-[Screw Size]` | Steel Spherical for 5/16" | `SPHERE-Steel-5/16` |
+| Split Washer (Lock) | `SPLIT-[Material]-[Screw Size]` | 18-8 SS Split Lock for 8-32 | `SPLIT-SS188-8-32` |
+| Square Washer | `SQUARE-[Material]-[Screw Size]` | Steel Square Washer for M8 | `SQUARE-Steel-M8` |
+| Tab Washer | `TAB-[Material]-[Screw Size]` | SS Tab Washer for 1/4-20 | `TAB-SS-1/4-20` |
+| Tapered Washer | `TAPERED-[Material]-[Screw Size]` | Steel Tapered for 3/8" | `TAPERED-Steel-3/8` |
+| Tooth Washer | `TOOTH-[Material]-[Screw Size]` | SS Tooth Lock Washer for M10 | `TOOTH-SS-M10` |
+| Wave Washer | `WAVE-[Material]-[Screw Size]` | Spring Steel Wave for 1/4" | `WAVE-Steel-1/4` |
+| Wedge Washer | `WEDGE-[Material]-[Screw Size]` | Steel Wedge Washer for M12 | `WEDGE-Steel-M12` |
+
+*Note: The system automatically detects washer type from the family description and applies the appropriate template. If no specific type is detected, it defaults to flat washer naming.*
 
 #### Material Abbreviations
 
@@ -237,6 +261,10 @@ mmc name 91831A005
 | Steel | `Steel` | Carbon/alloy steel |
 | Brass | `Brass` | Brass alloy |
 | Aluminum | `Al` | Aluminum alloy |
+| Copper | `Cu` | Copper alloy |
+| Nylon | `Nylon` | Nylon plastic |
+| Plastic | `Plastic` | Various plastic materials |
+| Rubber | `Rubber` | Rubber materials |
 
 #### Drive Style Abbreviations
 

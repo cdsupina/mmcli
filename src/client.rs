@@ -615,24 +615,220 @@ impl NameGenerator {
         };
         self.category_templates.insert("truss_head_screw".to_string(), truss_head_template);
         
-        // Washer template
+        // Washer templates - comprehensive support for all washer types
         let mut washer_abbrevs = HashMap::new();
         washer_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
         washer_abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
         washer_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
         washer_abbrevs.insert("Steel".to_string(), "Steel".to_string());
         washer_abbrevs.insert("Brass".to_string(), "Brass".to_string());
+        washer_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
+        washer_abbrevs.insert("Copper".to_string(), "Cu".to_string());
+        washer_abbrevs.insert("Nylon".to_string(), "Nylon".to_string());
+        washer_abbrevs.insert("Plastic".to_string(), "Plastic".to_string());
+        washer_abbrevs.insert("Rubber".to_string(), "Rubber".to_string());
         
-        let washer_template = NamingTemplate {
-            prefix: "WASHER".to_string(),
-            key_specs: vec![
-                "Material".to_string(),
-                "Inside Diameter".to_string(),
-                "Outside Diameter".to_string(),
-            ],
-            spec_abbreviations: washer_abbrevs,
+        // Screw size abbreviations for washers
+        washer_abbrevs.insert("No. 0".to_string(), "0".to_string());
+        washer_abbrevs.insert("No. 1".to_string(), "1".to_string());
+        washer_abbrevs.insert("No. 2".to_string(), "2".to_string());
+        washer_abbrevs.insert("No. 3".to_string(), "3".to_string());
+        washer_abbrevs.insert("No. 4".to_string(), "4".to_string());
+        washer_abbrevs.insert("No. 5".to_string(), "5".to_string());
+        washer_abbrevs.insert("No. 6".to_string(), "6".to_string());
+        washer_abbrevs.insert("No. 8".to_string(), "8".to_string());
+        washer_abbrevs.insert("No. 10".to_string(), "10".to_string());
+        washer_abbrevs.insert("No. 12".to_string(), "12".to_string());
+        washer_abbrevs.insert("No. 14".to_string(), "14".to_string());
+        
+        // Finish abbreviations for washers
+        washer_abbrevs.insert("Zinc Plated".to_string(), "ZP".to_string());
+        washer_abbrevs.insert("Zinc Yellow-Chromate Plated".to_string(), "ZYC".to_string());
+        washer_abbrevs.insert("Black Oxide".to_string(), "BO".to_string());
+        washer_abbrevs.insert("Black-Oxide".to_string(), "BO".to_string());
+        washer_abbrevs.insert("Passivated".to_string(), "PASS".to_string());
+        washer_abbrevs.insert("Plain".to_string(), "PLAIN".to_string());
+        washer_abbrevs.insert("Unfinished".to_string(), "UF".to_string());
+        washer_abbrevs.insert("Galvanized".to_string(), "GALV".to_string());
+        washer_abbrevs.insert("Cadmium Plated".to_string(), "CD".to_string());
+        washer_abbrevs.insert("Nickel Plated".to_string(), "NI".to_string());
+        washer_abbrevs.insert("Chrome Plated".to_string(), "CR".to_string());
+        
+        // Cup Washer
+        let cup_washer_template = NamingTemplate {
+            prefix: "CW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
         };
-        self.category_templates.insert("washer".to_string(), washer_template);
+        self.category_templates.insert("cup_washer".to_string(), cup_washer_template);
+        
+        // Curved Washer
+        let curved_washer_template = NamingTemplate {
+            prefix: "CRVW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("curved_washer".to_string(), curved_washer_template);
+        
+        // Dished Washer
+        let dished_washer_template = NamingTemplate {
+            prefix: "DW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("dished_washer".to_string(), dished_washer_template);
+        
+        // Domed Washer
+        let domed_washer_template = NamingTemplate {
+            prefix: "DMW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("domed_washer".to_string(), domed_washer_template);
+        
+        // Double Clipped Washer
+        let double_clipped_washer_template = NamingTemplate {
+            prefix: "DCW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("double_clipped_washer".to_string(), double_clipped_washer_template);
+        
+        // Clipped Washer (single clipped)
+        let clipped_washer_template = NamingTemplate {
+            prefix: "CLW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("clipped_washer".to_string(), clipped_washer_template);
+        
+        // Flat Washer (default/standard)
+        let flat_washer_template = NamingTemplate {
+            prefix: "FW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("flat_washer".to_string(), flat_washer_template);
+        
+        // Hillside Washer
+        let hillside_washer_template = NamingTemplate {
+            prefix: "HW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("hillside_washer".to_string(), hillside_washer_template);
+        
+        // Notched Washer
+        let notched_washer_template = NamingTemplate {
+            prefix: "NW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("notched_washer".to_string(), notched_washer_template);
+        
+        // Perforated Washer
+        let perforated_washer_template = NamingTemplate {
+            prefix: "PW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("perforated_washer".to_string(), perforated_washer_template);
+        
+        // Pronged Washer
+        let pronged_washer_template = NamingTemplate {
+            prefix: "PRW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("pronged_washer".to_string(), pronged_washer_template);
+        
+        // Rectangular Washer
+        let rectangular_washer_template = NamingTemplate {
+            prefix: "RW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("rectangular_washer".to_string(), rectangular_washer_template);
+        
+        // Sleeve Washer
+        let sleeve_washer_template = NamingTemplate {
+            prefix: "SW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("sleeve_washer".to_string(), sleeve_washer_template);
+        
+        // Slotted Washer
+        let slotted_washer_template = NamingTemplate {
+            prefix: "SLW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("slotted_washer".to_string(), slotted_washer_template);
+        
+        // Spherical Washer
+        let spherical_washer_template = NamingTemplate {
+            prefix: "SPW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("spherical_washer".to_string(), spherical_washer_template);
+        
+        // Split Washer (Lock Washer)
+        let split_washer_template = NamingTemplate {
+            prefix: "SPLW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("split_washer".to_string(), split_washer_template);
+        
+        // Square Washer
+        let square_washer_template = NamingTemplate {
+            prefix: "SQW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("square_washer".to_string(), square_washer_template);
+        
+        // Tab Washer
+        let tab_washer_template = NamingTemplate {
+            prefix: "TW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("tab_washer".to_string(), tab_washer_template);
+        
+        // Tapered Washer
+        let tapered_washer_template = NamingTemplate {
+            prefix: "TPW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("tapered_washer".to_string(), tapered_washer_template);
+        
+        // Tooth Washer
+        let tooth_washer_template = NamingTemplate {
+            prefix: "TOW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("tooth_washer".to_string(), tooth_washer_template);
+        
+        // Wave Washer
+        let wave_washer_template = NamingTemplate {
+            prefix: "WW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("wave_washer".to_string(), wave_washer_template);
+        
+        // Wedge Washer
+        let wedge_washer_template = NamingTemplate {
+            prefix: "WDW".to_string(),
+            key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: washer_abbrevs.clone(),
+        };
+        self.category_templates.insert("wedge_washer".to_string(), wedge_washer_template);
         
         // Nut templates
         let mut nut_abbrevs = HashMap::new();
@@ -816,7 +1012,54 @@ impl NameGenerator {
         } else if category_lower.contains("screw") || family_lower.contains("screw") {
             "generic_screw".to_string()
         } else if category_lower.contains("washer") || family_lower.contains("washer") {
-            "washer".to_string()
+            // Determine specific washer type
+            if family_lower.contains("cup") {
+                "cup_washer".to_string()
+            } else if family_lower.contains("curved") {
+                "curved_washer".to_string()
+            } else if family_lower.contains("dished") {
+                "dished_washer".to_string()
+            } else if family_lower.contains("domed") {
+                "domed_washer".to_string()
+            } else if family_lower.contains("double clipped") {
+                "double_clipped_washer".to_string()
+            } else if family_lower.contains("clipped") {
+                "clipped_washer".to_string()
+            } else if family_lower.contains("flat") {
+                "flat_washer".to_string()
+            } else if family_lower.contains("hillside") {
+                "hillside_washer".to_string()
+            } else if family_lower.contains("notched") {
+                "notched_washer".to_string()
+            } else if family_lower.contains("perforated") {
+                "perforated_washer".to_string()
+            } else if family_lower.contains("pronged") {
+                "pronged_washer".to_string()
+            } else if family_lower.contains("rectangular") {
+                "rectangular_washer".to_string()
+            } else if family_lower.contains("sleeve") {
+                "sleeve_washer".to_string()
+            } else if family_lower.contains("slotted") {
+                "slotted_washer".to_string()
+            } else if family_lower.contains("spherical") {
+                "spherical_washer".to_string()
+            } else if family_lower.contains("split") {
+                "split_washer".to_string()
+            } else if family_lower.contains("square") {
+                "square_washer".to_string()
+            } else if family_lower.contains("tab") {
+                "tab_washer".to_string()
+            } else if family_lower.contains("tapered") {
+                "tapered_washer".to_string()
+            } else if family_lower.contains("tooth") {
+                "tooth_washer".to_string()
+            } else if family_lower.contains("wave") {
+                "wave_washer".to_string()
+            } else if family_lower.contains("wedge") {
+                "wedge_washer".to_string()
+            } else {
+                "flat_washer".to_string() // Default to flat washer
+            }
         } else if category_lower.contains("nuts") || category_lower.contains("nut") || family_lower.contains("nut") {
             // Determine specific nut type
             if family_lower.contains("locknut") || family_lower.contains("lock nut") || 
@@ -838,6 +1081,7 @@ impl NameGenerator {
 
     fn apply_template(&self, product: &ProductDetail, template: &NamingTemplate) -> String {
         let mut name_parts = vec![template.prefix.clone()];
+        let mut extracted_finish: Option<String> = None;
         
         for spec_name in &template.key_specs {
             if let Some(spec) = product.specifications.iter()
@@ -845,13 +1089,54 @@ impl NameGenerator {
                 
                 let value = spec.values.first().unwrap_or(&"".to_string()).clone();
                 
-                // Apply abbreviation if available
-                let abbreviated = template.spec_abbreviations.get(&value)
+                // Special handling for Material that might include finish
+                if spec_name.eq_ignore_ascii_case("Material") {
+                    let (material, finish) = self.parse_material_and_finish(&value);
+                    
+                    // Add material abbreviation
+                    let material_abbrev = template.spec_abbreviations.get(&material)
+                        .cloned()
+                        .unwrap_or_else(|| self.abbreviate_value(&material));
+                    if !material_abbrev.is_empty() {
+                        name_parts.push(material_abbrev);
+                    }
+                    
+                    // Store extracted finish for later use
+                    extracted_finish = finish;
+                } else if spec_name.eq_ignore_ascii_case("Finish") {
+                    // Check if we have a separate finish spec, or use the extracted one
+                    let finish_value = if !value.is_empty() {
+                        value.clone()
+                    } else {
+                        extracted_finish.clone().unwrap_or_default()
+                    };
+                    
+                    if !finish_value.is_empty() {
+                        let finish_abbrev = template.spec_abbreviations.get(&finish_value)
+                            .cloned()
+                            .unwrap_or_else(|| self.abbreviate_value(&finish_value));
+                        if !finish_abbrev.is_empty() {
+                            name_parts.push(finish_abbrev);
+                        }
+                    }
+                } else {
+                    // Normal handling for other specs
+                    let abbreviated = template.spec_abbreviations.get(&value)
+                        .cloned()
+                        .unwrap_or_else(|| self.abbreviate_value(&value));
+                    
+                    if !abbreviated.is_empty() {
+                        name_parts.push(abbreviated);
+                    }
+                }
+            } else if spec_name.eq_ignore_ascii_case("Finish") && extracted_finish.is_some() {
+                // Handle case where there's no "Finish" attribute but we extracted finish from material
+                let finish_value = extracted_finish.clone().unwrap();
+                let finish_abbrev = template.spec_abbreviations.get(&finish_value)
                     .cloned()
-                    .unwrap_or_else(|| self.abbreviate_value(&value));
-                
-                if !abbreviated.is_empty() {
-                    name_parts.push(abbreviated);
+                    .unwrap_or_else(|| self.abbreviate_value(&finish_value));
+                if !finish_abbrev.is_empty() {
+                    name_parts.push(finish_abbrev);
                 }
             }
         }
@@ -859,18 +1144,30 @@ impl NameGenerator {
         name_parts.join("-")
     }
 
+    fn parse_material_and_finish(&self, material_value: &str) -> (String, Option<String>) {
+        // Common finish prefixes that can appear in material specifications
+        let finish_prefixes = [
+            "Black-Oxide ", "Black Oxide ", "Zinc Plated ", "Zinc Yellow-Chromate Plated ",
+            "Galvanized ", "Cadmium Plated ", "Nickel Plated ", "Chrome Plated ",
+            "Passivated ", "Plain ", "Unfinished "
+        ];
+        
+        for prefix in &finish_prefixes {
+            if material_value.starts_with(prefix) {
+                let finish = prefix.trim().to_string();
+                let material = material_value.strip_prefix(prefix).unwrap_or(material_value).to_string();
+                return (material, Some(finish));
+            }
+        }
+        
+        // No finish prefix found, return the whole value as material
+        (material_value.to_string(), None)
+    }
+
     fn abbreviate_value(&self, value: &str) -> String {
         // Handle common dimension formats
         if value.contains("\"") {
-            // Convert fractions to decimals for consistency
-            if value == "1/4\"" {
-                return "0.25".to_string();
-            } else if value == "1/2\"" {
-                return "0.5".to_string();
-            } else if value == "3/4\"" {
-                return "0.75".to_string();
-            }
-            // Remove quotes and return
+            // Keep fractions as-is, just remove quotes
             value.replace("\"", "").to_string()
         } else {
             // Return as-is for thread sizes and other values
@@ -2064,8 +2361,51 @@ certificate_password = "certificate_password"
                 return Err(anyhow::anyhow!("Failed to parse product data for name generation"));
             }
         } else if response.status().as_u16() == 403 {
+            // Product is not in subscription - offer to add it
             println!("❌ Product {} is not in your subscription.", product);
-            return Err(anyhow::anyhow!("Product not in subscription. Add it first with: mmc add {}", product));
+            print!("Would you like to add it to your subscription? (Y/n): ");
+            io::stdout().flush().unwrap();
+            
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
+            let input = input.trim().to_lowercase();
+            
+            if input == "y" || input == "yes" || input.is_empty() {
+                println!("Adding product {} to subscription...", product);
+                self.add_product(product).await?;
+                println!("✅ Product added! Generating name...");
+                
+                // Retry the product request after adding to subscription
+                let url = format!("{}/v1/products/{}", BASE_URL, product);
+                let response = self
+                    .client
+                    .get(&url)
+                    .bearer_auth(self.token.as_ref().unwrap())
+                    .send()
+                    .await
+                    .context("Failed to get product after adding to subscription")?;
+                
+                if response.status().is_success() {
+                    let response_text = response.text().await.context("Failed to get response text")?;
+                    
+                    if let Ok(product_detail) = serde_json::from_str::<ProductDetail>(&response_text) {
+                        let human_name = self.name_generator.generate_name(&product_detail);
+                        println!("{}", human_name);
+                    } else {
+                        return Err(anyhow::anyhow!("Failed to parse product data for name generation"));
+                    }
+                } else {
+                    return Err(anyhow::anyhow!(
+                        "Failed to get product {} after adding to subscription. Status: {}",
+                        product, response.status()
+                    ));
+                }
+            } else {
+                return Err(anyhow::anyhow!(
+                    "Product {} is not in your subscription. Add it first with: mmc add {}",
+                    product, product
+                ));
+            }
         } else {
             let status = response.status();
             let error_text = response.text().await.unwrap_or_default();
