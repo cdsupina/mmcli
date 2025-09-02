@@ -916,7 +916,7 @@ impl NameGenerator {
         
         // Locknut template (nylon-insert, prevailing torque, etc.)
         let locknut_template = NamingTemplate {
-            prefix: "LOCKNUT".to_string(),
+            prefix: "LN".to_string(),
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(),
@@ -928,7 +928,7 @@ impl NameGenerator {
         
         // Hex nut template
         let hex_nut_template = NamingTemplate {
-            prefix: "HEXNUT".to_string(),
+            prefix: "HN".to_string(),
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(),
@@ -940,7 +940,7 @@ impl NameGenerator {
         
         // Wing nut template
         let wing_nut_template = NamingTemplate {
-            prefix: "WINGNUT".to_string(),
+            prefix: "WN".to_string(),
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(),
@@ -952,7 +952,7 @@ impl NameGenerator {
         
         // Cap nut template
         let cap_nut_template = NamingTemplate {
-            prefix: "CAPNUT".to_string(),
+            prefix: "CN".to_string(),
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(),
@@ -964,15 +964,307 @@ impl NameGenerator {
         
         // Generic nut template
         let generic_nut_template = NamingTemplate {
-            prefix: "NUT".to_string(),
+            prefix: "N".to_string(),
             key_specs: vec![
                 "Material".to_string(),
                 "Thread Size".to_string(),
                 "Finish".to_string(),
             ],
-            spec_abbreviations: nut_abbrevs,
+            spec_abbreviations: nut_abbrevs.clone(),
         };
         self.category_templates.insert("generic_nut".to_string(), generic_nut_template);
+        
+        // Comprehensive nut type templates
+        
+        // Adhesive Mount Nut
+        let adhesive_mount_nut_template = NamingTemplate {
+            prefix: "AMN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("adhesive_mount_nut".to_string(), adhesive_mount_nut_template);
+        
+        // Clip On Nut
+        let clip_on_nut_template = NamingTemplate {
+            prefix: "CON".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("clip_on_nut".to_string(), clip_on_nut_template);
+        
+        // Coupling Nut
+        let coupling_nut_template = NamingTemplate {
+            prefix: "COUP".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("coupling_nut".to_string(), coupling_nut_template);
+        
+        // Dowel Nut
+        let dowel_nut_template = NamingTemplate {
+            prefix: "DN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("dowel_nut".to_string(), dowel_nut_template);
+        
+        // Externally Threaded Nut
+        let ext_threaded_nut_template = NamingTemplate {
+            prefix: "ETN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("externally_threaded_nut".to_string(), ext_threaded_nut_template);
+        
+        // Flange Nut
+        let flange_nut_template = NamingTemplate {
+            prefix: "FN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("flange_nut".to_string(), flange_nut_template);
+        
+        // Panel Nut
+        let panel_nut_template = NamingTemplate {
+            prefix: "PN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("panel_nut".to_string(), panel_nut_template);
+        
+        // Press Fit Nut
+        let press_fit_nut_template = NamingTemplate {
+            prefix: "PFN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("press_fit_nut".to_string(), press_fit_nut_template);
+        
+        // Push Button Nut
+        let push_button_nut_template = NamingTemplate {
+            prefix: "PBN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("push_button_nut".to_string(), push_button_nut_template);
+        
+        // Push Nut
+        let push_nut_template = NamingTemplate {
+            prefix: "PUSHN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("push_nut".to_string(), push_nut_template);
+        
+        // Rivet Mount Nut
+        let rivet_mount_nut_template = NamingTemplate {
+            prefix: "RMN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("rivet_mount_nut".to_string(), rivet_mount_nut_template);
+        
+        // Rivet Nut
+        let rivet_nut_template = NamingTemplate {
+            prefix: "RN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("rivet_nut".to_string(), rivet_nut_template);
+        
+        // Round Nut
+        let round_nut_template = NamingTemplate {
+            prefix: "ROUNDN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("round_nut".to_string(), round_nut_template);
+        
+        // Screw Mount Nut
+        let screw_mount_nut_template = NamingTemplate {
+            prefix: "SMN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("screw_mount_nut".to_string(), screw_mount_nut_template);
+        
+        // Snap In Nut
+        let snap_in_nut_template = NamingTemplate {
+            prefix: "SIN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("snap_in_nut".to_string(), snap_in_nut_template);
+        
+        // Socket Nut
+        let socket_nut_template = NamingTemplate {
+            prefix: "SN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("socket_nut".to_string(), socket_nut_template);
+        
+        // Speed Nut
+        let speed_nut_template = NamingTemplate {
+            prefix: "SPEEDN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("speed_nut".to_string(), speed_nut_template);
+        
+        // Square Nut
+        let square_nut_template = NamingTemplate {
+            prefix: "SQN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("square_nut".to_string(), square_nut_template);
+        
+        // Tamper Resistant Nut
+        let tamper_resistant_nut_template = NamingTemplate {
+            prefix: "TRN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("tamper_resistant_nut".to_string(), tamper_resistant_nut_template);
+        
+        // Threadless Nut
+        let threadless_nut_template = NamingTemplate {
+            prefix: "TLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("threadless_nut".to_string(), threadless_nut_template);
+        
+        // Thumb Nut
+        let thumb_nut_template = NamingTemplate {
+            prefix: "THUMBN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("thumb_nut".to_string(), thumb_nut_template);
+        
+        // Tube End Nut
+        let tube_end_nut_template = NamingTemplate {
+            prefix: "TEN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("tube_end_nut".to_string(), tube_end_nut_template);
+        
+        // Twist Close Nut
+        let twist_close_nut_template = NamingTemplate {
+            prefix: "TCN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("twist_close_nut".to_string(), twist_close_nut_template);
+        
+        // Weld Nut
+        let weld_nut_template = NamingTemplate {
+            prefix: "WELD".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("weld_nut".to_string(), weld_nut_template);
+        
+        // With Pilot Hole Nut
+        let with_pilot_hole_nut_template = NamingTemplate {
+            prefix: "WPHN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("with_pilot_hole_nut".to_string(), with_pilot_hole_nut_template);
+        
+        // Locking nut specific types (these will override the generic locknut when detected)
+        
+        // Cotter Pin Locknut
+        let cotter_pin_locknut_template = NamingTemplate {
+            prefix: "CPLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("cotter_pin_locknut".to_string(), cotter_pin_locknut_template);
+        
+        // Distorted Thread Locknut
+        let distorted_thread_locknut_template = NamingTemplate {
+            prefix: "DTLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("distorted_thread_locknut".to_string(), distorted_thread_locknut_template);
+        
+        // Flex-Top Locknut
+        let flex_top_locknut_template = NamingTemplate {
+            prefix: "FTLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("flex_top_locknut".to_string(), flex_top_locknut_template);
+        
+        // Lock Washer Locknut
+        let lock_washer_locknut_template = NamingTemplate {
+            prefix: "LWLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("lock_washer_locknut".to_string(), lock_washer_locknut_template);
+        
+        // Nylon Insert Locknut (keep existing LN for most common type)
+        let nylon_insert_locknut_template = NamingTemplate {
+            prefix: "LN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("nylon_insert_locknut".to_string(), nylon_insert_locknut_template);
+        
+        // Serrations Locknut
+        let serrations_locknut_template = NamingTemplate {
+            prefix: "SRLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("serrations_locknut".to_string(), serrations_locknut_template);
+        
+        // Spring-Stop Locknut
+        let spring_stop_locknut_template = NamingTemplate {
+            prefix: "SSLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("spring_stop_locknut".to_string(), spring_stop_locknut_template);
+        
+        // Steel Insert Locknut
+        let steel_insert_locknut_template = NamingTemplate {
+            prefix: "SILN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("steel_insert_locknut".to_string(), steel_insert_locknut_template);
+        
+        // Thread Forming Locknut
+        let thread_forming_locknut_template = NamingTemplate {
+            prefix: "TFLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("thread_forming_locknut".to_string(), thread_forming_locknut_template);
+        
+        // Threadlocker Locknut
+        let threadlocker_locknut_template = NamingTemplate {
+            prefix: "TLLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("threadlocker_locknut".to_string(), threadlocker_locknut_template);
+        
+        // Two-Piece Clamp Locknut
+        let two_piece_clamp_locknut_template = NamingTemplate {
+            prefix: "2PCLN".to_string(),
+            key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_abbreviations: nut_abbrevs.clone(),
+        };
+        self.category_templates.insert("two_piece_clamp_locknut".to_string(), two_piece_clamp_locknut_template);
     }
 
     pub fn generate_name(&self, product: &ProductDetail) -> String {
@@ -1139,12 +1431,88 @@ impl NameGenerator {
                 "flat_washer".to_string() // Default to flat washer
             }
         } else if category_lower.contains("nuts") || category_lower.contains("nut") || family_lower.contains("nut") {
-            // Determine specific nut type
-            if family_lower.contains("locknut") || family_lower.contains("lock nut") || 
-               family_lower.contains("nylon-insert") || family_lower.contains("prevailing torque") {
+            // Determine specific nut type (more specific types first)
+            
+            // Locking nut sub-types (most specific first)
+            if family_lower.contains("cotter pin") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "cotter_pin_locknut".to_string()
+            } else if family_lower.contains("distorted thread") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "distorted_thread_locknut".to_string()
+            } else if family_lower.contains("flex-top") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "flex_top_locknut".to_string()
+            } else if family_lower.contains("lock washer") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "lock_washer_locknut".to_string()
+            } else if family_lower.contains("nylon insert") || family_lower.contains("nylon-insert") {
+                "nylon_insert_locknut".to_string()
+            } else if family_lower.contains("serrations") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "serrations_locknut".to_string()
+            } else if family_lower.contains("spring-stop") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "spring_stop_locknut".to_string()
+            } else if family_lower.contains("steel insert") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "steel_insert_locknut".to_string()
+            } else if family_lower.contains("thread forming") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "thread_forming_locknut".to_string()
+            } else if family_lower.contains("threadlocker") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "threadlocker_locknut".to_string()
+            } else if family_lower.contains("two-piece clamp") && (family_lower.contains("locknut") || family_lower.contains("lock nut")) {
+                "two_piece_clamp_locknut".to_string()
+            } else if family_lower.contains("locknut") || family_lower.contains("lock nut") || 
+                     family_lower.contains("prevailing torque") {
                 "locknut".to_string()
+            
+            // Other nut types
+            } else if family_lower.contains("adhesive mount") {
+                "adhesive_mount_nut".to_string()
+            } else if family_lower.contains("clip on") || family_lower.contains("clip-on") {
+                "clip_on_nut".to_string()
+            } else if family_lower.contains("coupling") {
+                "coupling_nut".to_string()
+            } else if family_lower.contains("dowel") {
+                "dowel_nut".to_string()
+            } else if family_lower.contains("externally threaded") {
+                "externally_threaded_nut".to_string()
+            } else if family_lower.contains("flange") {
+                "flange_nut".to_string()
             } else if family_lower.contains("hex nut") || family_lower.contains("hexnut") {
                 "hex_nut".to_string()
+            } else if family_lower.contains("panel") {
+                "panel_nut".to_string()
+            } else if family_lower.contains("press fit") || family_lower.contains("press-fit") {
+                "press_fit_nut".to_string()
+            } else if family_lower.contains("push button") {
+                "push_button_nut".to_string()
+            } else if family_lower.contains("push nut") {
+                "push_nut".to_string()
+            } else if family_lower.contains("rivet mount") {
+                "rivet_mount_nut".to_string()
+            } else if family_lower.contains("rivet nut") {
+                "rivet_nut".to_string()
+            } else if family_lower.contains("round nut") {
+                "round_nut".to_string()
+            } else if family_lower.contains("screw mount") {
+                "screw_mount_nut".to_string()
+            } else if family_lower.contains("snap in") || family_lower.contains("snap-in") {
+                "snap_in_nut".to_string()
+            } else if family_lower.contains("socket nut") {
+                "socket_nut".to_string()
+            } else if family_lower.contains("speed") {
+                "speed_nut".to_string()
+            } else if family_lower.contains("square") {
+                "square_nut".to_string()
+            } else if family_lower.contains("tamper resistant") || family_lower.contains("tamper-resistant") {
+                "tamper_resistant_nut".to_string()
+            } else if family_lower.contains("threadless") {
+                "threadless_nut".to_string()
+            } else if family_lower.contains("thumb") {
+                "thumb_nut".to_string()
+            } else if family_lower.contains("tube end") {
+                "tube_end_nut".to_string()
+            } else if family_lower.contains("twist close") || family_lower.contains("twist-close") {
+                "twist_close_nut".to_string()
+            } else if family_lower.contains("weld") {
+                "weld_nut".to_string()
+            } else if family_lower.contains("with pilot hole") {
+                "with_pilot_hole_nut".to_string()
             } else if family_lower.contains("wing nut") || family_lower.contains("wingnut") {
                 "wing_nut".to_string()
             } else if family_lower.contains("cap nut") || family_lower.contains("capnut") {
