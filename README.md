@@ -188,7 +188,7 @@ mmc name 98164A133
 # Output: BHS-SS316-8x32-0.25-HEX
 
 mmc name 90480A005  
-# Output: HEXNUT-Steel-4x40-ZP
+# Output: HN-S-4x40-ZP
 ```
 
 ### Supported Categories
@@ -215,11 +215,13 @@ mmc name 90480A005
 
 | Type | Template | Example Input | Generated Name |
 |------|----------|---------------|----------------|
-| Locknut | `LOCKNUT-[Material]-[Thread]-[Finish]` | 18-8 SS Nylon-Insert Locknut, 4x40 | `LOCKNUT-SS188-4x40` |
-| Hex Nut | `HEXNUT-[Material]-[Thread]-[Finish]` | 316 SS Hex Nut, 1/4x20, Zinc-Plated | `HEXNUT-SS316-1/4x20-ZP` |
-| Wing Nut | `WINGNUT-[Material]-[Thread]-[Finish]` | Brass Wing Nut, 8x32 | `WINGNUT-Brass-8x32` |
-| Cap Nut | `CAPNUT-[Material]-[Thread]-[Finish]` | SS Cap Nut, M8x1.25 | `CAPNUT-SS-M8x1.25` |
-| Generic Nut | `NUT-[Material]-[Thread]-[Finish]` | Steel Nut, 5/16x18 | `NUT-Steel-5/16x18` |
+| Locknut | `LN-[Material]-[Thread]-[Finish]` | 18-8 SS Nylon-Insert Locknut, 4x40 | `LN-SS188-4x40` |
+| Hex Nut | `HN-[Material]-[Thread]-[Finish]` | 316 SS Hex Nut, 1/4x20, Zinc-Plated | `HN-SS316-1/4x20-ZP` |
+| Wing Nut | `WN-[Material]-[Thread]-[Finish]` | Brass Wing Nut, 8x32 | `WN-Brass-8x32` |
+| Cap Nut | `CN-[Material]-[Thread]-[Finish]` | SS Cap Nut, M8x1.25 | `CN-SS-M8x1.25` |
+| Generic Nut | `N-[Material]-[Thread]-[Finish]` | Steel Nut, 5/16x18 | `N-S-5/16x18` |
+
+*Note: Supports 36+ nut types including Flange (FN), Socket (SN), Speed (SPEEDN), Square (SQN), and 11 specialized locking nut types. See code for complete list.*
 
 #### Washers
 
@@ -252,6 +254,16 @@ McMaster-Carr CLI supports 19 different washer types with specific naming patter
 
 *Note: The system automatically detects washer type from the family description and applies the appropriate template. If no specific type is detected, it defaults to flat washer naming.*
 
+#### Threaded Standoffs
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Male-Female Standoff | `MFSO-[Material]-[Thread]-[Length]-[Finish]` | SS Male-Female Standoff, 4x40 x 0.5" | `MFSO-SS-4x40-0.5` |
+| Female Standoff | `FSO-[Material]-[Thread]-[Length]-[Finish]` | Brass Female Standoff, M6x1.0 x 25mm | `FSO-Brass-M6x1.0-25` |
+| Standoff (Generic) | `SO-[Material]-[Thread]-[Length]-[Finish]` | Aluminum Threaded Standoff, 8x32 x 0.75" | `SO-Al-8x32-0.75` |
+
+*Note: Supports various standoff configurations including male-female, female-only, and specialized types for electronics and mechanical assemblies.*
+
 #### Material Abbreviations
 
 | Full Name | Abbreviation | Notes |
@@ -259,7 +271,14 @@ McMaster-Carr CLI supports 19 different washer types with specific naming patter
 | 316 Stainless Steel | `SS316` | Marine grade, high corrosion resistance |
 | 18-8 Stainless Steel | `SS188` | Standard grade, good corrosion resistance |
 | Stainless Steel (generic) | `SS` | When specific grade not specified |
-| Steel | `Steel` | Carbon/alloy steel |
+| Grade 1 Steel | `SG1` | Low carbon steel |
+| Grade 2 Steel | `SG2` | Low carbon steel |
+| Grade 5 Steel | `SG5` | Medium carbon steel |
+| Grade 8 Steel | `SG8` | High strength alloy steel |
+| Class 8.8 Steel | `S8.8` | Metric medium strength |
+| Class 10.9 Steel | `S10.9` | Metric high strength |
+| Class 12.9 Steel | `S12.9` | Metric very high strength |
+| Steel (generic) | `S` | Carbon/alloy steel when grade not specified |
 | Brass | `Brass` | Brass alloy |
 | Aluminum | `Al` | Aluminum alloy |
 | Copper | `Cu` | Copper alloy |
@@ -318,7 +337,7 @@ For unsupported categories, the system generates fallback names using:
 ```csv
 Part Number,Description,Generated Name,Quantity
 98164A133,316 SS Button Head Hex Drive Screw,BHS-SS316-8x32-0.25-HEX,10
-90480A005,Low-Strength Steel Hex Nut,HEXNUT-Steel-4x40-ZP,10
+90480A005,Low-Strength Steel Hex Nut,HN-S-4x40-ZP,10
 ```
 
 #### Scripting
