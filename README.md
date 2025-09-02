@@ -185,10 +185,10 @@ McMaster-Carr CLI can generate human-readable, abbreviated technical names for p
 ```bash
 # Generate abbreviated technical name for any part
 mmc name 98164A133
-# Output: BHS-SS316-8-32-0.25-HEX
+# Output: BHS-SS316-8x32-0.25-HEX
 
-mmc name 91831A005  
-# Output: LOCKNUT-SS188-4-40
+mmc name 90480A005  
+# Output: HEXNUT-Steel-4x40-ZP
 ```
 
 ### Supported Categories
@@ -197,29 +197,29 @@ mmc name 91831A005
 
 | Type | Template | Example Input | Generated Name |
 |------|----------|---------------|----------------|
-| Button Head Screw | `BHS-[Material]-[Thread]-[Length]-[Drive]` | 316 SS Button Head Hex, 8-32 x 1/4" | `BHS-SS316-8-32-0.25-HEX` |
-| Socket Head Screw | `SHS-[Material]-[Thread]-[Length]-[Drive]` | Steel Socket Head Hex, 1/4-20 x 1" | `SHS-Steel-1/4-20-1-HEX` |
-| Flat Head Screw | `FHS-[Material]-[Thread]-[Length]-[Drive]` | 18-8 SS Flat Head Phillips, M6 x 20mm | `FHS-SS188-M6-20-PH` |
-| Pan Head Screw | `PHS-[Material]-[Thread]-[Length]-[Drive]` | Brass Pan Head Phillips, 6-32 x 0.5" | `PHS-Brass-6-32-0.5-PH` |
-| Hex Head Screw | `HHS-[Material]-[Thread]-[Length]` | SS Hex Head Screw, 1/4-20 x 1" | `HHS-SS-1/4-20-1` |
-| Rounded Head Screw | `RHS-[Material]-[Thread]-[Length]-[Drive]` | Steel Rounded Head Phillips, 8-32 x 0.5" | `RHS-Steel-8-32-0.5-PH` |
-| Thumb Screw | `THUMB-[Material]-[Thread]-[Length]` | Brass Thumb Screw, M6 x 20mm | `THUMB-Brass-M6-20` |
-| Eye Screw | `EYE-[Material]-[Thread]-[Length]` | Steel Eye Screw, 1/4-20 x 2" | `EYE-Steel-1/4-20-2` |
-| Hook Screw | `HOOK-[Material]-[Thread]-[Length]` | SS Hook Screw, 8-32 x 1" | `HOOK-SS-8-32-1` |
+| Button Head Screw | `BHS-[Material]-[Thread]-[Length]-[Drive]-[Finish]` | 316 SS Button Head Hex, 8x32 x 0.25" | `BHS-SS316-8x32-0.25-HEX` |
+| Socket Head Screw | `SHS-[Material]-[Thread]-[Length]-[Drive]-[Finish]` | Steel Socket Head Hex, 1/4x20 x 1" | `SHS-Steel-1/4x20-1-HEX` |
+| Flat Head Screw | `FHS-[Material]-[Thread]-[Length]-[Drive]-[Finish]` | 18-8 SS Flat Head Phillips, M6x1.0 x 20mm | `FHS-SS188-M6x1.0-20-PH` |
+| Pan Head Screw | `PHS-[Material]-[Thread]-[Length]-[Drive]-[Finish]` | Brass Pan Head Phillips, 6x32 x 0.5" | `PHS-Brass-6x32-0.5-PH` |
+| Hex Head Screw | `HHS-[Material]-[Thread]-[Length]-[Drive]-[Finish]` | SS Hex Head Screw, 1/4x20 x 1" | `HHS-SS-1/4x20-1-EHEX` |
+| Rounded Head Screw | `RHS-[Material]-[Thread]-[Length]-[Drive]-[Finish]` | Steel Rounded Head Phillips, 8x32 x 0.5" | `RHS-Steel-8x32-0.5-PH` |
+| Thumb Screw | `THUMB-[Material]-[Thread]-[Length]-[Finish]` | Brass Thumb Screw, M6x1.0 x 20mm | `THUMB-Brass-M6x1.0-20` |
+| Eye Screw | `EYE-[Material]-[Thread]-[Length]-[Finish]` | Steel Eye Screw, 1/4x20 x 2" | `EYE-Steel-1/4x20-2` |
+| Hook Screw | `HOOK-[Material]-[Thread]-[Length]-[Finish]` | SS Hook Screw, 8x32 x 1" | `HOOK-SS-8x32-1` |
 
 *Note: Supports 20+ head types including T-Handle, Pentagon, Oval, Square, Knob, Ring, and specialty types. See code for complete list.*
 
-| Generic Screw | `SCREW-[Material]-[Thread]-[Length]` | Brass Machine Screw, 6-32 x 0.5" | `SCREW-Brass-6-32-0.5` |
+| Generic Screw | `SCREW-[Material]-[Thread]-[Length]` | Brass Machine Screw, 6x32 x 0.5" | `SCREW-Brass-6x32-0.5` |
 
 #### Nuts
 
 | Type | Template | Example Input | Generated Name |
 |------|----------|---------------|----------------|
-| Locknut | `LOCKNUT-[Material]-[Thread]` | 18-8 SS Nylon-Insert Locknut, 4-40 | `LOCKNUT-SS188-4-40` |
-| Hex Nut | `HEXNUT-[Material]-[Thread]-[Height]` | 316 SS Hex Nut, 1/4-20, 7/32" H | `HEXNUT-SS316-1/4-20-7/32` |
-| Wing Nut | `WINGNUT-[Material]-[Thread]` | Brass Wing Nut, 8-32 | `WINGNUT-Brass-8-32` |
-| Cap Nut | `CAPNUT-[Material]-[Thread]-[Height]` | SS Cap Nut, M8, 12mm H | `CAPNUT-SS-M8-12` |
-| Generic Nut | `NUT-[Material]-[Thread]` | Steel Nut, 5/16-18 | `NUT-Steel-5/16-18` |
+| Locknut | `LOCKNUT-[Material]-[Thread]-[Finish]` | 18-8 SS Nylon-Insert Locknut, 4x40 | `LOCKNUT-SS188-4x40` |
+| Hex Nut | `HEXNUT-[Material]-[Thread]-[Finish]` | 316 SS Hex Nut, 1/4x20, Zinc-Plated | `HEXNUT-SS316-1/4x20-ZP` |
+| Wing Nut | `WINGNUT-[Material]-[Thread]-[Finish]` | Brass Wing Nut, 8x32 | `WINGNUT-Brass-8x32` |
+| Cap Nut | `CAPNUT-[Material]-[Thread]-[Finish]` | SS Cap Nut, M8x1.25 | `CAPNUT-SS-M8x1.25` |
+| Generic Nut | `NUT-[Material]-[Thread]-[Finish]` | Steel Nut, 5/16x18 | `NUT-Steel-5/16x18` |
 
 #### Washers
 
@@ -227,27 +227,28 @@ McMaster-Carr CLI supports 19 different washer types with specific naming patter
 
 | Type | Template | Example Input | Generated Name |
 |------|----------|---------------|----------------|
-| Cup Washer | `CUP-[Material]-[Screw Size]` | 316 SS Cup Washer for 1/4" Screws | `CUP-SS316-1/4` |
-| Curved Washer | `CURVED-[Material]-[Screw Size]` | Steel Curved Washer for 8-32 | `CURVED-Steel-8-32` |
-| Dished Washer | `DISHED-[Material]-[Screw Size]` | Brass Dished Washer for M6 | `DISHED-Brass-M6` |
-| Domed Washer | `DOMED-[Material]-[Screw Size]` | 18-8 SS Domed Washer for 1/4-20 | `DOMED-SS188-1/4-20` |
-| Double Clipped Washer | `DBLCLIP-[Material]-[Screw Size]` | Steel Double Clipped for #10 | `DBLCLIP-Steel-10` |
-| Flat Washer | `FLAT-[Material]-[Screw Size]` | 316 SS Flat Washer for 1/4" | `FLAT-SS316-1/4` |
-| Hillside Washer | `HILLSIDE-[Material]-[Screw Size]` | Steel Hillside Washer for M8 | `HILLSIDE-Steel-M8` |
-| Notched Washer | `NOTCHED-[Material]-[Screw Size]` | Aluminum Notched Washer for 6-32 | `NOTCHED-Al-6-32` |
-| Perforated Washer | `PERF-[Material]-[Screw Size]` | SS Perforated Washer for 1/2" | `PERF-SS-1/2` |
-| Pronged Washer | `PRONGED-[Material]-[Screw Size]` | Steel Pronged Washer for M5 | `PRONGED-Steel-M5` |
-| Rectangular Washer | `RECT-[Material]-[Screw Size]` | Nylon Rectangular for 10-24 | `RECT-Nylon-10-24` |
-| Sleeve Washer | `SLEEVE-[Material]-[Screw Size]` | Brass Sleeve Washer for 1/4" | `SLEEVE-Brass-1/4` |
-| Slotted Washer | `SLOTTED-[Material]-[Screw Size]` | SS Slotted Washer for M6 | `SLOTTED-SS-M6` |
-| Spherical Washer | `SPHERE-[Material]-[Screw Size]` | Steel Spherical for 5/16" | `SPHERE-Steel-5/16` |
-| Split Washer (Lock) | `SPLIT-[Material]-[Screw Size]` | 18-8 SS Split Lock for 8-32 | `SPLIT-SS188-8-32` |
-| Square Washer | `SQUARE-[Material]-[Screw Size]` | Steel Square Washer for M8 | `SQUARE-Steel-M8` |
-| Tab Washer | `TAB-[Material]-[Screw Size]` | SS Tab Washer for 1/4-20 | `TAB-SS-1/4-20` |
-| Tapered Washer | `TAPERED-[Material]-[Screw Size]` | Steel Tapered for 3/8" | `TAPERED-Steel-3/8` |
-| Tooth Washer | `TOOTH-[Material]-[Screw Size]` | SS Tooth Lock Washer for M10 | `TOOTH-SS-M10` |
-| Wave Washer | `WAVE-[Material]-[Screw Size]` | Spring Steel Wave for 1/4" | `WAVE-Steel-1/4` |
-| Wedge Washer | `WEDGE-[Material]-[Screw Size]` | Steel Wedge Washer for M12 | `WEDGE-Steel-M12` |
+| Cup Washer | `CW-[Material]-[Screw Size]-[Finish]` | 316 SS Cup Washer for 1/4" Screws | `CW-SS316-1/4` |
+| Curved Washer | `CRVW-[Material]-[Screw Size]-[Finish]` | Steel Curved Washer for 8x32 | `CRVW-Steel-8x32` |
+| Dished Washer | `DW-[Material]-[Screw Size]-[Finish]` | Brass Dished Washer for M6 | `DW-Brass-M6` |
+| Domed Washer | `DMW-[Material]-[Screw Size]-[Finish]` | 18-8 SS Domed Washer for 1/4x20 | `DMW-SS188-1/4x20` |
+| Double Clipped Washer | `DCW-[Material]-[Screw Size]-[Finish]` | Steel Double Clipped for #10 | `DCW-Steel-10` |
+| Clipped Washer | `CLW-[Material]-[Screw Size]-[Finish]` | Steel Clipped Washer for 5/16" | `CLW-Steel-5/16` |
+| Flat Washer | `FW-[Material]-[Screw Size]-[Finish]` | 316 SS Flat Washer for 1/4" | `FW-SS316-1/4` |
+| Hillside Washer | `HW-[Material]-[Screw Size]-[Finish]` | Steel Hillside Washer for M8 | `HW-Steel-M8` |
+| Notched Washer | `NW-[Material]-[Screw Size]-[Finish]` | Aluminum Notched Washer for 6x32 | `NW-Al-6x32` |
+| Perforated Washer | `PW-[Material]-[Screw Size]-[Finish]` | SS Perforated Washer for 1/2" | `PW-SS-1/2` |
+| Pronged Washer | `PRW-[Material]-[Screw Size]-[Finish]` | Steel Pronged Washer for M5 | `PRW-Steel-M5` |
+| Rectangular Washer | `RW-[Material]-[Screw Size]-[Finish]` | Nylon Rectangular for 10x24 | `RW-Nylon-10x24` |
+| Sleeve Washer | `SW-[Material]-[Screw Size]-[Finish]` | Brass Sleeve Washer for 1/4" | `SW-Brass-1/4` |
+| Slotted Washer | `SLW-[Material]-[Screw Size]-[Finish]` | SS Slotted Washer for M6 | `SLW-SS-M6` |
+| Spherical Washer | `SPW-[Material]-[Screw Size]-[Finish]` | Steel Spherical for 5/16" | `SPW-Steel-5/16` |
+| Split Washer (Lock) | `SPLW-[Material]-[Screw Size]-[Finish]` | 18-8 SS Split Lock for 8x32 | `SPLW-SS188-8x32` |
+| Square Washer | `SQW-[Material]-[Screw Size]-[Finish]` | Steel Square Washer for M8 | `SQW-Steel-M8` |
+| Tab Washer | `TW-[Material]-[Screw Size]-[Finish]` | SS Tab Washer for 1/4x20 | `TW-SS-1/4x20` |
+| Tapered Washer | `TPW-[Material]-[Screw Size]-[Finish]` | Steel Tapered for 3/8" | `TPW-Steel-3/8` |
+| Tooth Washer | `TOW-[Material]-[Screw Size]-[Finish]` | SS Tooth Lock Washer for M10 | `TOW-SS-M10` |
+| Wave Washer | `WW-[Material]-[Screw Size]-[Finish]` | Spring Steel Wave for 1/4" | `WW-Steel-1/4` |
+| Wedge Washer | `WDW-[Material]-[Screw Size]-[Finish]` | Steel Wedge Washer for M12 | `WDW-Steel-M12` |
 
 *Note: The system automatically detects washer type from the family description and applies the appropriate template. If no specific type is detected, it defaults to flat washer naming.*
 
@@ -265,6 +266,19 @@ McMaster-Carr CLI supports 19 different washer types with specific naming patter
 | Nylon | `Nylon` | Nylon plastic |
 | Plastic | `Plastic` | Various plastic materials |
 | Rubber | `Rubber` | Rubber materials |
+
+#### Finish Abbreviations
+
+| Full Name | Abbreviation | Notes |
+|-----------|--------------|-------|
+| Zinc Plated | `ZP` | Standard zinc coating |
+| Zinc Yellow-Chromate Plated | `ZYC` | Zinc with yellow chromate |
+| Black Oxide | `BO` | Black oxide coating |
+| Cadmium Plated | `CD` | Cadmium coating |
+| Nickel Plated | `NI` | Nickel coating |
+| Chrome Plated | `CR` | Chrome coating |
+| Galvanized | `GAL` | Hot-dip galvanized |
+| Passivated | `PASS` | Omitted in names (not meaningful info) |
 
 #### Drive Style Abbreviations
 
@@ -285,10 +299,11 @@ McMaster-Carr CLI supports 19 different washer types with specific naming patter
 
 ### Dimension Formatting
 
-- **Fractions**: Automatically converted to decimals (`1/4"` → `0.25`)
-- **Inches**: Quote marks removed for cleaner names (`0.25"` → `0.25`)
-- **Metric**: Preserved as-is (`M6`, `20mm`)
-- **Thread Sizes**: Preserved as-is (`8-32`, `1/4-20`, `M6x1.0`)
+- **Imperial Lengths**: Fractions automatically converted to decimals (`1/4"` → `0.25`)
+- **Metric Lengths**: mm suffix removed (`20mm` → `20`)
+- **Thread Sizes**: Use "x" separator for size/pitch (`8-32` → `8x32`, `M3 x 0.50mm` → `M3x0.50`)
+- **Washer Sizes**: Preserve fractions for screw compatibility (`1/4"` → `1/4`)
+- **Quote Marks**: Removed for cleaner names (`"` removed)
 
 ### Fallback Naming
 
@@ -302,14 +317,14 @@ For unsupported categories, the system generates fallback names using:
 #### BOM Usage
 ```csv
 Part Number,Description,Generated Name,Quantity
-98164A133,316 SS Button Head Hex Drive Screw,BHS-SS316-8-32-0.25-HEX,10
-91831A005,18-8 SS Nylon-Insert Locknut,LOCKNUT-SS188-4-40,10
+98164A133,316 SS Button Head Hex Drive Screw,BHS-SS316-8x32-0.25-HEX,10
+90480A005,Low-Strength Steel Hex Nut,HEXNUT-Steel-4x40-ZP,10
 ```
 
 #### Scripting
 ```bash
 # Generate names for a list of parts
-for part in 98164A133 91831A005; do
+for part in 98164A133 90480A005; do
   echo "$part: $(mmc name $part)"
 done
 
