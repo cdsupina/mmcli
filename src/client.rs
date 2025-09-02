@@ -109,7 +109,16 @@ impl NameGenerator {
         screw_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
         screw_abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
         screw_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
-        screw_abbrevs.insert("Steel".to_string(), "Steel".to_string());
+        screw_abbrevs.insert("Steel".to_string(), "S".to_string());
+        
+        // Steel grade abbreviations
+        screw_abbrevs.insert("Grade 1 Steel".to_string(), "SG1".to_string());
+        screw_abbrevs.insert("Grade 2 Steel".to_string(), "SG2".to_string());
+        screw_abbrevs.insert("Grade 5 Steel".to_string(), "SG5".to_string());
+        screw_abbrevs.insert("Grade 8 Steel".to_string(), "SG8".to_string());
+        screw_abbrevs.insert("8.8 Steel".to_string(), "S8.8".to_string());
+        screw_abbrevs.insert("10.9 Steel".to_string(), "S10.9".to_string());
+        screw_abbrevs.insert("12.9 Steel".to_string(), "S12.9".to_string());
         screw_abbrevs.insert("Brass".to_string(), "Brass".to_string());
         screw_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
         
@@ -650,7 +659,16 @@ impl NameGenerator {
         washer_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
         washer_abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
         washer_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
-        washer_abbrevs.insert("Steel".to_string(), "Steel".to_string());
+        washer_abbrevs.insert("Steel".to_string(), "S".to_string());
+        
+        // Steel grade abbreviations for washers
+        washer_abbrevs.insert("Grade 1 Steel".to_string(), "SG1".to_string());
+        washer_abbrevs.insert("Grade 2 Steel".to_string(), "SG2".to_string());
+        washer_abbrevs.insert("Grade 5 Steel".to_string(), "SG5".to_string());
+        washer_abbrevs.insert("Grade 8 Steel".to_string(), "SG8".to_string());
+        washer_abbrevs.insert("8.8 Steel".to_string(), "S8.8".to_string());
+        washer_abbrevs.insert("10.9 Steel".to_string(), "S10.9".to_string());
+        washer_abbrevs.insert("12.9 Steel".to_string(), "S12.9".to_string());
         washer_abbrevs.insert("Brass".to_string(), "Brass".to_string());
         washer_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
         washer_abbrevs.insert("Copper".to_string(), "Cu".to_string());
@@ -865,7 +883,16 @@ impl NameGenerator {
         nut_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
         nut_abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
         nut_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
-        nut_abbrevs.insert("Steel".to_string(), "Steel".to_string());
+        nut_abbrevs.insert("Steel".to_string(), "S".to_string());
+        
+        // Steel grade abbreviations for nuts
+        nut_abbrevs.insert("Grade 1 Steel".to_string(), "SG1".to_string());
+        nut_abbrevs.insert("Grade 2 Steel".to_string(), "SG2".to_string());
+        nut_abbrevs.insert("Grade 5 Steel".to_string(), "SG5".to_string());
+        nut_abbrevs.insert("Grade 8 Steel".to_string(), "SG8".to_string());
+        nut_abbrevs.insert("8.8 Steel".to_string(), "S8.8".to_string());
+        nut_abbrevs.insert("10.9 Steel".to_string(), "S10.9".to_string());
+        nut_abbrevs.insert("12.9 Steel".to_string(), "S12.9".to_string());
         nut_abbrevs.insert("Brass".to_string(), "Brass".to_string());
         nut_abbrevs.insert("Aluminum".to_string(), "Al".to_string());
         
@@ -1144,10 +1171,17 @@ impl NameGenerator {
                 if spec_name.eq_ignore_ascii_case("Material") {
                     let (material, finish) = self.parse_material_and_finish(&value);
                     
+                    // Check for steel grade to make steel more descriptive
+                    let final_material = if material.eq_ignore_ascii_case("Steel") {
+                        self.get_steel_grade_material(product, &material)
+                    } else {
+                        material
+                    };
+                    
                     // Add material abbreviation
-                    let material_abbrev = template.spec_abbreviations.get(&material)
+                    let material_abbrev = template.spec_abbreviations.get(&final_material)
                         .cloned()
-                        .unwrap_or_else(|| self.abbreviate_value(&material));
+                        .unwrap_or_else(|| self.abbreviate_value(&final_material));
                     if !material_abbrev.is_empty() {
                         name_parts.push(material_abbrev);
                     }
@@ -1280,6 +1314,37 @@ impl NameGenerator {
             // Return as-is for already decimal values
             value.to_string()
         }
+    }
+
+    fn get_steel_grade_material(&self, product: &ProductDetail, original_material: &str) -> String {
+        // Look for "Fastener Strength Grade/Class" specification to get more descriptive steel naming
+        if let Some(grade_spec) = product.specifications.iter()
+            .find(|s| s.attribute.eq_ignore_ascii_case("Fastener Strength Grade/Class") || 
+                     s.attribute.contains("Grade") || 
+                     s.attribute.contains("Strength")) 
+        {
+            if let Some(grade_value) = grade_spec.values.first() {
+                // Extract grade number from various formats
+                if grade_value.contains("Grade 5") || grade_value.contains("grade 5") {
+                    return "Grade 5 Steel".to_string();
+                } else if grade_value.contains("Grade 8") || grade_value.contains("grade 8") {
+                    return "Grade 8 Steel".to_string();
+                } else if grade_value.contains("Grade 2") || grade_value.contains("grade 2") {
+                    return "Grade 2 Steel".to_string();
+                } else if grade_value.contains("Grade 1") || grade_value.contains("grade 1") {
+                    return "Grade 1 Steel".to_string();
+                } else if grade_value.contains("10.9") {
+                    return "10.9 Steel".to_string();
+                } else if grade_value.contains("12.9") {
+                    return "12.9 Steel".to_string();
+                } else if grade_value.contains("8.8") {
+                    return "8.8 Steel".to_string();
+                }
+            }
+        }
+        
+        // Fallback to original material if no grade found
+        original_material.to_string()
     }
 
     fn extract_thread_with_pitch(&self, product: &ProductDetail, thread_size: &str) -> String {
