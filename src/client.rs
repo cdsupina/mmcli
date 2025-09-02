@@ -1171,6 +1171,16 @@ impl NameGenerator {
                             name_parts.push(finish_abbrev);
                         }
                     }
+                } else if spec_name.eq_ignore_ascii_case("Length") {
+                    // Special handling for Length - convert fractions to decimals for screws
+                    let length_value = self.convert_length_to_decimal(&value);
+                    let abbreviated = template.spec_abbreviations.get(&length_value)
+                        .cloned()
+                        .unwrap_or(length_value);
+                    
+                    if !abbreviated.is_empty() {
+                        name_parts.push(abbreviated);
+                    }
                 } else {
                     // Normal handling for other specs
                     let abbreviated = template.spec_abbreviations.get(&value)
@@ -1219,10 +1229,50 @@ impl NameGenerator {
         (material_value.to_string(), None)
     }
 
+    fn convert_length_to_decimal(&self, value: &str) -> String {
+        // Convert common fractions to decimals for screw lengths
+        if value.contains("\"") {
+            let clean_value = value.replace("\"", "");
+            match clean_value.as_str() {
+                "1/8" => "0.125".to_string(),
+                "3/16" => "0.1875".to_string(),
+                "1/4" => "0.25".to_string(),
+                "5/16" => "0.3125".to_string(),
+                "3/8" => "0.375".to_string(),
+                "7/16" => "0.4375".to_string(),
+                "1/2" => "0.5".to_string(),
+                "9/16" => "0.5625".to_string(),
+                "5/8" => "0.625".to_string(),
+                "11/16" => "0.6875".to_string(),
+                "3/4" => "0.75".to_string(),
+                "13/16" => "0.8125".to_string(),
+                "7/8" => "0.875".to_string(),
+                "15/16" => "0.9375".to_string(),
+                "1-1/8" => "1.125".to_string(),
+                "1-1/4" => "1.25".to_string(),
+                "1-3/8" => "1.375".to_string(),
+                "1-1/2" => "1.5".to_string(),
+                "1-5/8" => "1.625".to_string(),
+                "1-3/4" => "1.75".to_string(),
+                "1-7/8" => "1.875".to_string(),
+                "2-1/4" => "2.25".to_string(),
+                "2-1/2" => "2.5".to_string(),
+                "2-3/4" => "2.75".to_string(),
+                "3-1/4" => "3.25".to_string(),
+                "3-1/2" => "3.5".to_string(),
+                "3-3/4" => "3.75".to_string(),
+                _ => clean_value, // Return as-is if not in our conversion table
+            }
+        } else {
+            // Return as-is for metric or already decimal values
+            value.to_string()
+        }
+    }
+
     fn abbreviate_value(&self, value: &str) -> String {
         // Handle common dimension formats
         if value.contains("\"") {
-            // Keep fractions as-is, just remove quotes
+            // Keep fractions as-is, just remove quotes (for non-length specs like washers)
             value.replace("\"", "").to_string()
         } else {
             // Return as-is for thread sizes and other values
@@ -2410,6 +2460,9 @@ certificate_password = "certificate_password"
             let response_text = response.text().await.context("Failed to get response text")?;
             
             if let Ok(product_detail) = serde_json::from_str::<ProductDetail>(&response_text) {
+                // Print descriptions for verification
+                println!("{}", product_detail.family_description);
+                println!("{}", product_detail.detail_description);
                 let human_name = self.name_generator.generate_name(&product_detail);
                 println!("{}", human_name);
             } else {
@@ -2444,6 +2497,9 @@ certificate_password = "certificate_password"
                     let response_text = response.text().await.context("Failed to get response text")?;
                     
                     if let Ok(product_detail) = serde_json::from_str::<ProductDetail>(&response_text) {
+                        // Print descriptions for verification
+                        println!("{}", product_detail.family_description);
+                        println!("{}", product_detail.detail_description);
                         let human_name = self.name_generator.generate_name(&product_detail);
                         println!("{}", human_name);
                     } else {
