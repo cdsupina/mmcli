@@ -141,8 +141,12 @@ impl McmasterClient {
             anyhow::anyhow!("Not authenticated. Please login first with 'mmc login'")
         })?;
 
-        let response = self.client.delete(format!("https://api.mcmaster.com/v1/products/{}", product))
+        // Use correct API format from documentation
+        let response = self.client.delete("https://api.mcmaster.com/v1/products")
             .header("Authorization", format!("Bearer {}", token))
+            .json(&serde_json::json!({
+                "URL": format!("https://mcmaster.com/{}", product)
+            }))
             .send()
             .await?;
 
@@ -152,9 +156,8 @@ impl McmasterClient {
                 let _ = manager.remove_part(product); // Ignore result as local tracking is supplementary
             }
 
-            if !self.quiet_mode {
-                println!("✅ Removed {} from subscription", product);
-            }
+            // Always show confirmation for remove operation, even in quiet mode
+            println!("✅ Removed {} from subscription", product);
         } else {
             let error_text = response.text().await?;
             if let Ok(error_response) = serde_json::from_str::<ErrorResponse>(&error_text) {
