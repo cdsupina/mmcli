@@ -37,6 +37,7 @@ impl NameGenerator {
         templates::initialize_nut_templates(&mut self.category_templates);
         templates::initialize_standoff_templates(&mut self.category_templates);
         templates::initialize_spacer_templates(&mut self.category_templates);
+        templates::initialize_pin_templates(&mut self.category_templates);
         templates::initialize_bearing_templates(&mut self.category_templates);
     }
 
@@ -150,8 +151,10 @@ impl NameGenerator {
                     }
                 } else if spec_name.eq_ignore_ascii_case("For Shaft Diameter")
                     || spec_name.eq_ignore_ascii_case("OD")
+                    || spec_name.eq_ignore_ascii_case("Diameter")
+                    || spec_name.eq_ignore_ascii_case("Usable Length")
                 {
-                    // Special handling for bearing dimensions - convert fractions to decimals
+                    // Special handling for dimensions - convert fractions to decimals
                     let dimension_value = converters::convert_length_to_decimal(&value);
                     let abbreviated = template
                         .spec_abbreviations

@@ -116,6 +116,8 @@ pub fn determine_category(product: &ProductDetail) -> String {
         determine_standoff_type(&family_lower)
     } else if category_lower.contains("bearing") || family_lower.contains("bearing") {
         determine_bearing_type(product)
+    } else if category_lower.contains("pins") || family_lower.contains("pin") {
+        determine_pin_type(&family_lower)
     } else {
         "unknown".to_string()
     }
@@ -275,6 +277,17 @@ fn determine_spacer_type(family_lower: &str) -> String {
         "nylon_unthreaded_spacer".to_string()
     } else {
         "unthreaded_spacer".to_string()
+    }
+}
+
+/// Determine specific pin type
+fn determine_pin_type(family_lower: &str) -> String {
+    if family_lower.contains("clevis pin with retaining ring groove") {
+        "clevis_pin_with_retaining_ring_groove".to_string()
+    } else if family_lower.contains("clevis pin") {
+        "clevis_pin".to_string()
+    } else {
+        "generic_pin".to_string()
     }
 }
 
