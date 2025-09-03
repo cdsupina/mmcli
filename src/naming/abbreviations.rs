@@ -54,8 +54,8 @@ pub fn get_steel_grade_material(product: &ProductDetail, original_material: &str
 /// Create a basic abbreviation for values not in the template mappings
 pub fn abbreviate_value(value: &str) -> String {
     // Special handling for thread sizes - preserve full thread designation
-    if value.contains("x") && (value.contains("/") || value.starts_with('M')) {
-        // This looks like a thread size (e.g., "5/16"x18" or "M8x1.25"), preserve it
+    if value.contains("x") && (value.contains("/") || value.starts_with('M') || value.chars().next().map_or(false, |c| c.is_ascii_digit())) {
+        // This looks like a thread size (e.g., "5/16x18", "M8x1.25", or "10x24"), preserve it
         return value.replace("\"", "");
     }
     
