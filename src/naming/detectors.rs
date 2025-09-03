@@ -109,8 +109,10 @@ pub fn determine_category(product: &ProductDetail) -> String {
         determine_washer_type(&family_lower)
     } else if category_lower.contains("nuts") || category_lower.contains("nut") || family_lower.contains("nut") {
         determine_nut_type(&family_lower)
+    } else if family_lower.contains("unthreaded spacer") || (category_lower.contains("spacers") && family_lower.contains("spacer")) {
+        determine_spacer_type(&family_lower)
     } else if category_lower.contains("standoffs") || category_lower.contains("standoff") || 
-              family_lower.contains("standoff") || family_lower.contains("spacer") {
+              family_lower.contains("standoff") {
         determine_standoff_type(&family_lower)
     } else if category_lower.contains("bearing") || family_lower.contains("bearing") {
         determine_bearing_type(product)
@@ -260,6 +262,19 @@ fn determine_standoff_type(family_lower: &str) -> String {
         "female_hex_standoff".to_string()
     } else {
         "generic_standoff".to_string()
+    }
+}
+
+/// Determine specific spacer type
+fn determine_spacer_type(family_lower: &str) -> String {
+    if family_lower.contains("aluminum") {
+        "aluminum_unthreaded_spacer".to_string()
+    } else if family_lower.contains("stainless steel") || family_lower.contains("18-8") || family_lower.contains("316") {
+        "stainless_steel_unthreaded_spacer".to_string()
+    } else if family_lower.contains("nylon") {
+        "nylon_unthreaded_spacer".to_string()
+    } else {
+        "unthreaded_spacer".to_string()
     }
 }
 

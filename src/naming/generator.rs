@@ -36,6 +36,7 @@ impl NameGenerator {
         templates::initialize_washer_templates(&mut self.category_templates);
         templates::initialize_nut_templates(&mut self.category_templates);
         templates::initialize_standoff_templates(&mut self.category_templates);
+        templates::initialize_spacer_templates(&mut self.category_templates);
         templates::initialize_bearing_templates(&mut self.category_templates);
     }
 
