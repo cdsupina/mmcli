@@ -322,8 +322,11 @@ fn determine_bearing_type(product: &ProductDetail) -> String {
             .map(|v| v.to_lowercase())
             .unwrap_or_default();
         
+        let description_lower = product.detail_description.to_lowercase();
+        
         if mount_type.contains("two-bolt flange") || mount_type.contains("flange") {
-            if family_lower.contains("low-profile") || family_lower.contains("low profile") {
+            if family_lower.contains("low-profile") || family_lower.contains("low profile") 
+               || description_lower.contains("low-profile") || description_lower.contains("low profile") {
                 "low_profile_flange_mounted_ball_bearing".to_string()
             } else {
                 "flange_mounted_ball_bearing".to_string()

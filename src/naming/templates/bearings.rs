@@ -20,8 +20,9 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     bearing_abbrevs.insert("Graphite".to_string(), "GRAPH".to_string());
     bearing_abbrevs.insert("Steel-Backed PTFE".to_string(), "SBPTFE".to_string());
     bearing_abbrevs.insert("Bronze".to_string(), "BR".to_string());
-    bearing_abbrevs.insert("Steel".to_string(), "STL".to_string());
+    bearing_abbrevs.insert("Steel".to_string(), "S".to_string());
     bearing_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
+    bearing_abbrevs.insert("303 Stainless Steel".to_string(), "SS303".to_string());
     bearing_abbrevs.insert("Aluminum".to_string(), "AL".to_string());
     bearing_abbrevs.insert("Plastic".to_string(), "PL".to_string());
     
