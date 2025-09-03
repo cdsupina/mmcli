@@ -64,6 +64,7 @@ pub fn initialize_pin_templates(category_templates: &mut HashMap<String, NamingT
     // Create shared abbreviations for shaft collars (reuse pin abbreviations plus specific materials)
     let mut collar_abbrevs = pin_abbrevs.clone();
     collar_abbrevs.insert("303 Stainless Steel".to_string(), "SS303".to_string());
+    collar_abbrevs.insert("1215 Carbon Steel".to_string(), "1215S".to_string());
     
     // Face-Mount Shaft Collar
     let face_mount_collar_template = NamingTemplate {
