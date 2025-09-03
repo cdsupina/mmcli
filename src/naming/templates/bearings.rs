@@ -81,6 +81,38 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     };
     category_templates.insert("roller_bearing".to_string(), roller_bearing_template);
     
+    // Flange Mounted Ball Bearing
+    let flange_mounted_ball_bearing_template = NamingTemplate {
+        prefix: "MFBB".to_string(),
+        key_specs: vec!["Housing Material".to_string(), "For Shaft Diameter".to_string(), "Mounting Hole Center -to-Center".to_string(), "Overall Height".to_string()],
+        spec_abbreviations: bearing_abbrevs.clone(),
+    };
+    category_templates.insert("flange_mounted_ball_bearing".to_string(), flange_mounted_ball_bearing_template);
+    
+    // Low-Profile Flange Mounted Ball Bearing
+    let low_profile_flange_mounted_ball_bearing_template = NamingTemplate {
+        prefix: "LPMFBB".to_string(),
+        key_specs: vec!["Housing Material".to_string(), "For Shaft Diameter".to_string(), "Mounting Hole Center -to-Center".to_string(), "Overall Height".to_string()],
+        spec_abbreviations: bearing_abbrevs.clone(),
+    };
+    category_templates.insert("low_profile_flange_mounted_ball_bearing".to_string(), low_profile_flange_mounted_ball_bearing_template);
+    
+    // Pillow Block Mounted Ball Bearing
+    let pillow_block_mounted_ball_bearing_template = NamingTemplate {
+        prefix: "PBMBB".to_string(),
+        key_specs: vec!["Housing Material".to_string(), "For Shaft Diameter".to_string(), "Mounting Hole Center -to-Center".to_string(), "Overall Height".to_string()],
+        spec_abbreviations: bearing_abbrevs.clone(),
+    };
+    category_templates.insert("pillow_block_mounted_ball_bearing".to_string(), pillow_block_mounted_ball_bearing_template);
+    
+    // Generic Mounted Bearing
+    let generic_mounted_bearing_template = NamingTemplate {
+        prefix: "MBB".to_string(),
+        key_specs: vec!["Housing Material".to_string(), "For Shaft Diameter".to_string(), "Overall Height".to_string()],
+        spec_abbreviations: bearing_abbrevs.clone(),
+    };
+    category_templates.insert("generic_mounted_bearing".to_string(), generic_mounted_bearing_template);
+    
     // Generic Bearing (fallback)
     let generic_bearing_template = NamingTemplate {
         prefix: "BRG".to_string(),

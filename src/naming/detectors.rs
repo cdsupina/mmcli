@@ -307,13 +307,33 @@ fn determine_shaft_collar_type(family_lower: &str) -> String {
 /// Determine specific bearing type
 fn determine_bearing_type(product: &ProductDetail) -> String {
     let family_lower = product.family_description.to_lowercase();
+    let category_lower = product.product_category.to_lowercase();
     let plain_type = product.specifications.iter()
         .find(|s| s.attribute.eq_ignore_ascii_case("Plain Bearing Type"))
         .and_then(|s| s.values.first())
         .map(|v| v.as_str())
         .unwrap_or("");
+    
+    // Check for mounted bearings first (more specific)
+    if family_lower.contains("mounted") || category_lower.contains("mounted") {
+        let mount_type = product.specifications.iter()
+            .find(|s| s.attribute.eq_ignore_ascii_case("Mounted Bearing Type"))
+            .and_then(|s| s.values.first())
+            .map(|v| v.to_lowercase())
+            .unwrap_or_default();
         
-    if family_lower.contains("flanged") || plain_type.eq_ignore_ascii_case("Flanged") {
+        if mount_type.contains("two-bolt flange") || mount_type.contains("flange") {
+            if family_lower.contains("low-profile") || family_lower.contains("low profile") {
+                "low_profile_flange_mounted_ball_bearing".to_string()
+            } else {
+                "flange_mounted_ball_bearing".to_string()
+            }
+        } else if mount_type.contains("pillow") {
+            "pillow_block_mounted_ball_bearing".to_string()
+        } else {
+            "generic_mounted_bearing".to_string()
+        }
+    } else if family_lower.contains("flanged") || plain_type.eq_ignore_ascii_case("Flanged") {
         if family_lower.contains("sleeve") || family_lower.contains("plain") {
             "flanged_sleeve_bearing".to_string()
         } else {

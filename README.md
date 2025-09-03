@@ -312,13 +312,18 @@ McMaster-Carr CLI provides comprehensive bearing support with specialized naming
 | Linear Bearing | `LB-[Material]-[Shaft Diameter]-[Length]` | Steel linear bearing for 3/8" shaft, 2" long | `LB-STL-0.375-2` |
 | Needle Bearing | `NB-[Material]-[Bore]-[OD]-[Length]` | Steel needle bearing, 1/4" bore, 3/8" OD | `NB-STL-0.25-0.375-0.5` |
 | Roller Bearing | `RB-[Material]-[Bore]-[OD]-[Length]` | Bronze roller bearing, 20mm bore, 35mm OD | `RB-BR-20-35-12` |
+| Flange Mounted Ball Bearing | `MFBB-[Housing Material]-[Shaft Dia]-[Mount Holes C-to-C]-[Height]` | Steel flange mount, 3/4" shaft, 2-1/2" hole spacing, 2" height | `MFBB-STL-0.75-2.5-2` |
+| Low-Profile Flange Mounted Ball Bearing | `LPMFBB-[Housing Material]-[Shaft Dia]-[Mount Holes C-to-C]-[Height]` | Steel low-profile, 1" shaft, 3" hole spacing, 2.78" height | `LPMFBB-STL-1-3-2.78125` |
+| Pillow Block Mounted Ball Bearing | `PBMBB-[Housing Material]-[Shaft Dia]-[Mount Holes C-to-C]-[Height]` | Steel pillow block, 1/2" shaft, 4" hole spacing | `PBMBB-STL-0.5-4-1.5` |
+| Generic Mounted Bearing | `MBB-[Housing Material]-[Shaft Dia]-[Height]` | Steel mounted bearing for 5/8" shaft | `MBB-STL-0.625-2` |
 | Generic Bearing | `BRG-[Material]-[Type]` | PTFE bearing assembly | `BRG-PTFE-ASSEMBLY` |
 
 **Special Features:**
 - **Automatic Material Detection**: Combines filler materials (e.g., MDS-Filled Nylon)
 - **Dimension Conversion**: Fractions automatically converted to decimals (1/4" → 0.25)
 - **Metric Support**: Handles both imperial and metric dimensions
-- **Comprehensive Coverage**: Supports plain, flanged, ball, linear, needle, and roller bearings
+- **Mounted Bearing Support**: Includes housing material, mounting dimensions, and profile variations
+- **Comprehensive Coverage**: Supports plain, flanged, ball, linear, needle, roller, and mounted bearings
 
 **Bearing Material Abbreviations:**
 

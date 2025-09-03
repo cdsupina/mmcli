@@ -154,6 +154,9 @@ impl NameGenerator {
                     || spec_name.eq_ignore_ascii_case("Diameter")
                     || spec_name.eq_ignore_ascii_case("Usable Length")
                     || spec_name.eq_ignore_ascii_case("Width")
+                    || spec_name.eq_ignore_ascii_case("Overall Height")
+                    || spec_name.eq_ignore_ascii_case("Overall Length")
+                    || spec_name.eq_ignore_ascii_case("Mounting Hole Center -to-Center")
                 {
                     // Special handling for dimensions - convert fractions to decimals
                     let dimension_value = converters::convert_length_to_decimal(&value);
