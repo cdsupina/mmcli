@@ -13,9 +13,9 @@ pub fn determine_category(product: &ProductDetail) -> String {
         "button_head_screw".to_string()
     } else if family_lower.contains("high socket head") && family_lower.contains("screw") {
         "high_socket_head_screw".to_string()
-    } else if family_lower.contains("low socket head") && family_lower.contains("screw") {
+    } else if (family_lower.contains("low socket head") || family_lower.contains("low-profile socket head")) && family_lower.contains("screw") {
         "low_socket_head_screw".to_string()
-    } else if family_lower.contains("ultra low socket head") && family_lower.contains("screw") {
+    } else if (family_lower.contains("ultra low socket head") || family_lower.contains("ultra low-profile socket head")) && family_lower.contains("screw") {
         "ultra_low_socket_head_screw".to_string()
     } else if family_lower.contains("standard socket head") && family_lower.contains("screw") {
         "standard_socket_head_screw".to_string()
