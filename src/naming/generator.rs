@@ -153,6 +153,7 @@ impl NameGenerator {
                     || spec_name.eq_ignore_ascii_case("OD")
                     || spec_name.eq_ignore_ascii_case("Diameter")
                     || spec_name.eq_ignore_ascii_case("Usable Length")
+                    || spec_name.eq_ignore_ascii_case("Width")
                 {
                     // Special handling for dimensions - convert fractions to decimals
                     let dimension_value = converters::convert_length_to_decimal(&value);

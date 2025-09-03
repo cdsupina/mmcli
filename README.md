@@ -290,6 +290,15 @@ McMaster-Carr CLI supports 19 different washer types with specific naming patter
 
 *Note: Clevis pins are used for pivot connections and removable mechanical linkages. Retaining ring groove variants include a groove for secure retention.*
 
+#### Shaft Collars
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Face-Mount Shaft Collar | `FMSC-[Material]-[Shaft Dia]-[OD]-[Width]-[Finish]` | 303 SS Face-Mount, 1/2" shaft, 1-1/8" OD, 13/32" width | `FMSC-SS303-0.5-1.125-0.40625` |
+| Flange-Mount Shaft Collar | `FLSC-[Material]-[Shaft Dia]-[OD]-[Width]-[Finish]` | 18-8 SS Flange-Mount, 3/8" shaft, 7/8" OD, 1/4" width | `FLSC-SS188-0.375-0.875-0.25` |
+
+*Note: Shaft collars provide axial positioning and support for rotating shafts. Face-mount variants have tapped holes on the face, while flange-mount types have through-holes and counterbored mounting holes.*
+
 #### Bearings
 
 McMaster-Carr CLI provides comprehensive bearing support with specialized naming for different bearing types:

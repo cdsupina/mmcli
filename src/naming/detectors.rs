@@ -118,6 +118,8 @@ pub fn determine_category(product: &ProductDetail) -> String {
         determine_bearing_type(product)
     } else if category_lower.contains("pins") || family_lower.contains("pin") {
         determine_pin_type(&family_lower)
+    } else if category_lower.contains("shaft collars") || family_lower.contains("shaft collar") {
+        determine_shaft_collar_type(&family_lower)
     } else {
         "unknown".to_string()
     }
@@ -288,6 +290,17 @@ fn determine_pin_type(family_lower: &str) -> String {
         "clevis_pin".to_string()
     } else {
         "generic_pin".to_string()
+    }
+}
+
+/// Determine specific shaft collar type
+fn determine_shaft_collar_type(family_lower: &str) -> String {
+    if family_lower.contains("face-mount shaft collar") || family_lower.contains("face mount shaft collar") {
+        "face_mount_shaft_collar".to_string()
+    } else if family_lower.contains("flange-mount shaft collar") || family_lower.contains("flange mount shaft collar") {
+        "flange_mount_shaft_collar".to_string()
+    } else {
+        "generic_shaft_collar".to_string()
     }
 }
 

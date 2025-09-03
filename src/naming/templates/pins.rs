@@ -1,9 +1,9 @@
-//! Pin naming templates
+//! Pin and collar naming templates
 
 use std::collections::HashMap;
 use crate::naming::generator::NamingTemplate;
 
-/// Initialize all pin templates
+/// Initialize all pin and collar templates
 pub fn initialize_pin_templates(category_templates: &mut HashMap<String, NamingTemplate>) {
     let mut pin_abbrevs = HashMap::new();
     
@@ -60,4 +60,24 @@ pub fn initialize_pin_templates(category_templates: &mut HashMap<String, NamingT
         spec_abbreviations: pin_abbrevs.clone(),
     };
     category_templates.insert("clevis_pin_with_retaining_ring_groove".to_string(), clevis_pin_rrg_template);
+    
+    // Create shared abbreviations for shaft collars (reuse pin abbreviations plus specific materials)
+    let mut collar_abbrevs = pin_abbrevs.clone();
+    collar_abbrevs.insert("303 Stainless Steel".to_string(), "SS303".to_string());
+    
+    // Face-Mount Shaft Collar
+    let face_mount_collar_template = NamingTemplate {
+        prefix: "FMSC".to_string(),
+        key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "OD".to_string(), "Width".to_string(), "Finish".to_string()],
+        spec_abbreviations: collar_abbrevs.clone(),
+    };
+    category_templates.insert("face_mount_shaft_collar".to_string(), face_mount_collar_template);
+    
+    // Flange-Mount Shaft Collar
+    let flange_mount_collar_template = NamingTemplate {
+        prefix: "FLSC".to_string(),
+        key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "OD".to_string(), "Width".to_string(), "Finish".to_string()],
+        spec_abbreviations: collar_abbrevs,
+    };
+    category_templates.insert("flange_mount_shaft_collar".to_string(), flange_mount_collar_template);
 }

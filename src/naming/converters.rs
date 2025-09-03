@@ -23,6 +23,7 @@ pub fn convert_length_to_decimal(value: &str) -> String {
             "13/16" => "0.8125".to_string(),
             "7/8" => "0.875".to_string(),
             "15/16" => "0.9375".to_string(),
+            "13/32" => "0.40625".to_string(),
             "1" => "1".to_string(),
             "1-1/8" => "1.125".to_string(),
             "1-1/4" => "1.25".to_string(),
