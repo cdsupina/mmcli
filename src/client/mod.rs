@@ -7,5 +7,6 @@
 pub mod api;
 pub mod auth;
 pub mod downloads;
+pub mod subscriptions;
 
 pub use api::McmasterClient;

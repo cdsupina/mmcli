@@ -40,4 +40,5 @@ pub struct Credentials {
     pub password: String,
     pub certificate_path: Option<String>,
     pub certificate_password: Option<String>,
+    pub subscriptions_file: Option<String>,
 }
