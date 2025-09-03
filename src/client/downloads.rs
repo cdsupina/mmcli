@@ -31,7 +31,11 @@ impl super::api::McmasterClient {
         println!("📥 Downloading {} images to {}", links.images.len(), output_path.display());
 
         for (i, image_url) in links.images.iter().enumerate() {
-            let filename = format!("{}_image_{}.jpg", product, i + 1);
+            let filename = if links.images.len() == 1 {
+                format!("{}.jpg", product)
+            } else {
+                format!("{}_{}.jpg", product, i + 1)
+            };
             let file_path = output_path.join(&filename);
 
             match self.download_file(image_url, &file_path).await {
@@ -85,7 +89,7 @@ impl super::api::McmasterClient {
 
         for cad_file in filtered_cad {
             let extension = self.get_cad_extension(&cad_file.format);
-            let filename = format!("{}_{}.{}", product, cad_file.key.replace(" ", "_"), extension);
+            let filename = format!("{}.{}", product, extension);
             let file_path = output_path.join(&filename);
 
             match self.download_file(&cad_file.url, &file_path).await {
@@ -119,7 +123,11 @@ impl super::api::McmasterClient {
         println!("📥 Downloading {} datasheets to {}", links.datasheets.len(), output_path.display());
 
         for (i, datasheet_url) in links.datasheets.iter().enumerate() {
-            let filename = format!("{}_datasheet_{}.pdf", product, i + 1);
+            let filename = if links.datasheets.len() == 1 {
+                format!("{}.pdf", product)
+            } else {
+                format!("{}_{}.pdf", product, i + 1)
+            };
             let file_path = output_path.join(&filename);
 
             match self.download_file(datasheet_url, &file_path).await {
@@ -183,7 +191,21 @@ impl super::api::McmasterClient {
 
     /// Download a file from URL to local path
     async fn download_file(&self, url: &str, file_path: &PathBuf) -> Result<()> {
-        let response = self.client.get(url).send().await?;
+        // Convert relative URLs to absolute URLs
+        let full_url = if url.starts_with('/') {
+            format!("https://api.mcmaster.com{}", url)
+        } else {
+            url.to_string()
+        };
+        
+        // Add authentication token for download requests
+        let token = self.token.as_ref().ok_or_else(|| {
+            anyhow::anyhow!("Not authenticated. Please login first with 'mmc login'")
+        })?;
+        
+        let response = self.client.get(&full_url)
+            .header("Authorization", format!("Bearer {}", token))
+            .send().await?;
         
         if !response.status().is_success() {
             return Err(anyhow::anyhow!("Failed to download file: HTTP {}", response.status()));

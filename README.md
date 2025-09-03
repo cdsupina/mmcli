@@ -11,7 +11,7 @@ A command-line interface for the McMaster-Carr Product Information API. This too
 - 💰 **Product Information** - Get detailed product data and pricing
 - 🏷️ **Intelligent Name Generation** - Generate human-readable technical names for fasteners
 - 📊 **Change Tracking** - Monitor product updates and changes
-- 💾 **File Downloads** - Download CAD files, images, and datasheets
+- 💾 **File Downloads** - Download CAD files, images, and datasheets with clean filenames
 - 🚫 **No Flags Required** - Works without `-c` credentials flag for everyday use
 
 ## Installation

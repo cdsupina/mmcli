@@ -146,15 +146,20 @@ mmc name 91780A053  # Standoff
 
 ### File Downloads
 ```bash
-# Download images
+# Download images (saves as {part_number}.jpg)
 mmc image 91831A030
 
-# Download specific CAD formats
+# Download specific CAD formats (saves as {part_number}.step, {part_number}.dwg)
 mmc cad 91831A030 --step --dwg
 
 # Download all CAD files
 mmc cad 91831A030 --all
+
+# Download datasheets (saves as {part_number}.pdf)
+mmc datasheet 91831A030
 ```
+
+**Note**: Files are saved with clean naming using just the McMaster-Carr part number and appropriate extension.
 
 ## Dependencies
 

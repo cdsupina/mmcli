@@ -17,6 +17,10 @@ struct Cli {
     #[arg(short, long, global = true)]
     credentials: Option<String>,
     
+    /// Show detailed output including certificate loading and authentication details
+    #[arg(short, long, global = true)]
+    verbose: bool,
+    
     #[command(subcommand)]
     command: Commands,
 }
@@ -258,17 +262,13 @@ async fn main() -> Result<()> {
         load_default_credentials().await.ok()
     };
     
-    // Check if JSON output is requested to suppress verbose output
-    let json_output = matches!(cli.command, 
-        Commands::Info { output: OutputFormat::Json, .. } |
-        Commands::Price { output: OutputFormat::Json, .. }
-    );
-    
-    let mut client = if json_output {
-        // For JSON output, create client without verbose messages
-        McmasterClient::new_with_credentials_quiet(credentials)?
-    } else {
+    // Create client with quiet mode by default, verbose when requested
+    let mut client = if cli.verbose {
+        // Show detailed certificate and authentication messages
         McmasterClient::new_with_credentials(credentials)?
+    } else {
+        // Clean output by default
+        McmasterClient::new_with_credentials_quiet(credentials)?
     };
 
     // Load existing token if available
@@ -341,17 +341,9 @@ async fn main() -> Result<()> {
             client.remove_product(&product).await?;
         }
         Commands::Info { product, output, fields } => {
-            // Set quiet mode for JSON output to suppress other messages
-            if output == OutputFormat::Json {
-                client.set_quiet_mode(true);
-            }
             client.get_product(&product, output, &fields).await?;
         }
         Commands::Price { product, output } => {
-            // Set quiet mode for JSON output to suppress other messages
-            if output == OutputFormat::Json {
-                client.set_quiet_mode(true);
-            }
             client.get_price(&product, output).await?;
         }
         Commands::Changes { start } => {

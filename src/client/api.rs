@@ -208,7 +208,7 @@ impl McmasterClient {
                     println!("📝 Description: {}", product.detail_description);
                 }
                 ProductField::FamilyDescription => {
-                    println!("👨‍👩‍👧‍👦 Family: {}", product.family_description);
+                    println!("🏷️ Family: {}", product.family_description);
                 }
                 ProductField::Category => {
                     println!("📂 Category: {}", product.product_category);
@@ -231,7 +231,7 @@ impl McmasterClient {
                 ProductField::BasicInfo => {
                     println!("📦 Part Number: {}", product.part_number);
                     println!("📝 Description: {}", product.detail_description);
-                    println!("👨‍👩‍👧‍👦 Family: {}", product.family_description);
+                    println!("🏷️ Family: {}", product.family_description);
                     println!("📂 Category: {}", product.product_category);
                     println!("🔄 Status: {}", product.product_status);
                 }
@@ -254,7 +254,13 @@ impl McmasterClient {
             .await?;
 
         if response.status().is_success() {
-            let price_info: PriceInfo = response.json().await?;
+            let price_infos: Vec<PriceInfo> = response.json().await?;
+            
+            if price_infos.is_empty() {
+                return Err(anyhow::anyhow!("No pricing information available"));
+            }
+            
+            let price_info = &price_infos[0]; // Take first price option
             
             match output_format {
                 OutputFormat::Json => {

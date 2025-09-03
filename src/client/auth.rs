@@ -32,9 +32,8 @@ impl super::api::McmasterClient {
                 }
             }
 
-            if !self.quiet_mode {
-                println!("✅ Login successful");
-            }
+            // Always show login success (critical information)
+            println!("✅ Login successful");
         } else {
             // Try to parse as error response
             let error_text = response.text().await?;
@@ -66,13 +65,11 @@ impl super::api::McmasterClient {
                 if token_path.exists() {
                     let _ = async_fs::remove_file(token_path).await;
                 }
-                if !self.quiet_mode {
-                    println!("✅ Logout successful");
-                }
+                // Always show logout success (critical information)
+                println!("✅ Logout successful");
             } else {
-                if !self.quiet_mode {
-                    eprintln!("⚠️  Warning: Logout request failed, but clearing local token");
-                }
+                // Always show logout warnings (critical information)
+                eprintln!("⚠️  Warning: Logout request failed, but clearing local token");
                 self.token = None;
                 let token_path = get_token_path();
                 if token_path.exists() {
@@ -80,9 +77,8 @@ impl super::api::McmasterClient {
                 }
             }
         } else {
-            if !self.quiet_mode {
-                println!("ℹ️  No active session to logout from");
-            }
+            // Always show logout info (critical information)
+            println!("ℹ️  No active session to logout from");
         }
 
         Ok(())
