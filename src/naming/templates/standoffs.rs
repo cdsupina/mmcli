@@ -51,7 +51,7 @@ pub fn initialize_standoff_templates(category_templates: &mut HashMap<String, Na
     // Male-Female Threaded Hex Standoff
     let male_female_hex_standoff_template = NamingTemplate {
         prefix: "MFSO".to_string(),
-        key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+        key_specs: vec!["Material".to_string(), "Thread (A) Size".to_string(), "Length".to_string(), "Finish".to_string()],
         spec_abbreviations: standoff_abbrevs.clone(),
     };
     category_templates.insert("male_female_hex_standoff".to_string(), male_female_hex_standoff_template);

@@ -169,7 +169,7 @@ impl NameGenerator {
                     if !abbreviated.is_empty() {
                         name_parts.push(abbreviated);
                     }
-                } else if spec_name.eq_ignore_ascii_case("Thread Size") {
+                } else if spec_name.eq_ignore_ascii_case("Thread Size") || spec_name.eq_ignore_ascii_case("Thread (A) Size") {
                     // Special handling for Thread Size - extract pitch for metric threads
                     let thread_value = converters::extract_thread_with_pitch(product, &value);
                     let abbreviated = template
