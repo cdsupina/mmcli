@@ -1,6 +1,6 @@
 # McMaster-Carr CLI (mmc)
 
-A command-line interface for the McMaster-Carr Product Information API. This tool allows you to authenticate, manage product subscriptions, and retrieve product data from McMaster-Carr's API using client certificate authentication.
+A command-line interface for the McMaster-Carr Product Information API. This tool allows you to authenticate, manage product subscriptions, retrieve product data, and generate human-readable technical names for fasteners and components using client certificate authentication.
 
 ## Features
 
@@ -9,7 +9,9 @@ A command-line interface for the McMaster-Carr Product Information API. This too
 - 🔑 **Token Management** - Automatic token storage and reuse (24-hour validity)
 - 📦 **Product Management** - Add/remove products from subscription
 - 💰 **Product Information** - Get detailed product data and pricing
+- 🏷️ **Intelligent Name Generation** - Generate human-readable technical names for fasteners
 - 📊 **Change Tracking** - Monitor product updates and changes
+- 💾 **File Downloads** - Download CAD files, images, and datasheets with clean filenames
 - 🚫 **No Flags Required** - Works without `-c` credentials flag for everyday use
 
 ## Installation
@@ -237,7 +239,7 @@ McMaster-Carr CLI supports 19 different washer types with specific naming patter
 | Clipped Washer | `CLW-[Material]-[Screw Size]-[Finish]` | Steel Clipped Washer for 5/16" | `CLW-Steel-5/16` |
 | Flat Washer | `FW-[Material]-[Screw Size]-[Finish]` | 316 SS Flat Washer for 1/4" | `FW-SS316-1/4` |
 | Hillside Washer | `HW-[Material]-[Screw Size]-[Finish]` | Steel Hillside Washer for M8 | `HW-Steel-M8` |
-| Notched Washer | `NW-[Material]-[Screw Size]-[Finish]` | Aluminum Notched Washer for 6x32 | `NW-Al-6x32` |
+| Notched Washer | `NW-[Material]-[Screw Size]-[Finish]` | Aluminum Notched Washer for 6x32 | `NW-AL-6x32` |
 | Perforated Washer | `PW-[Material]-[Screw Size]-[Finish]` | SS Perforated Washer for 1/2" | `PW-SS-1/2` |
 | Pronged Washer | `PRW-[Material]-[Screw Size]-[Finish]` | Steel Pronged Washer for M5 | `PRW-Steel-M5` |
 | Rectangular Washer | `RW-[Material]-[Screw Size]-[Finish]` | Nylon Rectangular for 10x24 | `RW-Nylon-10x24` |
@@ -260,7 +262,7 @@ McMaster-Carr CLI supports 19 different washer types with specific naming patter
 |------|----------|---------------|----------------|
 | Male-Female Standoff | `MFSO-[Material]-[Thread]-[Length]-[Finish]` | SS Male-Female Standoff, 4x40 x 0.5" | `MFSO-SS-4x40-0.5` |
 | Female Standoff | `FSO-[Material]-[Thread]-[Length]-[Finish]` | Brass Female Standoff, M6x1.0 x 25mm | `FSO-Brass-M6x1.0-25` |
-| Standoff (Generic) | `SO-[Material]-[Thread]-[Length]-[Finish]` | Aluminum Threaded Standoff, 8x32 x 0.75" | `SO-Al-8x32-0.75` |
+| Standoff (Generic) | `SO-[Material]-[Thread]-[Length]-[Finish]` | Aluminum Threaded Standoff, 8x32 x 0.75" | `SO-AL-8x32-0.75` |
 
 *Note: Supports various standoff configurations including male-female, female-only, and specialized types for electronics and mechanical assemblies.*
 
@@ -321,7 +323,7 @@ McMaster-Carr CLI provides comprehensive bearing support with specialized naming
 | Class 12.9 Steel | `S12.9` | Metric very high strength |
 | Steel (generic) | `S` | Carbon/alloy steel when grade not specified |
 | Brass | `Brass` | Brass alloy |
-| Aluminum | `Al` | Aluminum alloy |
+| Aluminum | `AL` | Aluminum alloy |
 | Copper | `Cu` | Copper alloy |
 | Nylon | `Nylon` | Nylon plastic |
 | Plastic | `Plastic` | Various plastic materials |
@@ -430,13 +432,17 @@ mmc add 90128a211  # M4x0.7mm Socket Head Screws
 mmc add 92141A008  # #6 Stainless Steel Washers  
 mmc add 92141A029  # 1/4" Stainless Steel Washers
 
-# Get detailed product information
-mmc product 90128a211
+# Get detailed product information  
+mmc info 90128a211
 # Returns: specifications, CAD links, material properties, etc.
 
 # Check pricing
 mmc price 92141A008
-# Returns: $1.53 per pack of 100 washers
+# Returns: pricing information per unit/pack
+
+# Generate technical names
+mmc name 92141A008
+# Returns: FW-SS188-6 (Flat Washer, 18-8 SS, #6 screw size)
 
 # Monitor changes since start of year
 mmc changes -s "01/01/2024"
@@ -521,22 +527,52 @@ The CLI interacts with McMaster-Carr's Product Information API:
 
 ```
 src/
-├── main.rs          # CLI interface and command parsing
-├── client.rs        # McMaster-Carr API client
-└── lib.rs          # Library exports (if needed)
+├── lib.rs                    # Library root with exports
+├── main.rs                   # CLI entry point
+├── client/                   # API client functionality
+│   ├── mod.rs               # Module declarations
+│   ├── api.rs               # Core API operations
+│   ├── auth.rs              # Authentication handling
+│   └── downloads.rs         # File downloads
+├── naming/                   # Name generation system
+│   ├── mod.rs               # Module declarations
+│   ├── generator.rs         # Core name generation logic
+│   ├── abbreviations.rs     # Value abbreviation logic
+│   ├── converters.rs        # Data conversion utilities
+│   ├── detectors.rs         # Fastener type detection
+│   └── templates/           # Naming templates by category
+│       ├── mod.rs
+│       ├── screws.rs        # Screw naming templates
+│       ├── nuts.rs          # Nut naming templates
+│       ├── washers.rs       # Washer naming templates
+│       ├── standoffs.rs     # Standoff naming templates
+│       └── bearings.rs      # Bearing naming templates
+├── models/                   # Data structures
+│   ├── mod.rs               # Model exports
+│   ├── api.rs               # API response models
+│   ├── auth.rs              # Authentication models
+│   └── product.rs           # Product data models
+├── config/                   # Configuration management
+│   ├── mod.rs               # Module declarations
+│   └── paths.rs             # XDG-compliant path handling
+└── utils/                    # Utilities
+    ├── mod.rs               # Module declarations
+    ├── output.rs            # Output formatting
+    └── error.rs             # Error handling
 ```
 
 ### Dependencies
 
-- `clap` - Command line parsing
+- `clap` - Command line parsing with derive macros
 - `reqwest` - HTTP client with native-tls support
-- `serde` - JSON/TOML serialization
+- `serde` - JSON/TOML serialization  
 - `tokio` - Async runtime
 - `anyhow` - Error handling
 - `native-tls` - TLS with client certificate support
-- `dirs` - XDG standard directory locations
-- `toml` - TOML file parsing
+- `dirs` - Cross-platform directory paths
+- `toml` - TOML configuration file parsing
 - `urlencoding` - URL parameter encoding
+- `regex` - Pattern matching for naming system
 
 ## API Integration
 
