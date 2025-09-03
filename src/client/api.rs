@@ -10,6 +10,7 @@ use crate::models::auth::{Credentials, ErrorResponse};
 use crate::models::product::{ProductDetail, PriceInfo};
 use crate::utils::output::{OutputFormat, ProductField};
 use crate::naming::NameGenerator;
+use crate::client::subscriptions::SubscriptionManager;
 
 /// Main client for McMaster-Carr API operations
 pub struct McmasterClient {
@@ -18,6 +19,7 @@ pub struct McmasterClient {
     pub(crate) credentials: Option<Credentials>,
     pub(crate) quiet_mode: bool, // For suppressing output when in JSON mode
     name_generator: NameGenerator,
+    subscription_manager: std::sync::Mutex<SubscriptionManager>,
 }
 
 impl McmasterClient {
@@ -79,12 +81,16 @@ impl McmasterClient {
             .build()
             .map_err(|e| anyhow::anyhow!("Failed to create HTTP client: {}", e))?;
 
+        // Initialize subscription manager
+        let subscription_manager = SubscriptionManager::new(&credentials)?;
+
         Ok(McmasterClient {
             client,
             token: None,
             credentials,
             quiet_mode: quiet,
             name_generator: NameGenerator::new(),
+            subscription_manager: std::sync::Mutex::new(subscription_manager),
         })
     }
 
@@ -100,6 +106,11 @@ impl McmasterClient {
             .await?;
 
         if response.status().is_success() {
+            // Add to local tracking after successful API call
+            if let Ok(mut manager) = self.subscription_manager.lock() {
+                let _ = manager.add_part(product); // Ignore result as local tracking is supplementary
+            }
+
             if !self.quiet_mode {
                 println!("✅ Added {} to subscription", product);
             }
@@ -130,6 +141,11 @@ impl McmasterClient {
             .await?;
 
         if response.status().is_success() {
+            // Remove from local tracking after successful API call
+            if let Ok(mut manager) = self.subscription_manager.lock() {
+                let _ = manager.remove_part(product); // Ignore result as local tracking is supplementary
+            }
+
             if !self.quiet_mode {
                 println!("✅ Removed {} from subscription", product);
             }
@@ -162,6 +178,11 @@ impl McmasterClient {
 
         if response.status().is_success() {
             let product_detail: ProductDetail = response.json().await?;
+            
+            // Add to local tracking after successful API call (auto-discovery)
+            if let Ok(mut manager) = self.subscription_manager.lock() {
+                let _ = manager.add_part(product); // Ignore result as local tracking is supplementary
+            }
             
             match output_format {
                 OutputFormat::Json => {
@@ -260,6 +281,11 @@ impl McmasterClient {
                 return Err(anyhow::anyhow!("No pricing information available"));
             }
             
+            // Add to local tracking after successful API call (auto-discovery)
+            if let Ok(mut manager) = self.subscription_manager.lock() {
+                let _ = manager.add_part(product); // Ignore result as local tracking is supplementary
+            }
+            
             let price_info = &price_infos[0]; // Take first price option
             
             match output_format {
@@ -334,7 +360,14 @@ impl McmasterClient {
             .await?;
 
         let product_detail: ProductDetail = if response.status().is_success() {
-            response.json().await?
+            let product_detail: ProductDetail = response.json().await?;
+            
+            // Add to local tracking after successful API call (auto-discovery)
+            if let Ok(mut manager) = self.subscription_manager.lock() {
+                let _ = manager.add_part(product); // Ignore result as local tracking is supplementary
+            }
+            
+            product_detail
         } else if response.status().as_u16() == 404 {
             // Product not in subscription, add it
             if !self.quiet_mode {
@@ -355,7 +388,10 @@ impl McmasterClient {
                 .await?;
                 
             if response.status().is_success() {
-                response.json().await?
+                let product_detail: ProductDetail = response.json().await?;
+                
+                // Part was already tracked by add_product call above, so no need to track again
+                product_detail
             } else {
                 let error_text = response.text().await?;
                 return Err(anyhow::anyhow!("Failed to get product after adding to subscription: {}", error_text));
@@ -375,6 +411,94 @@ impl McmasterClient {
         let generated_name = self.name_generator.generate_name(&product_detail);
         println!("{}", generated_name);
 
+        Ok(())
+    }
+
+    /// List all locally tracked subscriptions
+    pub fn list_subscriptions(&self) -> Result<()> {
+        if let Ok(manager) = self.subscription_manager.lock() {
+            let parts = manager.get_all_parts();
+            let file_path = manager.get_file_path();
+            
+            println!("📁 Subscription file: {}", file_path.display());
+            
+            if parts.is_empty() {
+                println!("📭 No subscribed parts tracked locally");
+                println!("💡 Parts will be automatically tracked as you use them");
+            } else {
+                println!("📦 Locally tracked subscriptions ({} parts):", parts.len());
+                for part in parts {
+                    println!("  • {}", part);
+                }
+            }
+        } else {
+            return Err(anyhow::anyhow!("Failed to access subscription manager"));
+        }
+        Ok(())
+    }
+
+    /// Import parts from a file into local subscription tracking
+    pub fn import_subscriptions(&self, import_path: &str) -> Result<()> {
+        if let Ok(mut manager) = self.subscription_manager.lock() {
+            let imported_count = manager.import_from_file(import_path)?;
+            if !self.quiet_mode {
+                println!("📥 Imported {} new parts from {}", imported_count, import_path);
+            }
+        } else {
+            return Err(anyhow::anyhow!("Failed to access subscription manager"));
+        }
+        Ok(())
+    }
+
+    /// Sync local subscription list with API (verify each part is actually subscribed)
+    pub async fn sync_subscriptions(&self) -> Result<()> {
+        if let Ok(manager) = self.subscription_manager.lock() {
+            let parts = manager.get_all_parts();
+            if parts.is_empty() {
+                println!("📭 No locally tracked parts to sync");
+                return Ok(());
+            }
+
+            println!("🔄 Syncing {} locally tracked parts with API...", parts.len());
+            
+            let token = self.token.as_ref().ok_or_else(|| {
+                anyhow::anyhow!("Not authenticated. Please login first with 'mmc login'")
+            })?;
+
+            let mut verified = 0;
+            let mut not_found = Vec::new();
+
+            for part in parts {
+                let url = format!("https://api.mcmaster.com/v1/products/{}", part);
+                let response = self.client.get(&url)
+                    .header("Authorization", format!("Bearer {}", token))
+                    .send()
+                    .await?;
+
+                if response.status().is_success() {
+                    verified += 1;
+                    if !self.quiet_mode {
+                        print!("✅ {}", part);
+                        // Clear line and move cursor back
+                        print!("\r");
+                    }
+                } else if response.status().as_u16() == 404 {
+                    not_found.push(part);
+                }
+            }
+
+            println!("✅ Verified {} parts are subscribed", verified);
+            
+            if !not_found.is_empty() {
+                println!("❌ {} parts not found in subscription:", not_found.len());
+                for part in not_found {
+                    println!("  • {}", part);
+                }
+            }
+        } else {
+            return Err(anyhow::anyhow!("Failed to access subscription manager"));
+        }
+        
         Ok(())
     }
 }

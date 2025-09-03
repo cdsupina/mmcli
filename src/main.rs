@@ -146,6 +146,15 @@ enum Commands {
         /// Product number
         product: String,
     },
+    /// List locally tracked subscriptions
+    List,
+    /// Sync local subscriptions with API
+    Sync,
+    /// Import subscriptions from file
+    Import {
+        /// Path to file containing part numbers (one per line)
+        file: String,
+    },
 }
 
 async fn load_credentials_from_file(path: &str) -> Result<Credentials> {
@@ -374,6 +383,15 @@ async fn main() -> Result<()> {
         }
         Commands::Name { product } => {
             client.generate_name(&product).await?;
+        }
+        Commands::List => {
+            client.list_subscriptions()?;
+        }
+        Commands::Sync => {
+            client.sync_subscriptions().await?;
+        }
+        Commands::Import { file } => {
+            client.import_subscriptions(&file)?;
         }
     }
 

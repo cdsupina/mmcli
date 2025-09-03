@@ -15,6 +15,11 @@ pub fn get_token_path() -> PathBuf {
     get_config_dir().join("token")
 }
 
+/// Get the subscriptions file path
+pub fn get_subscriptions_path() -> PathBuf {
+    get_config_dir().join("subscriptions.txt")
+}
+
 /// Find certificate in default locations
 pub fn find_certificate_path() -> Option<PathBuf> {
     let config_dir = get_config_dir();
