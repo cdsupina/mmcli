@@ -78,6 +78,7 @@ fn initialize_all_washer_types(category_templates: &mut HashMap<String, NamingTe
         let washer_template = NamingTemplate {
             prefix: prefix.to_string(),
             key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+            spec_aliases: None,
             spec_abbreviations: abbrevs.clone(),
         };
         category_templates.insert(washer_type.to_string(), washer_template);
