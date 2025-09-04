@@ -112,6 +112,7 @@ impl NameGenerator {
         templates::initialize_spacer_templates(&mut self.category_templates);
         templates::initialize_pin_templates(&mut self.category_templates);
         templates::initialize_bearing_templates(&mut self.category_templates);
+        templates::initialize_pulley_templates(&mut self.category_templates);
     }
 
     /// Generate a human-readable name for the given product

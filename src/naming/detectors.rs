@@ -120,6 +120,8 @@ pub fn determine_category(product: &ProductDetail) -> String {
         determine_pin_type(&family_lower)
     } else if category_lower.contains("shaft collars") || family_lower.contains("shaft collar") {
         determine_shaft_collar_type(&family_lower)
+    } else if category_lower.contains("pulleys") || family_lower.contains("pulley") || family_lower.contains("sheave") {
+        determine_pulley_type(&family_lower)
     } else {
         "unknown".to_string()
     }
@@ -354,5 +356,20 @@ fn determine_bearing_type(product: &ProductDetail) -> String {
         "roller_bearing".to_string()
     } else {
         "generic_bearing".to_string()
+    }
+}
+
+/// Determine specific pulley type
+fn determine_pulley_type(family_lower: &str) -> String {
+    if family_lower.contains("wire rope") {
+        "wire_rope_pulley".to_string()
+    } else if family_lower.contains("rope") && !family_lower.contains("wire") {
+        "rope_pulley".to_string()
+    } else if family_lower.contains("v-belt") || family_lower.contains("belt") {
+        "v_belt_pulley".to_string()
+    } else if family_lower.contains("sheave") {
+        "sheave".to_string()
+    } else {
+        "pulley".to_string()
     }
 }
