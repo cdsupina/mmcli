@@ -30,6 +30,7 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     let flanged_sleeve_bearing_template = NamingTemplate {
         prefix: "FSB".to_string(),
         key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "OD".to_string(), "Length".to_string()],
+        spec_aliases: None,
         spec_abbreviations: bearing_abbrevs.clone(),
     };
     category_templates.insert("flanged_sleeve_bearing".to_string(), flanged_sleeve_bearing_template);
@@ -38,6 +39,7 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     let sleeve_bearing_template = NamingTemplate {
         prefix: "SB".to_string(),
         key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "OD".to_string(), "Length".to_string()],
+        spec_aliases: None,
         spec_abbreviations: bearing_abbrevs.clone(),
     };
     category_templates.insert("sleeve_bearing".to_string(), sleeve_bearing_template);
@@ -46,6 +48,7 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     let flanged_bearing_template = NamingTemplate {
         prefix: "FB".to_string(),
         key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "OD".to_string(), "Length".to_string()],
+        spec_aliases: None,
         spec_abbreviations: bearing_abbrevs.clone(),
     };
     category_templates.insert("flanged_bearing".to_string(), flanged_bearing_template);
@@ -54,6 +57,7 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     let ball_bearing_template = NamingTemplate {
         prefix: "BB".to_string(),
         key_specs: vec!["Material".to_string(), "Bore".to_string(), "OD".to_string()],
+        spec_aliases: None,
         spec_abbreviations: bearing_abbrevs.clone(),
     };
     category_templates.insert("ball_bearing".to_string(), ball_bearing_template);
@@ -62,6 +66,7 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     let linear_bearing_template = NamingTemplate {
         prefix: "LB".to_string(),
         key_specs: vec!["Material".to_string(), "For Shaft Diameter".to_string(), "Length".to_string()],
+        spec_aliases: None,
         spec_abbreviations: bearing_abbrevs.clone(),
     };
     category_templates.insert("linear_bearing".to_string(), linear_bearing_template);
@@ -70,6 +75,7 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     let needle_bearing_template = NamingTemplate {
         prefix: "NB".to_string(),
         key_specs: vec!["Material".to_string(), "Bore".to_string(), "OD".to_string(), "Length".to_string()],
+        spec_aliases: None,
         spec_abbreviations: bearing_abbrevs.clone(),
     };
     category_templates.insert("needle_bearing".to_string(), needle_bearing_template);
@@ -78,6 +84,7 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     let roller_bearing_template = NamingTemplate {
         prefix: "RB".to_string(),
         key_specs: vec!["Material".to_string(), "Bore".to_string(), "OD".to_string(), "Length".to_string()],
+        spec_aliases: None,
         spec_abbreviations: bearing_abbrevs.clone(),
     };
     category_templates.insert("roller_bearing".to_string(), roller_bearing_template);
@@ -86,6 +93,7 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     let flange_mounted_ball_bearing_template = NamingTemplate {
         prefix: "MFBB".to_string(),
         key_specs: vec!["Housing Material".to_string(), "For Shaft Diameter".to_string(), "Mounting Hole Center -to-Center".to_string(), "Overall Height".to_string()],
+        spec_aliases: None,
         spec_abbreviations: bearing_abbrevs.clone(),
     };
     category_templates.insert("flange_mounted_ball_bearing".to_string(), flange_mounted_ball_bearing_template);
@@ -94,6 +102,7 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     let low_profile_flange_mounted_ball_bearing_template = NamingTemplate {
         prefix: "LPMFBB".to_string(),
         key_specs: vec!["Housing Material".to_string(), "For Shaft Diameter".to_string(), "Mounting Hole Center -to-Center".to_string(), "Overall Height".to_string()],
+        spec_aliases: None,
         spec_abbreviations: bearing_abbrevs.clone(),
     };
     category_templates.insert("low_profile_flange_mounted_ball_bearing".to_string(), low_profile_flange_mounted_ball_bearing_template);
@@ -102,6 +111,7 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     let pillow_block_mounted_ball_bearing_template = NamingTemplate {
         prefix: "PBMBB".to_string(),
         key_specs: vec!["Housing Material".to_string(), "For Shaft Diameter".to_string(), "Mounting Hole Center -to-Center".to_string(), "Overall Height".to_string()],
+        spec_aliases: None,
         spec_abbreviations: bearing_abbrevs.clone(),
     };
     category_templates.insert("pillow_block_mounted_ball_bearing".to_string(), pillow_block_mounted_ball_bearing_template);
@@ -110,6 +120,7 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     let generic_mounted_bearing_template = NamingTemplate {
         prefix: "MBB".to_string(),
         key_specs: vec!["Housing Material".to_string(), "For Shaft Diameter".to_string(), "Overall Height".to_string()],
+        spec_aliases: None,
         spec_abbreviations: bearing_abbrevs.clone(),
     };
     category_templates.insert("generic_mounted_bearing".to_string(), generic_mounted_bearing_template);
@@ -118,6 +129,7 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     let generic_bearing_template = NamingTemplate {
         prefix: "BRG".to_string(),
         key_specs: vec!["Material".to_string(), "Type".to_string()],
+        spec_aliases: None,
         spec_abbreviations: bearing_abbrevs,
     };
     category_templates.insert("generic_bearing".to_string(), generic_bearing_template);

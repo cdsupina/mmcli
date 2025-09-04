@@ -42,10 +42,15 @@ pub fn initialize_spacer_templates(category_templates: &mut HashMap<String, Nami
     spacer_abbrevs.insert("Black Anodized".to_string(), "BA".to_string());
     spacer_abbrevs.insert("Black-Anodized".to_string(), "BA".to_string());
     
+    // Create aliases for For Screw Size - prefer "For Screw Size" over precise "ID"
+    let mut screw_size_aliases = HashMap::new();
+    screw_size_aliases.insert("For Screw Size".to_string(), vec!["For Screw Size".to_string(), "For Screw Size".to_string()]);
+    
     // Generic Unthreaded Spacer
     let spacer_template = NamingTemplate {
         prefix: "SP".to_string(),
-        key_specs: vec!["Material".to_string(), "ID".to_string(), "OD".to_string(), "Length".to_string(), "Finish".to_string()],
+        key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "OD".to_string(), "Length".to_string(), "Finish".to_string()],
+        spec_aliases: Some(screw_size_aliases.clone()),
         spec_abbreviations: spacer_abbrevs.clone(),
     };
     category_templates.insert("unthreaded_spacer".to_string(), spacer_template);
@@ -53,7 +58,8 @@ pub fn initialize_spacer_templates(category_templates: &mut HashMap<String, Nami
     // Aluminum Unthreaded Spacer
     let aluminum_spacer_template = NamingTemplate {
         prefix: "ASP".to_string(),
-        key_specs: vec!["Material".to_string(), "ID".to_string(), "OD".to_string(), "Length".to_string(), "Finish".to_string()],
+        key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "OD".to_string(), "Length".to_string(), "Finish".to_string()],
+        spec_aliases: Some(screw_size_aliases.clone()),
         spec_abbreviations: spacer_abbrevs.clone(),
     };
     category_templates.insert("aluminum_unthreaded_spacer".to_string(), aluminum_spacer_template);
@@ -61,7 +67,8 @@ pub fn initialize_spacer_templates(category_templates: &mut HashMap<String, Nami
     // Stainless Steel Unthreaded Spacer
     let stainless_spacer_template = NamingTemplate {
         prefix: "SSSP".to_string(),
-        key_specs: vec!["Material".to_string(), "ID".to_string(), "OD".to_string(), "Length".to_string(), "Finish".to_string()],
+        key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "OD".to_string(), "Length".to_string(), "Finish".to_string()],
+        spec_aliases: Some(screw_size_aliases.clone()),
         spec_abbreviations: spacer_abbrevs.clone(),
     };
     category_templates.insert("stainless_steel_unthreaded_spacer".to_string(), stainless_spacer_template);
@@ -69,7 +76,8 @@ pub fn initialize_spacer_templates(category_templates: &mut HashMap<String, Nami
     // Nylon Unthreaded Spacer
     let nylon_spacer_template = NamingTemplate {
         prefix: "NSP".to_string(),
-        key_specs: vec!["Material".to_string(), "ID".to_string(), "OD".to_string(), "Length".to_string(), "Finish".to_string()],
+        key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "OD".to_string(), "Length".to_string()],
+        spec_aliases: Some(screw_size_aliases),
         spec_abbreviations: spacer_abbrevs,
     };
     category_templates.insert("nylon_unthreaded_spacer".to_string(), nylon_spacer_template);

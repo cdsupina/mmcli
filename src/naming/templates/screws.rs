@@ -93,6 +93,7 @@ fn initialize_button_head_screws(category_templates: &mut HashMap<String, Naming
     let button_head_screw_template = NamingTemplate {
         prefix: "BHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("button_head_screw".to_string(), button_head_screw_template);
@@ -104,6 +105,7 @@ fn initialize_socket_head_screws(category_templates: &mut HashMap<String, Naming
     let socket_head_screw_template = NamingTemplate {
         prefix: "SHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("socket_head_screw".to_string(), socket_head_screw_template);
@@ -112,6 +114,7 @@ fn initialize_socket_head_screws(category_templates: &mut HashMap<String, Naming
     let high_socket_head_screw_template = NamingTemplate {
         prefix: "HSHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("high_socket_head_screw".to_string(), high_socket_head_screw_template);
@@ -120,6 +123,7 @@ fn initialize_socket_head_screws(category_templates: &mut HashMap<String, Naming
     let low_socket_head_screw_template = NamingTemplate {
         prefix: "LSHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("low_socket_head_screw".to_string(), low_socket_head_screw_template);
@@ -128,6 +132,7 @@ fn initialize_socket_head_screws(category_templates: &mut HashMap<String, Naming
     let ultra_low_socket_head_screw_template = NamingTemplate {
         prefix: "ULSHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("ultra_low_socket_head_screw".to_string(), ultra_low_socket_head_screw_template);
@@ -136,6 +141,7 @@ fn initialize_socket_head_screws(category_templates: &mut HashMap<String, Naming
     let standard_socket_head_screw_template = NamingTemplate {
         prefix: "SSHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("standard_socket_head_screw".to_string(), standard_socket_head_screw_template);
@@ -147,6 +153,7 @@ fn initialize_flat_head_screws(category_templates: &mut HashMap<String, NamingTe
     let flat_head_screw_template = NamingTemplate {
         prefix: "FHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("flat_head_screw".to_string(), flat_head_screw_template);
@@ -155,6 +162,7 @@ fn initialize_flat_head_screws(category_templates: &mut HashMap<String, NamingTe
     let narrow_flat_head_screw_template = NamingTemplate {
         prefix: "NFHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("narrow_flat_head_screw".to_string(), narrow_flat_head_screw_template);
@@ -163,6 +171,7 @@ fn initialize_flat_head_screws(category_templates: &mut HashMap<String, NamingTe
     let standard_flat_head_screw_template = NamingTemplate {
         prefix: "SFHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("standard_flat_head_screw".to_string(), standard_flat_head_screw_template);
@@ -171,6 +180,7 @@ fn initialize_flat_head_screws(category_templates: &mut HashMap<String, NamingTe
     let undercut_flat_head_screw_template = NamingTemplate {
         prefix: "UFHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("undercut_flat_head_screw".to_string(), undercut_flat_head_screw_template);
@@ -179,6 +189,7 @@ fn initialize_flat_head_screws(category_templates: &mut HashMap<String, NamingTe
     let wide_flat_head_screw_template = NamingTemplate {
         prefix: "WFHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("wide_flat_head_screw".to_string(), wide_flat_head_screw_template);
@@ -190,6 +201,7 @@ fn initialize_other_head_screws(category_templates: &mut HashMap<String, NamingT
     let pan_head_screw_template = NamingTemplate {
         prefix: "PHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("pan_head_screw".to_string(), pan_head_screw_template);
@@ -198,6 +210,7 @@ fn initialize_other_head_screws(category_templates: &mut HashMap<String, NamingT
     let hex_head_screw_template = NamingTemplate {
         prefix: "HHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("hex_head_screw".to_string(), hex_head_screw_template);
@@ -206,6 +219,7 @@ fn initialize_other_head_screws(category_templates: &mut HashMap<String, NamingT
     let rounded_head_screw_template = NamingTemplate {
         prefix: "RHS".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("rounded_head_screw".to_string(), rounded_head_screw_template);
@@ -214,6 +228,7 @@ fn initialize_other_head_screws(category_templates: &mut HashMap<String, NamingT
     let generic_screw_template = NamingTemplate {
         prefix: "SCREW".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("generic_screw".to_string(), generic_screw_template);
@@ -225,6 +240,7 @@ fn initialize_specialty_screws(category_templates: &mut HashMap<String, NamingTe
     let thumb_screw_template = NamingTemplate {
         prefix: "THUMB".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("thumb_screw".to_string(), thumb_screw_template);
@@ -233,6 +249,7 @@ fn initialize_specialty_screws(category_templates: &mut HashMap<String, NamingTe
     let eye_screw_template = NamingTemplate {
         prefix: "EYE".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("eye_screw".to_string(), eye_screw_template);
@@ -241,6 +258,7 @@ fn initialize_specialty_screws(category_templates: &mut HashMap<String, NamingTe
     let hook_screw_template = NamingTemplate {
         prefix: "HOOK".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("hook_screw".to_string(), hook_screw_template);

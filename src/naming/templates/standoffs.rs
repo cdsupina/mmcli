@@ -48,10 +48,15 @@ pub fn initialize_standoff_templates(category_templates: &mut HashMap<String, Na
     standoff_abbrevs.insert("Chrome-Plated".to_string(), "CR".to_string());
     standoff_abbrevs.insert("Galvanized".to_string(), "GAL".to_string());
     
+    // Create aliases for thread size variations
+    let mut thread_size_aliases = HashMap::new();
+    thread_size_aliases.insert("Thread Size".to_string(), vec!["Thread Size".to_string(), "Thread (A) Size".to_string()]);
+    
     // Male-Female Threaded Hex Standoff
     let male_female_hex_standoff_template = NamingTemplate {
         prefix: "MFSO".to_string(),
-        key_specs: vec!["Material".to_string(), "Thread (A) Size".to_string(), "Length".to_string(), "Finish".to_string()],
+        key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+        spec_aliases: Some(thread_size_aliases.clone()),
         spec_abbreviations: standoff_abbrevs.clone(),
     };
     category_templates.insert("male_female_hex_standoff".to_string(), male_female_hex_standoff_template);
@@ -60,6 +65,7 @@ pub fn initialize_standoff_templates(category_templates: &mut HashMap<String, Na
     let female_hex_standoff_template = NamingTemplate {
         prefix: "FSO".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+        spec_aliases: Some(thread_size_aliases.clone()),
         spec_abbreviations: standoff_abbrevs.clone(),
     };
     category_templates.insert("female_hex_standoff".to_string(), female_hex_standoff_template);
@@ -68,6 +74,7 @@ pub fn initialize_standoff_templates(category_templates: &mut HashMap<String, Na
     let generic_standoff_template = NamingTemplate {
         prefix: "SO".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+        spec_aliases: Some(thread_size_aliases),
         spec_abbreviations: standoff_abbrevs,
     };
     category_templates.insert("generic_standoff".to_string(), generic_standoff_template);

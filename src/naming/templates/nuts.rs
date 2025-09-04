@@ -69,6 +69,7 @@ fn initialize_common_nuts(category_templates: &mut HashMap<String, NamingTemplat
     let hex_nut_template = NamingTemplate {
         prefix: "HN".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("hex_nut".to_string(), hex_nut_template);
@@ -77,6 +78,7 @@ fn initialize_common_nuts(category_templates: &mut HashMap<String, NamingTemplat
     let wing_nut_template = NamingTemplate {
         prefix: "WN".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("wing_nut".to_string(), wing_nut_template);
@@ -85,6 +87,7 @@ fn initialize_common_nuts(category_templates: &mut HashMap<String, NamingTemplat
     let cap_nut_template = NamingTemplate {
         prefix: "CN".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("cap_nut".to_string(), cap_nut_template);
@@ -93,6 +96,7 @@ fn initialize_common_nuts(category_templates: &mut HashMap<String, NamingTemplat
     let flange_nut_template = NamingTemplate {
         prefix: "FN".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("flange_nut".to_string(), flange_nut_template);
@@ -101,6 +105,7 @@ fn initialize_common_nuts(category_templates: &mut HashMap<String, NamingTemplat
     let generic_nut_template = NamingTemplate {
         prefix: "N".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("generic_nut".to_string(), generic_nut_template);
@@ -112,6 +117,7 @@ fn initialize_locking_nuts(category_templates: &mut HashMap<String, NamingTempla
     let nylon_insert_locknut_template = NamingTemplate {
         prefix: "LN".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("nylon_insert_locknut".to_string(), nylon_insert_locknut_template);
@@ -120,6 +126,7 @@ fn initialize_locking_nuts(category_templates: &mut HashMap<String, NamingTempla
     let generic_locknut_template = NamingTemplate {
         prefix: "LN".to_string(),
         key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+        spec_aliases: None,
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("generic_locknut".to_string(), generic_locknut_template);
@@ -135,6 +142,7 @@ fn initialize_locking_nuts(category_templates: &mut HashMap<String, NamingTempla
         let locknut_template = NamingTemplate {
             prefix: "LN".to_string(),
             key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_aliases: None,
             spec_abbreviations: abbrevs.clone(),
         };
         category_templates.insert(nut_type.to_string(), locknut_template);
@@ -175,6 +183,7 @@ fn initialize_specialty_nuts(category_templates: &mut HashMap<String, NamingTemp
         let nut_template = NamingTemplate {
             prefix: prefix.to_string(),
             key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Finish".to_string()],
+            spec_aliases: None,
             spec_abbreviations: abbrevs.clone(),
         };
         category_templates.insert(nut_type.to_string(), nut_template);
