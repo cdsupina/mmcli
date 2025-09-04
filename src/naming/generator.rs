@@ -395,4 +395,9 @@ impl NameGenerator {
 
         fallback_name
     }
+    
+    /// Get a template by category name (for analysis)
+    pub fn get_template(&self, category: &str) -> Option<&NamingTemplate> {
+        self.category_templates.get(category)
+    }
 }

@@ -155,6 +155,23 @@ enum Commands {
         /// Path to file containing part numbers (one per line)
         file: String,
     },
+    /// Analyze part specifications for debugging naming issues
+    Analyze {
+        /// Product number to analyze
+        product: String,
+        /// Output format
+        #[arg(short, long, default_value_t = OutputFormat::Human)]
+        output: OutputFormat,
+        /// Show naming template details
+        #[arg(long)]
+        template: bool,
+        /// Show specification aliases and mappings
+        #[arg(long)]
+        aliases: bool,
+        /// Show all details (equivalent to --template --aliases)
+        #[arg(short, long)]
+        all: bool,
+    },
 }
 
 async fn load_credentials_from_file(path: &str) -> Result<Credentials> {
@@ -392,6 +409,9 @@ async fn main() -> Result<()> {
         }
         Commands::Import { file } => {
             client.import_subscriptions(&file)?;
+        }
+        Commands::Analyze { product, output, template, aliases, all } => {
+            client.analyze_product(&product, output, template, aliases, all).await?;
         }
     }
 

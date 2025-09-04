@@ -518,4 +518,60 @@ impl McmasterClient {
         
         Ok(())
     }
+    
+    /// Analyze part specifications for debugging naming issues
+    pub async fn analyze_product(&self, product: &str, output_format: OutputFormat, show_template: bool, show_aliases: bool, show_all: bool) -> Result<()> {
+        use crate::naming::{PartAnalyzer};
+        
+        let token = self.token.as_ref().ok_or_else(|| {
+            anyhow::anyhow!("Not authenticated. Please login first with 'mmc login'")
+        })?;
+
+        let url = format!("https://api.mcmaster.com/v1/products/{}", product);
+        let response = self.client.get(&url)
+            .header("Authorization", format!("Bearer {}", token))
+            .send()
+            .await?;
+
+        if response.status().is_success() {
+            let product_detail: ProductDetail = response.json().await?;
+            
+            // Add to local tracking after successful API call (auto-discovery)
+            if let Ok(mut manager) = self.subscription_manager.lock() {
+                let _ = manager.add_part(product); // Ignore result as local tracking is supplementary
+            }
+            
+            // Create analyzer and analyze the part
+            let analyzer = PartAnalyzer::new();
+            let final_show_template = show_template || show_all;
+            let final_show_aliases = show_aliases || show_all;
+            let analysis = analyzer.analyze_part(&product_detail, final_show_template, final_show_aliases);
+            
+            // Output results
+            match output_format {
+                OutputFormat::Human => {
+                    println!("{}", analyzer.format_human(&analysis, final_show_template, final_show_aliases));
+                }
+                OutputFormat::Json => {
+                    match analyzer.format_json(&analysis) {
+                        Ok(json) => println!("{}", json),
+                        Err(e) => return Err(anyhow::anyhow!("Failed to format JSON output: {}", e)),
+                    }
+                }
+            }
+        } else {
+            let status = response.status();
+            let error_text = response.text().await?;
+            if let Ok(error_response) = serde_json::from_str::<ErrorResponse>(&error_text) {
+                return Err(anyhow::anyhow!(
+                    "API Error: {} - {}",
+                    error_response.error_code.unwrap_or_else(|| "Unknown".to_string()),
+                    error_response.error_message.unwrap_or_else(|| "No message".to_string())
+                ));
+            }
+            return Err(anyhow::anyhow!("HTTP Error: {} - {}", status, error_text));
+        }
+
+        Ok(())
+    }
 }
