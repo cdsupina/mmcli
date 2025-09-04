@@ -11,6 +11,7 @@ pub fn initialize_pin_templates(category_templates: &mut HashMap<String, NamingT
     pin_abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
     pin_abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
     pin_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
+    pin_abbrevs.insert("1004-1045 Carbon Steel".to_string(), "S".to_string());
     pin_abbrevs.insert("Steel".to_string(), "S".to_string());
     pin_abbrevs.insert("Alloy Steel".to_string(), "S".to_string());
     pin_abbrevs.insert("Brass".to_string(), "Brass".to_string());
