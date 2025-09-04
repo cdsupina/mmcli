@@ -28,6 +28,7 @@ pub struct PartAnalysis {
     
     /// Name generation results
     pub generated_name: String,
+    pub suggested_name: Option<String>, // Name with potential finish if applicable
     pub name_components: Vec<NameComponent>,
     
     /// Recommendations and insights
@@ -110,6 +111,7 @@ impl PartAnalyzer {
         
         // Generate the name and break it down
         let generated_name = self.name_generator.generate_name(product);
+        let suggested_name = self.generate_suggested_name(product, &template, &missing_specs);
         let name_components = self.breakdown_name(&generated_name, &detected_type, template);
         
         // Get template information for display
@@ -139,6 +141,7 @@ impl PartAnalyzer {
             template_specs,
             spec_aliases,
             generated_name,
+            suggested_name,
             name_components,
             suggestions,
         }
@@ -230,6 +233,51 @@ impl PartAnalyzer {
         components
     }
     
+    /// Generate a suggested name with potential finish if applicable
+    fn generate_suggested_name(&self, product: &ProductDetail, template: &Option<&NamingTemplate>, missing_specs: &[String]) -> Option<String> {
+        if let Some(template) = template {
+            // Check if this template expects finish and it's missing
+            if template.key_specs.contains(&"Finish".to_string()) && missing_specs.contains(&"Finish".to_string()) {
+                // Try to extract finish from material or infer a common one
+                let suggested_finish = self.suggest_finish_for_material(product);
+                if let Some(finish) = suggested_finish {
+                    let current_name = self.name_generator.generate_name(product);
+                    // Only suggest if the finish isn't already in the name
+                    if !current_name.ends_with(&format!("-{}", finish)) {
+                        return Some(format!("{}-{}", current_name, finish));
+                    }
+                }
+            }
+        }
+        None
+    }
+    
+    /// Suggest a finish based on material and common patterns
+    fn suggest_finish_for_material(&self, product: &ProductDetail) -> Option<String> {
+        // Look for material specification
+        for spec in &product.specifications {
+            if spec.attribute == "Material" {
+                if let Some(material) = spec.values.first() {
+                    let material_lower = material.to_lowercase();
+                    
+                    // Common finish patterns for different materials
+                    if material_lower.contains("stainless") {
+                        return Some("PASS".to_string()); // Passivated is common for stainless
+                    } else if material_lower.contains("steel") && !material_lower.contains("stainless") {
+                        return Some("ZP".to_string()); // Zinc plated is common for steel
+                    } else if material_lower.contains("brass") {
+                        return Some("UNFINISHED".to_string()); // Brass often unfinished
+                    } else if material_lower.contains("aluminum") {
+                        return Some("CLEAR".to_string()); // Clear anodized common for aluminum
+                    }
+                }
+            }
+        }
+        
+        // Default suggestion for missing finish
+        Some("?".to_string())
+    }
+    
     /// Generate helpful suggestions based on analysis
     fn generate_suggestions(&self, product: &ProductDetail, template: Option<&NamingTemplate>, unmapped_specs: &[String], missing_specs: &[String]) -> Vec<String> {
         let mut suggestions = Vec::new();
@@ -310,6 +358,9 @@ impl PartAnalyzer {
         
         // Generated name breakdown
         output.push_str(&format!("🔧 Generated Name: {}\n", analysis.generated_name));
+        if let Some(suggested) = &analysis.suggested_name {
+            output.push_str(&format!("💡 Suggested Name with Finish: {}\n", suggested));
+        }
         if !analysis.name_components.is_empty() {
             output.push_str("   Components:\n");
             for component in &analysis.name_components {
