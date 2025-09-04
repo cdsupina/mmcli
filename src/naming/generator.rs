@@ -36,6 +36,8 @@ impl NameGenerator {
         templates::initialize_washer_templates(&mut self.category_templates);
         templates::initialize_nut_templates(&mut self.category_templates);
         templates::initialize_standoff_templates(&mut self.category_templates);
+        templates::initialize_spacer_templates(&mut self.category_templates);
+        templates::initialize_pin_templates(&mut self.category_templates);
         templates::initialize_bearing_templates(&mut self.category_templates);
     }
 
@@ -149,8 +151,14 @@ impl NameGenerator {
                     }
                 } else if spec_name.eq_ignore_ascii_case("For Shaft Diameter")
                     || spec_name.eq_ignore_ascii_case("OD")
+                    || spec_name.eq_ignore_ascii_case("Diameter")
+                    || spec_name.eq_ignore_ascii_case("Usable Length")
+                    || spec_name.eq_ignore_ascii_case("Width")
+                    || spec_name.eq_ignore_ascii_case("Overall Height")
+                    || spec_name.eq_ignore_ascii_case("Overall Length")
+                    || spec_name.eq_ignore_ascii_case("Mounting Hole Center -to-Center")
                 {
-                    // Special handling for bearing dimensions - convert fractions to decimals
+                    // Special handling for dimensions - convert fractions to decimals
                     let dimension_value = converters::convert_length_to_decimal(&value);
                     let abbreviated = template
                         .spec_abbreviations
@@ -161,7 +169,7 @@ impl NameGenerator {
                     if !abbreviated.is_empty() {
                         name_parts.push(abbreviated);
                     }
-                } else if spec_name.eq_ignore_ascii_case("Thread Size") {
+                } else if spec_name.eq_ignore_ascii_case("Thread Size") || spec_name.eq_ignore_ascii_case("Thread (A) Size") {
                     // Special handling for Thread Size - extract pitch for metric threads
                     let thread_value = converters::extract_thread_with_pitch(product, &value);
                     let abbreviated = template

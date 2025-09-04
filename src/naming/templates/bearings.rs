@@ -20,8 +20,9 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
     bearing_abbrevs.insert("Graphite".to_string(), "GRAPH".to_string());
     bearing_abbrevs.insert("Steel-Backed PTFE".to_string(), "SBPTFE".to_string());
     bearing_abbrevs.insert("Bronze".to_string(), "BR".to_string());
-    bearing_abbrevs.insert("Steel".to_string(), "STL".to_string());
+    bearing_abbrevs.insert("Steel".to_string(), "S".to_string());
     bearing_abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
+    bearing_abbrevs.insert("303 Stainless Steel".to_string(), "SS303".to_string());
     bearing_abbrevs.insert("Aluminum".to_string(), "AL".to_string());
     bearing_abbrevs.insert("Plastic".to_string(), "PL".to_string());
     
@@ -80,6 +81,38 @@ pub fn initialize_bearing_templates(category_templates: &mut HashMap<String, Nam
         spec_abbreviations: bearing_abbrevs.clone(),
     };
     category_templates.insert("roller_bearing".to_string(), roller_bearing_template);
+    
+    // Flange Mounted Ball Bearing
+    let flange_mounted_ball_bearing_template = NamingTemplate {
+        prefix: "MFBB".to_string(),
+        key_specs: vec!["Housing Material".to_string(), "For Shaft Diameter".to_string(), "Mounting Hole Center -to-Center".to_string(), "Overall Height".to_string()],
+        spec_abbreviations: bearing_abbrevs.clone(),
+    };
+    category_templates.insert("flange_mounted_ball_bearing".to_string(), flange_mounted_ball_bearing_template);
+    
+    // Low-Profile Flange Mounted Ball Bearing
+    let low_profile_flange_mounted_ball_bearing_template = NamingTemplate {
+        prefix: "LPMFBB".to_string(),
+        key_specs: vec!["Housing Material".to_string(), "For Shaft Diameter".to_string(), "Mounting Hole Center -to-Center".to_string(), "Overall Height".to_string()],
+        spec_abbreviations: bearing_abbrevs.clone(),
+    };
+    category_templates.insert("low_profile_flange_mounted_ball_bearing".to_string(), low_profile_flange_mounted_ball_bearing_template);
+    
+    // Pillow Block Mounted Ball Bearing
+    let pillow_block_mounted_ball_bearing_template = NamingTemplate {
+        prefix: "PBMBB".to_string(),
+        key_specs: vec!["Housing Material".to_string(), "For Shaft Diameter".to_string(), "Mounting Hole Center -to-Center".to_string(), "Overall Height".to_string()],
+        spec_abbreviations: bearing_abbrevs.clone(),
+    };
+    category_templates.insert("pillow_block_mounted_ball_bearing".to_string(), pillow_block_mounted_ball_bearing_template);
+    
+    // Generic Mounted Bearing
+    let generic_mounted_bearing_template = NamingTemplate {
+        prefix: "MBB".to_string(),
+        key_specs: vec!["Housing Material".to_string(), "For Shaft Diameter".to_string(), "Overall Height".to_string()],
+        spec_abbreviations: bearing_abbrevs.clone(),
+    };
+    category_templates.insert("generic_mounted_bearing".to_string(), generic_mounted_bearing_template);
     
     // Generic Bearing (fallback)
     let generic_bearing_template = NamingTemplate {

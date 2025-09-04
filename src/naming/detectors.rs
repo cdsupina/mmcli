@@ -13,9 +13,9 @@ pub fn determine_category(product: &ProductDetail) -> String {
         "button_head_screw".to_string()
     } else if family_lower.contains("high socket head") && family_lower.contains("screw") {
         "high_socket_head_screw".to_string()
-    } else if family_lower.contains("low socket head") && family_lower.contains("screw") {
+    } else if (family_lower.contains("low socket head") || family_lower.contains("low-profile socket head")) && family_lower.contains("screw") {
         "low_socket_head_screw".to_string()
-    } else if family_lower.contains("ultra low socket head") && family_lower.contains("screw") {
+    } else if (family_lower.contains("ultra low socket head") || family_lower.contains("ultra low-profile socket head")) && family_lower.contains("screw") {
         "ultra_low_socket_head_screw".to_string()
     } else if family_lower.contains("standard socket head") && family_lower.contains("screw") {
         "standard_socket_head_screw".to_string()
@@ -109,11 +109,17 @@ pub fn determine_category(product: &ProductDetail) -> String {
         determine_washer_type(&family_lower)
     } else if category_lower.contains("nuts") || category_lower.contains("nut") || family_lower.contains("nut") {
         determine_nut_type(&family_lower)
+    } else if family_lower.contains("unthreaded spacer") || (category_lower.contains("spacers") && family_lower.contains("spacer")) {
+        determine_spacer_type(&family_lower)
     } else if category_lower.contains("standoffs") || category_lower.contains("standoff") || 
-              family_lower.contains("standoff") || family_lower.contains("spacer") {
+              family_lower.contains("standoff") {
         determine_standoff_type(&family_lower)
     } else if category_lower.contains("bearing") || family_lower.contains("bearing") {
         determine_bearing_type(product)
+    } else if category_lower.contains("pins") || family_lower.contains("pin") {
+        determine_pin_type(&family_lower)
+    } else if category_lower.contains("shaft collars") || family_lower.contains("shaft collar") {
+        determine_shaft_collar_type(&family_lower)
     } else {
         "unknown".to_string()
     }
@@ -263,16 +269,74 @@ fn determine_standoff_type(family_lower: &str) -> String {
     }
 }
 
+/// Determine specific spacer type
+fn determine_spacer_type(family_lower: &str) -> String {
+    if family_lower.contains("aluminum") {
+        "aluminum_unthreaded_spacer".to_string()
+    } else if family_lower.contains("stainless steel") || family_lower.contains("18-8") || family_lower.contains("316") {
+        "stainless_steel_unthreaded_spacer".to_string()
+    } else if family_lower.contains("nylon") {
+        "nylon_unthreaded_spacer".to_string()
+    } else {
+        "unthreaded_spacer".to_string()
+    }
+}
+
+/// Determine specific pin type
+fn determine_pin_type(family_lower: &str) -> String {
+    if family_lower.contains("clevis pin with retaining ring groove") {
+        "clevis_pin_with_retaining_ring_groove".to_string()
+    } else if family_lower.contains("clevis pin") {
+        "clevis_pin".to_string()
+    } else {
+        "generic_pin".to_string()
+    }
+}
+
+/// Determine specific shaft collar type
+fn determine_shaft_collar_type(family_lower: &str) -> String {
+    if family_lower.contains("face-mount shaft collar") || family_lower.contains("face mount shaft collar") {
+        "face_mount_shaft_collar".to_string()
+    } else if family_lower.contains("flange-mount shaft collar") || family_lower.contains("flange mount shaft collar") {
+        "flange_mount_shaft_collar".to_string()
+    } else {
+        "generic_shaft_collar".to_string()
+    }
+}
+
 /// Determine specific bearing type
 fn determine_bearing_type(product: &ProductDetail) -> String {
     let family_lower = product.family_description.to_lowercase();
+    let category_lower = product.product_category.to_lowercase();
     let plain_type = product.specifications.iter()
         .find(|s| s.attribute.eq_ignore_ascii_case("Plain Bearing Type"))
         .and_then(|s| s.values.first())
         .map(|v| v.as_str())
         .unwrap_or("");
+    
+    // Check for mounted bearings first (more specific)
+    if family_lower.contains("mounted") || category_lower.contains("mounted") {
+        let mount_type = product.specifications.iter()
+            .find(|s| s.attribute.eq_ignore_ascii_case("Mounted Bearing Type"))
+            .and_then(|s| s.values.first())
+            .map(|v| v.to_lowercase())
+            .unwrap_or_default();
         
-    if family_lower.contains("flanged") || plain_type.eq_ignore_ascii_case("Flanged") {
+        let description_lower = product.detail_description.to_lowercase();
+        
+        if mount_type.contains("two-bolt flange") || mount_type.contains("flange") {
+            if family_lower.contains("low-profile") || family_lower.contains("low profile") 
+               || description_lower.contains("low-profile") || description_lower.contains("low profile") {
+                "low_profile_flange_mounted_ball_bearing".to_string()
+            } else {
+                "flange_mounted_ball_bearing".to_string()
+            }
+        } else if mount_type.contains("pillow") {
+            "pillow_block_mounted_ball_bearing".to_string()
+        } else {
+            "generic_mounted_bearing".to_string()
+        }
+    } else if family_lower.contains("flanged") || plain_type.eq_ignore_ascii_case("Flanged") {
         if family_lower.contains("sleeve") || family_lower.contains("plain") {
             "flanged_sleeve_bearing".to_string()
         } else {

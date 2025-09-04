@@ -3,6 +3,7 @@
 use anyhow::Result;
 use reqwest::{Client, Identity};
 use std::fs;
+use std::io::{self, Write};
 use serde_json;
 
 use crate::config::paths::{expand_path};
@@ -100,8 +101,12 @@ impl McmasterClient {
             anyhow::anyhow!("Not authenticated. Please login first with 'mmc login'")
         })?;
 
-        let response = self.client.post(format!("https://api.mcmaster.com/v1/products/{}", product))
+        // Use correct API format from documentation
+        let response = self.client.put("https://api.mcmaster.com/v1/products")
             .header("Authorization", format!("Bearer {}", token))
+            .json(&serde_json::json!({
+                "URL": format!("https://mcmaster.com/{}", product)
+            }))
             .send()
             .await?;
 
@@ -111,9 +116,10 @@ impl McmasterClient {
                 let _ = manager.add_part(product); // Ignore result as local tracking is supplementary
             }
 
-            if !self.quiet_mode {
-                println!("✅ Added {} to subscription", product);
-            }
+            // Always show confirmation for add operation, even in quiet mode
+            println!("✅ Added {} to subscription", product);
+            let product_detail: ProductDetail = response.json().await?;
+            println!("   {} - {}", product_detail.detail_description, product_detail.family_description);
         } else {
             let error_text = response.text().await?;
             if let Ok(error_response) = serde_json::from_str::<ErrorResponse>(&error_text) {
@@ -135,8 +141,12 @@ impl McmasterClient {
             anyhow::anyhow!("Not authenticated. Please login first with 'mmc login'")
         })?;
 
-        let response = self.client.delete(format!("https://api.mcmaster.com/v1/products/{}", product))
+        // Use correct API format from documentation
+        let response = self.client.delete("https://api.mcmaster.com/v1/products")
             .header("Authorization", format!("Bearer {}", token))
+            .json(&serde_json::json!({
+                "URL": format!("https://mcmaster.com/{}", product)
+            }))
             .send()
             .await?;
 
@@ -146,9 +156,8 @@ impl McmasterClient {
                 let _ = manager.remove_part(product); // Ignore result as local tracking is supplementary
             }
 
-            if !self.quiet_mode {
-                println!("✅ Removed {} from subscription", product);
-            }
+            // Always show confirmation for remove operation, even in quiet mode
+            println!("✅ Removed {} from subscription", product);
         } else {
             let error_text = response.text().await?;
             if let Ok(error_response) = serde_json::from_str::<ErrorResponse>(&error_text) {
@@ -368,14 +377,22 @@ impl McmasterClient {
             }
             
             product_detail
-        } else if response.status().as_u16() == 404 {
-            // Product not in subscription, add it
-            if !self.quiet_mode {
-                println!("❌ Product {} is not in your subscription.", product);
-                println!("Would you like to add it to your subscription? (Y/n): Adding product {} to subscription...", product);
-            }
+        } else if response.status().as_u16() == 404 || response.status().as_u16() == 403 {
+            // Product not in subscription, always prompt user to add it
+            println!("❌ Product {} is not in your subscription.", product);
+            print!("Would you like to add it to your subscription? (Y/n): ");
+            io::stdout().flush().unwrap();
             
-            self.add_product(product).await?;
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
+            let input = input.trim().to_lowercase();
+            
+            if input.is_empty() || input == "y" || input == "yes" {
+                println!("Adding product {} to subscription...", product);
+                self.add_product(product).await?;
+            } else {
+                return Err(anyhow::anyhow!("Product {} is not in your subscription. Add it with 'mmc add {}'", product, product));
+            }
             
             if !self.quiet_mode {
                 println!("✅ Product added! Generating name...");

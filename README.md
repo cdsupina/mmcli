@@ -145,9 +145,13 @@ mmc login -u username -p password
 ```bash
 # Add product to subscription (required before accessing product data)
 mmc add 90128a211
+# Returns: "✅ Added 90128a211 to subscription" with product details
 
-# Remove product from subscription
+# Remove product from subscription  
 mmc remove 90128a211
+# Returns: "✅ Removed 90128a211 from subscription"
+
+# Note: The 'name' command will automatically prompt to add unsubscribed products
 ```
 
 ### Product Information
@@ -266,6 +270,35 @@ McMaster-Carr CLI supports 19 different washer types with specific naming patter
 
 *Note: Supports various standoff configurations including male-female, female-only, and specialized types for electronics and mechanical assemblies.*
 
+#### Unthreaded Spacers
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Generic Spacer | `SP-[Material]-[ID]-[OD]-[Length]-[Finish]` | Acetal Spacer, 0.252" ID, 1/2" OD, 2" long | `SP-ACET-0.25-0.5-2` |
+| Aluminum Spacer | `ASP-[Material]-[ID]-[OD]-[Length]-[Finish]` | Aluminum Spacer, 1/4" ID, 3/8" OD, 1" long | `ASP-AL-0.25-0.375-1` |
+| Stainless Steel Spacer | `SSSP-[Material]-[ID]-[OD]-[Length]-[Finish]` | 18-8 SS Spacer, 5/16" ID, 5/8" OD, 1.5" long | `SSSP-SS188-0.3125-0.625-1.5` |
+| Nylon Spacer | `NSP-[Material]-[ID]-[OD]-[Length]-[Finish]` | Nylon Spacer, 1/8" ID, 1/4" OD, 0.5" long | `NSP-Nylon-0.125-0.25-0.5` |
+
+*Note: Unthreaded spacers are distinguished from threaded standoffs by the absence of threading. They provide precise spacing between components without fastening capability.*
+
+#### Clevis Pins
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Clevis Pin | `CP-[Material]-[Diameter]-[Usable Length]-[Finish]` | Steel Clevis Pin, 1/4" dia, 1.5" usable length | `CP-S-0.25-1.5` |
+| Clevis Pin with Retaining Ring Groove | `CPRRG-[Material]-[Diameter]-[Usable Length]-[Finish]` | 18-8 SS Clevis Pin w/ RRG, 1/4" dia, 2-3/8" usable | `CPRRG-SS188-0.25-2.375` |
+
+*Note: Clevis pins are used for pivot connections and removable mechanical linkages. Retaining ring groove variants include a groove for secure retention.*
+
+#### Shaft Collars
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Face-Mount Shaft Collar | `FMSC-[Material]-[Shaft Dia]-[OD]-[Width]-[Finish]` | 303 SS Face-Mount, 1/2" shaft, 1-1/8" OD, 13/32" width | `FMSC-SS303-0.5-1.125-0.40625` |
+| Flange-Mount Shaft Collar | `FLSC-[Material]-[Shaft Dia]-[OD]-[Width]-[Finish]` | 18-8 SS Flange-Mount, 3/8" shaft, 7/8" OD, 1/4" width | `FLSC-SS188-0.375-0.875-0.25` |
+
+*Note: Shaft collars provide axial positioning and support for rotating shafts. Face-mount variants have tapped holes on the face, while flange-mount types have through-holes and counterbored mounting holes.*
+
 #### Bearings
 
 McMaster-Carr CLI provides comprehensive bearing support with specialized naming for different bearing types:
@@ -279,13 +312,18 @@ McMaster-Carr CLI provides comprehensive bearing support with specialized naming
 | Linear Bearing | `LB-[Material]-[Shaft Diameter]-[Length]` | Steel linear bearing for 3/8" shaft, 2" long | `LB-STL-0.375-2` |
 | Needle Bearing | `NB-[Material]-[Bore]-[OD]-[Length]` | Steel needle bearing, 1/4" bore, 3/8" OD | `NB-STL-0.25-0.375-0.5` |
 | Roller Bearing | `RB-[Material]-[Bore]-[OD]-[Length]` | Bronze roller bearing, 20mm bore, 35mm OD | `RB-BR-20-35-12` |
+| Flange Mounted Ball Bearing | `MFBB-[Housing Material]-[Shaft Dia]-[Mount Holes C-to-C]-[Height]` | Steel flange mount, 3/4" shaft, 2-1/2" hole spacing, 2" height | `MFBB-STL-0.75-2.5-2` |
+| Low-Profile Flange Mounted Ball Bearing | `LPMFBB-[Housing Material]-[Shaft Dia]-[Mount Holes C-to-C]-[Height]` | Steel low-profile, 1" shaft, 3" hole spacing, 2.78" height | `LPMFBB-STL-1-3-2.78125` |
+| Pillow Block Mounted Ball Bearing | `PBMBB-[Housing Material]-[Shaft Dia]-[Mount Holes C-to-C]-[Height]` | Steel pillow block, 1/2" shaft, 4" hole spacing | `PBMBB-STL-0.5-4-1.5` |
+| Generic Mounted Bearing | `MBB-[Housing Material]-[Shaft Dia]-[Height]` | Steel mounted bearing for 5/8" shaft | `MBB-STL-0.625-2` |
 | Generic Bearing | `BRG-[Material]-[Type]` | PTFE bearing assembly | `BRG-PTFE-ASSEMBLY` |
 
 **Special Features:**
 - **Automatic Material Detection**: Combines filler materials (e.g., MDS-Filled Nylon)
 - **Dimension Conversion**: Fractions automatically converted to decimals (1/4" → 0.25)
 - **Metric Support**: Handles both imperial and metric dimensions
-- **Comprehensive Coverage**: Supports plain, flanged, ball, linear, needle, and roller bearings
+- **Mounted Bearing Support**: Includes housing material, mounting dimensions, and profile variations
+- **Comprehensive Coverage**: Supports plain, flanged, ball, linear, needle, roller, and mounted bearings
 
 **Bearing Material Abbreviations:**
 
@@ -440,8 +478,9 @@ mmc info 90128a211
 mmc price 92141A008
 # Returns: pricing information per unit/pack
 
-# Generate technical names
+# Generate technical names (prompts to add if not subscribed)
 mmc name 92141A008
+# If not subscribed, prompts: "❌ Product 92141A008 is not in your subscription. Would you like to add it to your subscription? (Y/n):"
 # Returns: FW-SS188-6 (Flat Washer, 18-8 SS, #6 screw size)
 
 # Monitor changes since start of year
