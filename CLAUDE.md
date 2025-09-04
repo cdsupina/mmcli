@@ -73,7 +73,6 @@ src/
 ## Key Features
 
 ### 1. Flexible Naming System
-- **100% Success Rate**: All inventory parts generate correct names
 - **Specification Aliases**: Handles field name variations (e.g., "Thread Size" vs "Thread (A) Size")
 - **Context-Sensitive Processing**: Same fields processed differently by part type (washers vs spacers)
 - **Enhanced Finish Extraction**: Works with both explicit fields and embedded material finishes
@@ -215,7 +214,7 @@ mmc price 91831A030
 ## Flexible Naming System Architecture
 
 ### Overview
-The naming system has been completely redesigned to achieve **100% success rate** on all inventory parts while making the system robust and maintainable.
+The naming system has been redesigned with a flexible architecture to handle field variations and improve reliability while maintaining backward compatibility.
 
 ### Core Features
 

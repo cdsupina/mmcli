@@ -9,7 +9,7 @@ A command-line interface for the McMaster-Carr Product Information API. This too
 - 🔑 **Token Management** - Automatic token storage and reuse (24-hour validity)
 - 📦 **Product Management** - Add/remove products from subscription
 - 💰 **Product Information** - Get detailed product data and pricing
-- 🏷️ **Flexible Name Generation** - 100% success rate intelligent name generation with specification aliases
+- 🏷️ **Flexible Name Generation** - Robust intelligent name generation with specification aliases
 - 📊 **Change Tracking** - Monitor product updates and changes
 - 💾 **File Downloads** - Download CAD files, images, and datasheets with clean filenames
 - 🚫 **No Flags Required** - Works without `-c` credentials flag for everyday use
@@ -184,7 +184,7 @@ mmc changes -s "08/20/2025 10:30"
 
 ## Name Generation
 
-McMaster-Carr CLI features a **flexible naming system** with 100% success rate that generates human-readable, abbreviated technical names for parts. The system automatically adapts to McMaster-Carr's field variations and handles context-sensitive processing for different part types.
+McMaster-Carr CLI features a **flexible naming system** that generates human-readable, abbreviated technical names for parts. The system automatically adapts to McMaster-Carr's field variations and handles context-sensitive processing for different part types.
 
 ### Usage
 
