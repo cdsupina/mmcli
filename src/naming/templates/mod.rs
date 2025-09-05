@@ -5,6 +5,7 @@
 
 pub mod bearings;
 pub mod cable_holders;
+pub mod latches;
 pub mod nuts;
 pub mod pins;
 pub mod pulleys;
@@ -15,6 +16,7 @@ pub mod washers;
 
 pub use bearings::initialize_bearing_templates;
 pub use cable_holders::initialize_cable_holder_templates;
+pub use latches::initialize_latch_templates;
 pub use nuts::initialize_nut_templates;
 pub use pins::initialize_pin_templates;
 pub use pulleys::initialize_pulley_templates;

@@ -147,6 +147,8 @@ pub fn determine_category(product: &ProductDetail) -> String {
         determine_pulley_type(&family_lower)
     } else if category_lower.contains("bundling") || family_lower.contains("cable holder") {
         determine_cable_holder_type(&family_lower)
+    } else if category_lower.contains("locks and latches") || category_lower.contains("latches") || family_lower.contains("latch") {
+        determine_latch_type(&family_lower)
     } else {
         "unknown".to_string()
     }
@@ -196,6 +198,8 @@ fn determine_washer_type(family_lower: &str) -> String {
         "wave_washer".to_string()
     } else if family_lower.contains("wedge") {
         "wedge_washer".to_string()
+    } else if family_lower.contains("sealing") {
+        "sealing_washer".to_string()
     } else {
         "flat_washer".to_string() // Default to flat washer
     }
@@ -405,5 +409,22 @@ fn determine_cable_holder_type(family_lower: &str) -> String {
         "cable_holder".to_string()
     } else {
         "generic_cable_holder".to_string()
+    }
+}
+
+/// Determine specific latch type
+fn determine_latch_type(family_lower: &str) -> String {
+    if family_lower.contains("draw latch") {
+        "draw_latch".to_string()
+    } else if family_lower.contains("toggle latch") {
+        "toggle_latch".to_string()
+    } else if family_lower.contains("compression latch") {
+        "compression_latch".to_string()
+    } else if family_lower.contains("slam latch") {
+        "slam_latch".to_string()
+    } else if family_lower.contains("latch") {
+        "generic_latch".to_string()
+    } else {
+        "generic_latch".to_string()
     }
 }
