@@ -9,7 +9,28 @@ pub fn determine_category(product: &ProductDetail) -> String {
     let _detail_lower = product.detail_description.to_lowercase();
     
     // Check for specific screw head types (order matters - more specific first)
-    if family_lower.contains("button head") && family_lower.contains("screw") {
+    // First check for thread forming screws (most specific)
+    if family_lower.contains("thread-forming") || family_lower.contains("thread forming") {
+        if family_lower.contains("button head") && family_lower.contains("screw") {
+            "thread_forming_button_head_screw".to_string()
+        } else if family_lower.contains("high socket head") && family_lower.contains("screw") {
+            "thread_forming_high_socket_head_screw".to_string()
+        } else if (family_lower.contains("low socket head") || family_lower.contains("low-profile socket head")) && family_lower.contains("screw") {
+            "thread_forming_low_socket_head_screw".to_string()
+        } else if family_lower.contains("socket head") && family_lower.contains("screw") {
+            "thread_forming_socket_head_screw".to_string()
+        } else if family_lower.contains("flat head") && family_lower.contains("screw") {
+            "thread_forming_flat_head_screw".to_string()
+        } else if family_lower.contains("pan head") && family_lower.contains("screw") {
+            "thread_forming_pan_head_screw".to_string()
+        } else if family_lower.contains("hex head") && family_lower.contains("screw") {
+            "thread_forming_hex_head_screw".to_string()
+        } else if family_lower.contains("screw") {
+            "thread_forming_screw".to_string()
+        } else {
+            "thread_forming_screw".to_string()
+        }
+    } else if family_lower.contains("button head") && family_lower.contains("screw") {
         "button_head_screw".to_string()
     } else if family_lower.contains("high socket head") && family_lower.contains("screw") {
         "high_socket_head_screw".to_string()

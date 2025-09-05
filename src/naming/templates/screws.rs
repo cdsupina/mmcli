@@ -9,6 +9,7 @@ pub fn initialize_screw_templates(category_templates: &mut HashMap<String, Namin
     let screw_abbrevs = create_screw_abbreviations();
     
     // Initialize all screw head type templates
+    initialize_thread_forming_screws(category_templates, &screw_abbrevs);
     initialize_button_head_screws(category_templates, &screw_abbrevs);
     initialize_socket_head_screws(category_templates, &screw_abbrevs);
     initialize_flat_head_screws(category_templates, &screw_abbrevs);
@@ -87,6 +88,86 @@ fn create_screw_abbreviations() -> HashMap<String, String> {
     abbrevs.insert("Pin Hex".to_string(), "PINHEX".to_string());
     
     abbrevs
+}
+
+/// Initialize thread forming screw templates
+fn initialize_thread_forming_screws(category_templates: &mut HashMap<String, NamingTemplate>, abbrevs: &HashMap<String, String>) {
+    // Create shared aliases for thread forming screws to handle both "Thread Size" and "Screw Size"
+    let mut thread_aliases = HashMap::new();
+    thread_aliases.insert("Thread Size".to_string(), vec![
+        "Thread Size".to_string(),
+        "Screw Size".to_string()
+    ]);
+    
+    // Thread Forming Flat Head Screw
+    let thread_forming_flat_head_screw_template = NamingTemplate {
+        prefix: "TFFHS".to_string(),
+        key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: Some(thread_aliases.clone()),
+        spec_abbreviations: abbrevs.clone(),
+    };
+    category_templates.insert("thread_forming_flat_head_screw".to_string(), thread_forming_flat_head_screw_template);
+    
+    // Thread Forming Pan Head Screw
+    let thread_forming_pan_head_screw_template = NamingTemplate {
+        prefix: "TFPHS".to_string(),
+        key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: Some(thread_aliases.clone()),
+        spec_abbreviations: abbrevs.clone(),
+    };
+    category_templates.insert("thread_forming_pan_head_screw".to_string(), thread_forming_pan_head_screw_template);
+    
+    // Thread Forming Button Head Screw
+    let thread_forming_button_head_screw_template = NamingTemplate {
+        prefix: "TFBHS".to_string(),
+        key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: Some(thread_aliases.clone()),
+        spec_abbreviations: abbrevs.clone(),
+    };
+    category_templates.insert("thread_forming_button_head_screw".to_string(), thread_forming_button_head_screw_template);
+    
+    // Thread Forming Socket Head Screws
+    let thread_forming_socket_head_screw_template = NamingTemplate {
+        prefix: "TFSHS".to_string(),
+        key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: Some(thread_aliases.clone()),
+        spec_abbreviations: abbrevs.clone(),
+    };
+    category_templates.insert("thread_forming_socket_head_screw".to_string(), thread_forming_socket_head_screw_template);
+    
+    let thread_forming_high_socket_head_screw_template = NamingTemplate {
+        prefix: "TFHSHS".to_string(),
+        key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: Some(thread_aliases.clone()),
+        spec_abbreviations: abbrevs.clone(),
+    };
+    category_templates.insert("thread_forming_high_socket_head_screw".to_string(), thread_forming_high_socket_head_screw_template);
+    
+    let thread_forming_low_socket_head_screw_template = NamingTemplate {
+        prefix: "TFLSHS".to_string(),
+        key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: Some(thread_aliases.clone()),
+        spec_abbreviations: abbrevs.clone(),
+    };
+    category_templates.insert("thread_forming_low_socket_head_screw".to_string(), thread_forming_low_socket_head_screw_template);
+    
+    // Thread Forming Hex Head Screw
+    let thread_forming_hex_head_screw_template = NamingTemplate {
+        prefix: "TFHHS".to_string(),
+        key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string(), "Finish".to_string()],
+        spec_aliases: Some(thread_aliases.clone()),
+        spec_abbreviations: abbrevs.clone(),
+    };
+    category_templates.insert("thread_forming_hex_head_screw".to_string(), thread_forming_hex_head_screw_template);
+    
+    // Generic Thread Forming Screw (fallback)
+    let thread_forming_screw_template = NamingTemplate {
+        prefix: "TFS".to_string(),
+        key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Finish".to_string()],
+        spec_aliases: Some(thread_aliases),
+        spec_abbreviations: abbrevs.clone(),
+    };
+    category_templates.insert("thread_forming_screw".to_string(), thread_forming_screw_template);
 }
 
 /// Initialize button head screw templates

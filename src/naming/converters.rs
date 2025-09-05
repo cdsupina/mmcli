@@ -69,7 +69,7 @@ pub fn convert_length_to_decimal(value: &str) -> String {
     }
 }
 
-/// Extract thread size with pitch for metric threads, convert separators to 'x'
+/// Extract thread size with pitch for both metric and inch threads, convert separators to 'x'
 pub fn extract_thread_with_pitch(product: &ProductDetail, thread_size: &str) -> String {
     // First, handle the separator conversion (hyphen to x)
     let thread_with_x = thread_size.replace("-", "x");
@@ -96,6 +96,16 @@ pub fn extract_thread_with_pitch(product: &ProductDetail, thread_size: &str) -> 
                 let clean_pitch = pitch_value.replace("mm", "").trim().to_string();
                 return format!("{}x{}", thread_with_x, clean_pitch);
             }
+        }
+    }
+    
+    // For inch screws (e.g., "No. 4", "1/4", "5/16"), check for threads per inch
+    if let Some(tpi_spec) = product.specifications.iter()
+        .find(|s| s.attribute.contains("Threads per Inch") || s.attribute.contains("threads per inch")) {
+        if let Some(tpi_value) = tpi_spec.values.first() {
+            // Convert "No. 4" → "4x20" or "1/4" → "1/4x20"
+            let clean_size = thread_size.replace("No. ", "");
+            return format!("{}x{}", clean_size, tpi_value.trim());
         }
     }
     
