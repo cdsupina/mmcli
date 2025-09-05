@@ -145,6 +145,8 @@ pub fn determine_category(product: &ProductDetail) -> String {
         determine_shaft_collar_type(&family_lower)
     } else if category_lower.contains("pulleys") || family_lower.contains("pulley") || family_lower.contains("sheave") {
         determine_pulley_type(&family_lower)
+    } else if category_lower.contains("bundling") || family_lower.contains("cable holder") {
+        determine_cable_holder_type(&family_lower)
     } else {
         "unknown".to_string()
     }
@@ -394,5 +396,14 @@ fn determine_pulley_type(family_lower: &str) -> String {
         "sheave".to_string()
     } else {
         "pulley".to_string()
+    }
+}
+
+/// Determine specific cable holder type
+fn determine_cable_holder_type(family_lower: &str) -> String {
+    if family_lower.contains("cable holder") {
+        "cable_holder".to_string()
+    } else {
+        "generic_cable_holder".to_string()
     }
 }
