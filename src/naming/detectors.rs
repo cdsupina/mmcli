@@ -91,6 +91,8 @@ pub fn determine_category(product: &ProductDetail) -> String {
         "wing_thumb_screw".to_string()
     } else if family_lower.contains("thumb") && family_lower.contains("screw") {
         "thumb_screw".to_string()
+    } else if family_lower.contains("captive panel") && family_lower.contains("screw") {
+        "captive_panel_screw".to_string()
     } else if family_lower.contains("hook") && family_lower.contains("screw") {
         "hook_screw".to_string()
     } else if family_lower.contains("ring") && family_lower.contains("screw") {

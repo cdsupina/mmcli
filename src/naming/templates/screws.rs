@@ -22,6 +22,7 @@ fn create_screw_abbreviations() -> HashMap<String, String> {
     
     // Material abbreviations
     abbrevs.insert("316 Stainless Steel".to_string(), "SS316".to_string());
+    abbrevs.insert("400 Series Stainless Steel".to_string(), "SS400".to_string());
     abbrevs.insert("18-8 Stainless Steel".to_string(), "SS188".to_string());
     abbrevs.insert("Stainless Steel".to_string(), "SS".to_string());
     abbrevs.insert("Steel".to_string(), "S".to_string());
@@ -223,6 +224,22 @@ fn initialize_other_head_screws(category_templates: &mut HashMap<String, NamingT
         spec_abbreviations: abbrevs.clone(),
     };
     category_templates.insert("rounded_head_screw".to_string(), rounded_head_screw_template);
+    
+    // Captive Panel Screw
+    let mut cps_aliases = HashMap::new();
+    cps_aliases.insert("Material".to_string(), vec![
+        "Material".to_string(),
+        "Screw Material".to_string(),  // Primary material for captive panel screws
+        "Body Material".to_string()
+    ]);
+    
+    let captive_panel_screw_template = NamingTemplate {
+        prefix: "CPS".to_string(),
+        key_specs: vec!["Material".to_string(), "Thread Size".to_string(), "Length".to_string(), "Drive Style".to_string()],
+        spec_aliases: Some(cps_aliases),
+        spec_abbreviations: abbrevs.clone(),
+    };
+    category_templates.insert("captive_panel_screw".to_string(), captive_panel_screw_template);
     
     // Generic Screw (fallback)
     let generic_screw_template = NamingTemplate {
