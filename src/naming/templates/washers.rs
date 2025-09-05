@@ -47,7 +47,7 @@ fn create_washer_abbreviations() -> HashMap<String, String> {
     abbrevs
 }
 
-/// Initialize all 19 washer type templates
+/// Initialize all washer type templates
 fn initialize_all_washer_types(category_templates: &mut HashMap<String, NamingTemplate>, abbrevs: &HashMap<String, String>) {
     let washer_types = [
         ("cup_washer", "CW"),
@@ -83,4 +83,20 @@ fn initialize_all_washer_types(category_templates: &mut HashMap<String, NamingTe
         };
         category_templates.insert(washer_type.to_string(), washer_template);
     }
+    
+    // Add sealing washer with special template including seal material
+    let mut sealing_abbrevs = abbrevs.clone();
+    sealing_abbrevs.insert("Neoprene Rubber".to_string(), "NEO".to_string());
+    sealing_abbrevs.insert("EPDM Rubber".to_string(), "EPDM".to_string());
+    sealing_abbrevs.insert("Viton Rubber".to_string(), "VIT".to_string());
+    sealing_abbrevs.insert("Nitrile Rubber".to_string(), "NBR".to_string());
+    sealing_abbrevs.insert("Silicone Rubber".to_string(), "SIL".to_string());
+    
+    let sealing_washer_template = NamingTemplate {
+        prefix: "SEW".to_string(),
+        key_specs: vec!["Material".to_string(), "Seal Material".to_string(), "For Screw Size".to_string(), "Finish".to_string()],
+        spec_aliases: None,
+        spec_abbreviations: sealing_abbrevs,
+    };
+    category_templates.insert("sealing_washer".to_string(), sealing_washer_template);
 }

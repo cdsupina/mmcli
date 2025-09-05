@@ -175,11 +175,95 @@ mmc price 98164A133 --output json
 # Generate human-readable part name
 mmc name 98164A133
 
+# Analyze part specifications for debugging naming system
+mmc analyze 90548A142
+
+# Analyze with detailed template and alias information
+mmc analyze 90548A142 --template --aliases
+
+# Analyze with all details (equivalent to --template --aliases)
+mmc analyze 90548A142 --all
+
+# Get analysis output in JSON format (for automation)
+mmc analyze 90548A142 --output json
+
 # List recent changes (requires start date)
 mmc changes -s "01/01/2024"
 
 # List changes from a specific date with time
 mmc changes -s "08/20/2025 10:30"
+```
+
+### Part Analysis and Debugging
+
+McMaster-Carr CLI includes a powerful **analyze command** for debugging the naming system and understanding how parts are processed:
+
+```bash
+# Basic part analysis - shows specification mapping and generated name
+mmc analyze 98164A133
+# Output: Shows detected type, used/unused specs, template info, and suggestions
+
+# Detailed analysis with template information
+mmc analyze 98164A133 --template
+# Output: Includes expected specifications and template details
+
+# Analysis with specification aliases
+mmc analyze 98164A133 --aliases  
+# Output: Shows how field name variations are mapped
+
+# Complete analysis (all details)
+mmc analyze 98164A133 --all
+# Output: Template info, aliases, name breakdown, and suggestions
+
+# JSON output for automation and scripting
+mmc analyze 98164A133 --output json
+# Output: Machine-readable analysis data
+```
+
+#### Analysis Features
+
+- **Part Detection**: Shows how the system identifies fastener types
+- **Specification Mapping**: Displays which specs are used vs unused in names
+- **Template Compatibility**: Shows expected vs available specifications  
+- **Missing Spec Detection**: Identifies specs expected by template but not found
+- **Name Breakdown**: Shows how each component maps back to specifications
+- **Smart Suggestions**: Provides actionable recommendations for naming improvements
+- **Finish Intelligence**: Suggests likely finishes based on material analysis
+- **Alias Debugging**: Shows field name variations and mappings
+
+#### Example Analysis Output
+
+```
+🔍 Part Analysis: 98164A133
+
+📦 Product Info:
+   Category: Screws And Bolts
+   Family: Button Head Socket Screw
+   Detected Type: button_head_screw
+
+📋 Specifications (15 found):
+   ✓ Material: 316 Stainless Steel → (used in name)
+   ✓ Thread Size: 8-32 → (used in name)
+   ✓ Length: 1/4" → (used in name)
+   ✓ Drive Style: Hex → (used in name)
+   ✗ Head Diameter: 0.312" → (not used)
+   ✗ Thread Type: UNC → (not used)
+   ...
+
+🏷️ Template: button_head_screw
+   Expected: [Material, Thread Size, Length, Drive Style, Finish]
+
+🔧 Generated Name: BHS-SS316-8x32-0.25-HEX
+   Components:
+   - BHS: Template prefix (button_head_screw)
+   - SS316: Material
+   - 8x32: Thread Size
+   - 0.25: Length
+   - HEX: Drive Style
+
+💡 Suggestions:
+   🔍 Missing expected specifications: Finish
+   📋 Unmapped specifications available: Head Diameter, Thread Type, ...
 ```
 
 ## Name Generation
@@ -212,6 +296,7 @@ mmc name 90480A005
 | Thumb Screw | `THUMB-[Material]-[Thread]-[Length]-[Finish]` | Brass Thumb Screw, M6x1.0 x 20mm | `THUMB-Brass-M6x1.0-20` |
 | Eye Screw | `EYE-[Material]-[Thread]-[Length]-[Finish]` | Steel Eye Screw, 1/4x20 x 2" | `EYE-Steel-1/4x20-2` |
 | Hook Screw | `HOOK-[Material]-[Thread]-[Length]-[Finish]` | SS Hook Screw, 8x32 x 1" | `HOOK-SS-8x32-1` |
+| Captive Panel Screw | `CPS-[Material]-[Thread]-[Length]-[Drive]` | 400 Series SS Captive Panel, 10x32 x 0.41", Phillips | `CPS-SS400-10x32-0.41-PH` |
 
 *Note: Supports 20+ head types including T-Handle, Pentagon, Oval, Square, Knob, Ring, and specialty types. See code for complete list.*
 
@@ -274,10 +359,10 @@ McMaster-Carr CLI supports 19 different washer types with specific naming patter
 
 | Type | Template | Example Input | Generated Name |
 |------|----------|---------------|----------------|
-| Generic Spacer | `SP-[Material]-[ID]-[OD]-[Length]-[Finish]` | Acetal Spacer, 0.252" ID, 1/2" OD, 2" long | `SP-ACET-0.25-0.5-2` |
-| Aluminum Spacer | `ASP-[Material]-[ID]-[OD]-[Length]-[Finish]` | Aluminum Spacer, 1/4" ID, 3/8" OD, 1" long | `ASP-AL-0.25-0.375-1` |
-| Stainless Steel Spacer | `SSSP-[Material]-[ID]-[OD]-[Length]-[Finish]` | 18-8 SS Spacer, 5/16" ID, 5/8" OD, 1.5" long | `SSSP-SS188-0.3125-0.625-1.5` |
-| Nylon Spacer | `NSP-[Material]-[ID]-[OD]-[Length]-[Finish]` | Nylon Spacer, 1/8" ID, 1/4" OD, 0.5" long | `NSP-Nylon-0.125-0.25-0.5` |
+| Generic Spacer | `SP-[Material]-[Screw Size]-[OD]-[Length]-[Finish]` | Acetal Spacer, 1/4" screw, 1/2" OD, 2" long | `SP-ACET-0.25-0.5-2` |
+| Aluminum Spacer | `SP-[Material]-[Screw Size]-[OD]-[Length]-[Finish]` | Aluminum Spacer, M5 screw, 8mm OD, 8mm long | `SP-AL-M5-8-8` |
+| Stainless Steel Spacer | `SSSP-[Material]-[Screw Size]-[OD]-[Length]-[Finish]` | 18-8 SS Spacer, 5/16" screw, 5/8" OD, 1.5" long | `SSSP-SS188-5/16-0.625-1.5` |
+| Nylon Spacer | `NSP-[Material]-[Screw Size]-[Length]` | Nylon Spacer, 1/8" screw, 0.5" long | `NSP-Nylon-0.125-0.5` |
 
 *Note: Unthreaded spacers are distinguished from threaded standoffs by the absence of threading. They provide precise spacing between components without fastening capability.*
 
@@ -345,13 +430,68 @@ McMaster-Carr CLI provides comprehensive bearing support with specialized naming
 
 *Note: The system automatically detects bearing type from product specifications and applies the appropriate template. Filler materials are automatically combined with base materials for accurate naming.*
 
+#### Pulleys
+
+McMaster-Carr CLI provides comprehensive pulley support for various rope, wire rope, and belt applications:
+
+| Type | Template | Example Input | Generated Name |
+|------|----------|---------------|----------------|
+| Wire Rope Pulley | `WRP-[Material]-[Rope Diameter]-[OD]-[Bearing Type]` | Steel wire rope pulley, 3/16" rope, 1-1/4" OD, ball bearing | `WRP-S-0.1875-1.25-BALL` |
+| Generic Rope Pulley | `RP-[Material]-[Rope Diameter]-[OD]-[Bearing Type]` | SS rope pulley, 1/4" rope, 2" OD, plain bearing | `RP-SS-0.25-2-PLAIN` |
+| V-Belt Pulley | `VBP-[Material]-[Belt Width]-[OD]-[Bearing Type]` | Aluminum V-belt pulley, 1/2" belt, 3" OD | `VBP-AL-0.5-3-NONE` |
+| Generic Pulley | `PUL-[Material]-[OD]-[Bearing Type]` | Bronze pulley, 4" OD, roller bearing | `PUL-BR-4-ROLLER` |
+| Sheave | `SHV-[Material]-[Rope Diameter]-[OD]-[Bearing Type]` | Steel sheave for lifting, 5/16" rope, 6" OD | `SHV-S-0.3125-6-BALL` |
+
+**Pulley Material Abbreviations:**
+
+| Full Name | Abbreviation | Applications |
+|-----------|--------------|-------------|
+| Steel | `S` | General purpose, high strength |
+| Stainless Steel | `SS` | Corrosion resistant applications |
+| 303 Stainless Steel | `SS303` | Machined stainless components |
+| 316 Stainless Steel | `SS316` | Marine and chemical environments |
+| Aluminum | `AL` | Lightweight applications |
+| Bronze | `BR` | Corrosion resistant, heavy duty |
+| Cast Iron | `CI` | Industrial, heavy-duty applications |
+| Plastic | `PL` | Lightweight, chemical resistant |
+| Nylon | `NYL` | Self-lubricating, quiet operation |
+
+**Bearing Type Abbreviations:**
+
+| Full Name | Abbreviation | Applications |
+|-----------|--------------|-------------|
+| Ball | `BALL` | Low friction, general purpose |
+| Plain | `PLAIN` | Simple, maintenance-free |
+| Roller | `ROLLER` | Heavy load applications |
+| None | `NONE` | Direct shaft mounting |
+
+**Application Categories:**
+
+| Application | Abbreviation | Usage |
+|------------|--------------|-------|
+| For Pulling | `PULL` | Horizontal load applications |
+| For Lifting | `LIFT` | Vertical load applications |
+| For Horizontal Pulling | `HPULL` | Specific horizontal applications |
+
+**Key Features:**
+- **Automatic Type Detection**: Distinguishes between wire rope, rope, V-belt, and generic pulleys
+- **Bearing Integration**: Includes bearing type in naming for maintenance planning
+- **Dimensional Precision**: Rope/belt diameters and pulley OD for accurate specifications
+- **Application Context**: Recognizes lifting vs pulling applications
+- **Sheave Recognition**: Handles alternative pulley terminology used in rigging
+
+*Note: The system automatically detects pulley type from family description and applies the appropriate template. Sheaves are treated as specialized pulleys for lifting applications.*
+
 #### Material Abbreviations
 
 | Full Name | Abbreviation | Notes |
 |-----------|--------------|-------|
 | 316 Stainless Steel | `SS316` | Marine grade, high corrosion resistance |
+| 400 Series Stainless Steel | `SS400` | Magnetic stainless, good corrosion resistance |
 | 18-8 Stainless Steel | `SS188` | Standard grade, good corrosion resistance |
+| 303 Stainless Steel | `SS303` | Free-machining stainless steel |
 | Stainless Steel (generic) | `SS` | When specific grade not specified |
+| 1004-1045 Carbon Steel | `S` | Low to medium carbon steel |
 | Grade 1 Steel | `SG1` | Low carbon steel |
 | Grade 2 Steel | `SG2` | Low carbon steel |
 | Grade 5 Steel | `SG5` | Medium carbon steel |
@@ -359,6 +499,7 @@ McMaster-Carr CLI provides comprehensive bearing support with specialized naming
 | Class 8.8 Steel | `S8.8` | Metric medium strength |
 | Class 10.9 Steel | `S10.9` | Metric high strength |
 | Class 12.9 Steel | `S12.9` | Metric very high strength |
+| 1215 Carbon Steel | `1215S` | Free-machining carbon steel |
 | Steel (generic) | `S` | Carbon/alloy steel when grade not specified |
 | Brass | `Brass` | Brass alloy |
 | Aluminum | `AL` | Aluminum alloy |

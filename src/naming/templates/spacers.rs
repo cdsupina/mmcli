@@ -57,7 +57,7 @@ pub fn initialize_spacer_templates(category_templates: &mut HashMap<String, Nami
     
     // Aluminum Unthreaded Spacer
     let aluminum_spacer_template = NamingTemplate {
-        prefix: "ASP".to_string(),
+        prefix: "SP".to_string(),
         key_specs: vec!["Material".to_string(), "For Screw Size".to_string(), "OD".to_string(), "Length".to_string(), "Finish".to_string()],
         spec_aliases: Some(screw_size_aliases.clone()),
         spec_abbreviations: spacer_abbrevs.clone(),

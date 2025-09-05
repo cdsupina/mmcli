@@ -9,7 +9,28 @@ pub fn determine_category(product: &ProductDetail) -> String {
     let _detail_lower = product.detail_description.to_lowercase();
     
     // Check for specific screw head types (order matters - more specific first)
-    if family_lower.contains("button head") && family_lower.contains("screw") {
+    // First check for thread forming screws (most specific)
+    if family_lower.contains("thread-forming") || family_lower.contains("thread forming") {
+        if family_lower.contains("button head") && family_lower.contains("screw") {
+            "thread_forming_button_head_screw".to_string()
+        } else if family_lower.contains("high socket head") && family_lower.contains("screw") {
+            "thread_forming_high_socket_head_screw".to_string()
+        } else if (family_lower.contains("low socket head") || family_lower.contains("low-profile socket head")) && family_lower.contains("screw") {
+            "thread_forming_low_socket_head_screw".to_string()
+        } else if family_lower.contains("socket head") && family_lower.contains("screw") {
+            "thread_forming_socket_head_screw".to_string()
+        } else if family_lower.contains("flat head") && family_lower.contains("screw") {
+            "thread_forming_flat_head_screw".to_string()
+        } else if family_lower.contains("pan head") && family_lower.contains("screw") {
+            "thread_forming_pan_head_screw".to_string()
+        } else if family_lower.contains("hex head") && family_lower.contains("screw") {
+            "thread_forming_hex_head_screw".to_string()
+        } else if family_lower.contains("screw") {
+            "thread_forming_screw".to_string()
+        } else {
+            "thread_forming_screw".to_string()
+        }
+    } else if family_lower.contains("button head") && family_lower.contains("screw") {
         "button_head_screw".to_string()
     } else if family_lower.contains("high socket head") && family_lower.contains("screw") {
         "high_socket_head_screw".to_string()
@@ -91,6 +112,8 @@ pub fn determine_category(product: &ProductDetail) -> String {
         "wing_thumb_screw".to_string()
     } else if family_lower.contains("thumb") && family_lower.contains("screw") {
         "thumb_screw".to_string()
+    } else if family_lower.contains("captive panel") && family_lower.contains("screw") {
+        "captive_panel_screw".to_string()
     } else if family_lower.contains("hook") && family_lower.contains("screw") {
         "hook_screw".to_string()
     } else if family_lower.contains("ring") && family_lower.contains("screw") {
@@ -120,6 +143,12 @@ pub fn determine_category(product: &ProductDetail) -> String {
         determine_pin_type(&family_lower)
     } else if category_lower.contains("shaft collars") || family_lower.contains("shaft collar") {
         determine_shaft_collar_type(&family_lower)
+    } else if category_lower.contains("pulleys") || family_lower.contains("pulley") || family_lower.contains("sheave") {
+        determine_pulley_type(&family_lower)
+    } else if category_lower.contains("bundling") || family_lower.contains("cable holder") {
+        determine_cable_holder_type(&family_lower)
+    } else if category_lower.contains("locks and latches") || category_lower.contains("latches") || family_lower.contains("latch") {
+        determine_latch_type(&family_lower)
     } else {
         "unknown".to_string()
     }
@@ -169,6 +198,8 @@ fn determine_washer_type(family_lower: &str) -> String {
         "wave_washer".to_string()
     } else if family_lower.contains("wedge") {
         "wedge_washer".to_string()
+    } else if family_lower.contains("sealing") {
+        "sealing_washer".to_string()
     } else {
         "flat_washer".to_string() // Default to flat washer
     }
@@ -354,5 +385,46 @@ fn determine_bearing_type(product: &ProductDetail) -> String {
         "roller_bearing".to_string()
     } else {
         "generic_bearing".to_string()
+    }
+}
+
+/// Determine specific pulley type
+fn determine_pulley_type(family_lower: &str) -> String {
+    if family_lower.contains("wire rope") {
+        "wire_rope_pulley".to_string()
+    } else if family_lower.contains("rope") && !family_lower.contains("wire") {
+        "rope_pulley".to_string()
+    } else if family_lower.contains("v-belt") || family_lower.contains("belt") {
+        "v_belt_pulley".to_string()
+    } else if family_lower.contains("sheave") {
+        "sheave".to_string()
+    } else {
+        "pulley".to_string()
+    }
+}
+
+/// Determine specific cable holder type
+fn determine_cable_holder_type(family_lower: &str) -> String {
+    if family_lower.contains("cable holder") {
+        "cable_holder".to_string()
+    } else {
+        "generic_cable_holder".to_string()
+    }
+}
+
+/// Determine specific latch type
+fn determine_latch_type(family_lower: &str) -> String {
+    if family_lower.contains("draw latch") {
+        "draw_latch".to_string()
+    } else if family_lower.contains("toggle latch") {
+        "toggle_latch".to_string()
+    } else if family_lower.contains("compression latch") {
+        "compression_latch".to_string()
+    } else if family_lower.contains("slam latch") {
+        "slam_latch".to_string()
+    } else if family_lower.contains("latch") {
+        "generic_latch".to_string()
+    } else {
+        "generic_latch".to_string()
     }
 }

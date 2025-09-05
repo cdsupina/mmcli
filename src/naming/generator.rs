@@ -112,6 +112,9 @@ impl NameGenerator {
         templates::initialize_spacer_templates(&mut self.category_templates);
         templates::initialize_pin_templates(&mut self.category_templates);
         templates::initialize_bearing_templates(&mut self.category_templates);
+        templates::initialize_pulley_templates(&mut self.category_templates);
+        templates::initialize_cable_holder_templates(&mut self.category_templates);
+        templates::initialize_latch_templates(&mut self.category_templates);
     }
 
     /// Generate a human-readable name for the given product
@@ -362,6 +365,7 @@ impl NameGenerator {
         spec_lower == "thread size" ||
         spec_lower == "thread (a) size" ||
         spec_lower == "thread (b) size" ||
+        spec_lower == "screw size" ||  // Added for thread forming screws
         spec_lower.starts_with("thread size") ||
         spec_lower.starts_with("thread (") && spec_lower.contains(") size")
     }
