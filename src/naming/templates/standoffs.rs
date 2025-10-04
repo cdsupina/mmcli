@@ -16,7 +16,8 @@ pub fn initialize_standoff_templates(category_templates: &mut HashMap<String, Na
     standoff_abbrevs.insert("Brass".to_string(), "Brass".to_string());
     standoff_abbrevs.insert("Aluminum".to_string(), "AL".to_string());
     standoff_abbrevs.insert("Nylon".to_string(), "Nylon".to_string());
-    
+    standoff_abbrevs.insert("12L14 Steel".to_string(), "12L14S".to_string());
+
     // Steel grade abbreviations for standoffs
     standoff_abbrevs.insert("Grade 1 Steel".to_string(), "SG1".to_string());
     standoff_abbrevs.insert("Grade 2 Steel".to_string(), "SG2".to_string());
