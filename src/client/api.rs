@@ -3,14 +3,12 @@
 use anyhow::Result;
 use reqwest::{Client, Identity};
 use std::fs;
-use std::io::{self, Write};
 use serde_json;
 
 use crate::config::paths::{expand_path};
 use crate::models::auth::{Credentials, ErrorResponse};
 use crate::models::product::{ProductDetail, PriceInfo};
 use crate::utils::output::{OutputFormat, ProductField};
-use crate::naming::NameGenerator;
 use crate::client::subscriptions::SubscriptionManager;
 
 /// Main client for McMaster-Carr API operations
@@ -19,7 +17,6 @@ pub struct McmasterClient {
     pub(crate) token: Option<String>,
     pub(crate) credentials: Option<Credentials>,
     pub(crate) quiet_mode: bool, // For suppressing output when in JSON mode
-    name_generator: NameGenerator,
     subscription_manager: std::sync::Mutex<SubscriptionManager>,
 }
 
@@ -90,7 +87,6 @@ impl McmasterClient {
             token: None,
             credentials,
             quiet_mode: quiet,
-            name_generator: NameGenerator::new(),
             subscription_manager: std::sync::Mutex::new(subscription_manager),
         })
     }
@@ -207,8 +203,8 @@ impl McmasterClient {
             
             if status.as_u16() == 404 {
                 return Err(anyhow::anyhow!(
-                    "Product {} is not in your subscription.\nWould you like to add it to your subscription? (Y/n): Adding product {} to subscription...\n✅ Added {} to subscription\n✅ Product added! Generating name...",
-                    product, product, product
+                    "Product {} is not in your subscription. Add it with 'mmc add {}'",
+                    product, product
                 ));
             }
             
@@ -360,82 +356,6 @@ impl McmasterClient {
         Ok(())
     }
 
-    /// Generate human-readable name for product
-    pub async fn generate_name(&self, product: &str) -> Result<()> {
-        let token = self.token.as_ref().ok_or_else(|| {
-            anyhow::anyhow!("Not authenticated. Please login first with 'mmc login'")
-        })?;
-
-        // First check if product is in subscription, if not add it
-        let url = format!("https://api.mcmaster.com/v1/products/{}", product);
-        let response = self.client.get(&url)
-            .header("Authorization", format!("Bearer {}", token))
-            .send()
-            .await?;
-
-        let product_detail: ProductDetail = if response.status().is_success() {
-            let product_detail: ProductDetail = response.json().await?;
-            
-            // Add to local tracking after successful API call (auto-discovery)
-            if let Ok(mut manager) = self.subscription_manager.lock() {
-                let _ = manager.add_part(product); // Ignore result as local tracking is supplementary
-            }
-            
-            product_detail
-        } else if response.status().as_u16() == 404 || response.status().as_u16() == 403 {
-            // Product not in subscription, always prompt user to add it
-            println!("❌ Product {} is not in your subscription.", product);
-            print!("Would you like to add it to your subscription? (Y/n): ");
-            io::stdout().flush().unwrap();
-            
-            let mut input = String::new();
-            io::stdin().read_line(&mut input).unwrap();
-            let input = input.trim().to_lowercase();
-            
-            if input.is_empty() || input == "y" || input == "yes" {
-                println!("Adding product {} to subscription...", product);
-                self.add_product(product).await?;
-            } else {
-                return Err(anyhow::anyhow!("Product {} is not in your subscription. Add it with 'mmc add {}'", product, product));
-            }
-            
-            if !self.quiet_mode {
-                println!("✅ Product added! Generating name...");
-            }
-            
-            // Try again to get product details
-            let response = self.client.get(&url)
-                .header("Authorization", format!("Bearer {}", token))
-                .send()
-                .await?;
-                
-            if response.status().is_success() {
-                let product_detail: ProductDetail = response.json().await?;
-                
-                // Part was already tracked by add_product call above, so no need to track again
-                product_detail
-            } else {
-                let error_text = response.text().await?;
-                return Err(anyhow::anyhow!("Failed to get product after adding to subscription: {}", error_text));
-            }
-        } else {
-            let error_text = response.text().await?;
-            return Err(anyhow::anyhow!("Failed to get product: {}", error_text));
-        };
-
-        // Display family and detail descriptions for verification
-        if !self.quiet_mode {
-            println!("{}", product_detail.family_description);
-            println!("{}", product_detail.detail_description);
-        }
-        
-        // Generate and display the name
-        let generated_name = self.name_generator.generate_name(&product_detail);
-        println!("{}", generated_name);
-
-        Ok(())
-    }
-
     /// List all locally tracked subscriptions
     pub fn list_subscriptions(&self) -> Result<()> {
         if let Ok(manager) = self.subscription_manager.lock() {
@@ -524,59 +444,4 @@ impl McmasterClient {
         Ok(())
     }
     
-    /// Analyze part specifications for debugging naming issues
-    pub async fn analyze_product(&self, product: &str, output_format: OutputFormat, show_template: bool, show_aliases: bool, show_all: bool) -> Result<()> {
-        use crate::naming::{PartAnalyzer};
-        
-        let token = self.token.as_ref().ok_or_else(|| {
-            anyhow::anyhow!("Not authenticated. Please login first with 'mmc login'")
-        })?;
-
-        let url = format!("https://api.mcmaster.com/v1/products/{}", product);
-        let response = self.client.get(&url)
-            .header("Authorization", format!("Bearer {}", token))
-            .send()
-            .await?;
-
-        if response.status().is_success() {
-            let product_detail: ProductDetail = response.json().await?;
-            
-            // Add to local tracking after successful API call (auto-discovery)
-            if let Ok(mut manager) = self.subscription_manager.lock() {
-                let _ = manager.add_part(product); // Ignore result as local tracking is supplementary
-            }
-            
-            // Create analyzer and analyze the part
-            let analyzer = PartAnalyzer::new();
-            let final_show_template = show_template || show_all;
-            let final_show_aliases = show_aliases || show_all;
-            let analysis = analyzer.analyze_part(&product_detail, final_show_template, final_show_aliases);
-            
-            // Output results
-            match output_format {
-                OutputFormat::Human => {
-                    println!("{}", analyzer.format_human(&analysis, final_show_template, final_show_aliases));
-                }
-                OutputFormat::Json => {
-                    match analyzer.format_json(&analysis) {
-                        Ok(json) => println!("{}", json),
-                        Err(e) => return Err(anyhow::anyhow!("Failed to format JSON output: {}", e)),
-                    }
-                }
-            }
-        } else {
-            let status = response.status();
-            let error_text = response.text().await?;
-            if let Ok(error_response) = serde_json::from_str::<ErrorResponse>(&error_text) {
-                return Err(anyhow::anyhow!(
-                    "API Error: {} - {}",
-                    error_response.error_code.unwrap_or_else(|| "Unknown".to_string()),
-                    error_response.error_message.unwrap_or_else(|| "No message".to_string())
-                ));
-            }
-            return Err(anyhow::anyhow!("HTTP Error: {} - {}", status, error_text));
-        }
-
-        Ok(())
-    }
 }

@@ -141,11 +141,6 @@ enum Commands {
         #[arg(short, long)]
         output: Option<String>,
     },
-    /// Generate human-readable name for product
-    Name {
-        /// Product number
-        product: String,
-    },
     /// List locally tracked subscriptions
     List,
     /// Sync local subscriptions with API
@@ -154,23 +149,6 @@ enum Commands {
     Import {
         /// Path to file containing part numbers (one per line)
         file: String,
-    },
-    /// Analyze part specifications for debugging naming issues
-    Analyze {
-        /// Product number to analyze
-        product: String,
-        /// Output format
-        #[arg(short, long, default_value_t = OutputFormat::Human)]
-        output: OutputFormat,
-        /// Show naming template details
-        #[arg(long)]
-        template: bool,
-        /// Show specification aliases and mappings
-        #[arg(long)]
-        aliases: bool,
-        /// Show all details (equivalent to --template --aliases)
-        #[arg(short, long)]
-        all: bool,
     },
 }
 
@@ -398,9 +376,6 @@ async fn main() -> Result<()> {
         Commands::Datasheet { product, output } => {
             client.download_datasheets(&product, output.as_deref()).await?;
         }
-        Commands::Name { product } => {
-            client.generate_name(&product).await?;
-        }
         Commands::List => {
             client.list_subscriptions()?;
         }
@@ -409,9 +384,6 @@ async fn main() -> Result<()> {
         }
         Commands::Import { file } => {
             client.import_subscriptions(&file)?;
-        }
-        Commands::Analyze { product, output, template, aliases, all } => {
-            client.analyze_product(&product, output, template, aliases, all).await?;
         }
     }
 
