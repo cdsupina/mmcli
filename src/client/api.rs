@@ -295,17 +295,22 @@ impl McmasterClient {
                 let _ = manager.add_part(product); // Ignore result as local tracking is supplementary
             }
             
-            let price_info = &price_infos[0]; // Take first price option
-            
             match output_format {
                 OutputFormat::Json => {
-                    println!("{}", serde_json::to_string_pretty(&price_info)?);
+                    println!("{}", serde_json::to_string_pretty(&price_infos)?);
                 }
                 OutputFormat::Human => {
-                    println!("💰 Price: ${:.2} per {} (minimum quantity: {})", 
-                        price_info.amount, 
-                        price_info.unit_of_measure,
-                        price_info.minimum_quantity);
+                    println!("💰 Pricing for {}", product);
+                    let unit = &price_infos[0].unit_of_measure;
+                    for price_info in &price_infos {
+                        let qty = price_info.minimum_quantity;
+                        let qty_str = if qty == qty.floor() {
+                            format!("{}+", qty as i64)
+                        } else {
+                            format!("{}+", qty)
+                        };
+                        println!("   {:<8} -> ${:.4} per {}", qty_str, price_info.amount, unit);
+                    }
                 }
             }
         } else {

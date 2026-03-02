@@ -640,6 +640,7 @@ mmc changes -s "01/01/2024"
 ### Global Options
 
 - `-c, --credentials <FILE>` - Specify credentials file path
+- `-v, --verbose` - Show detailed output including certificate loading and authentication details
 - `-h, --help` - Show help information
 - `-V, --version` - Show version information
 
@@ -662,9 +663,17 @@ The CLI interacts with McMaster-Carr's Product Information API:
 | `init-cert` | Local | Copy certificate to default location |
 | `add` | `/v1/products` | Add product to subscription |
 | `remove` | `/v1/products` | Remove product from subscription |
-| `product` | `/v1/products/*` | Get product information |
+| `info` | `/v1/products/*` | Get product information |
 | `price` | `/v1/products/*/price` | Get product pricing |
+| `name` | API + Local | Generate human-readable part name |
+| `analyze` | API + Local | Analyze part specifications for debugging |
 | `changes` | `/v1/changes?start=MM/dd/yyyy` | Get change notifications since date |
+| `image` | API | Download product images |
+| `cad` | API | Download product CAD files |
+| `datasheet` | API | Download product datasheets |
+| `list` | Local | List locally tracked subscriptions |
+| `sync` | API | Sync local subscriptions with API |
+| `import` | Local | Import subscriptions from file |
 
 ## Security
 
@@ -713,11 +722,13 @@ src/
 │   ├── mod.rs               # Module declarations
 │   ├── api.rs               # Core API operations
 │   ├── auth.rs              # Authentication handling
-│   └── downloads.rs         # File downloads
+│   ├── downloads.rs         # File downloads
+│   └── subscriptions.rs     # Subscription management
 ├── naming/                   # Name generation system
 │   ├── mod.rs               # Module declarations
 │   ├── generator.rs         # Core name generation logic
 │   ├── abbreviations.rs     # Value abbreviation logic
+│   ├── analyzer.rs          # Part specification analysis/debugging
 │   ├── converters.rs        # Data conversion utilities
 │   ├── detectors.rs         # Fastener type detection
 │   └── templates/           # Naming templates by category
@@ -726,7 +737,12 @@ src/
 │       ├── nuts.rs          # Nut naming templates
 │       ├── washers.rs       # Washer naming templates
 │       ├── standoffs.rs     # Standoff naming templates
-│       └── bearings.rs      # Bearing naming templates
+│       ├── bearings.rs      # Bearing naming templates
+│       ├── spacers.rs       # Spacer naming templates
+│       ├── pins.rs          # Pin naming templates
+│       ├── pulleys.rs       # Pulley naming templates
+│       ├── cable_holders.rs # Cable holder naming templates
+│       └── latches.rs       # Latch naming templates
 ├── models/                   # Data structures
 │   ├── mod.rs               # Model exports
 │   ├── api.rs               # API response models

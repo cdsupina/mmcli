@@ -42,11 +42,13 @@ src/
 │   ├── mod.rs               # Module declarations
 │   ├── api.rs               # Core API operations
 │   ├── auth.rs              # Authentication handling
-│   └── downloads.rs         # File downloads
+│   ├── downloads.rs         # File downloads
+│   └── subscriptions.rs     # Subscription management
 ├── naming/                   # Name generation system
 │   ├── mod.rs               # Module declarations
 │   ├── generator.rs         # Core name generation logic
 │   ├── abbreviations.rs     # Value abbreviation logic
+│   ├── analyzer.rs          # Part specification analysis/debugging
 │   ├── converters.rs        # Data conversion utilities
 │   ├── detectors.rs         # Fastener type detection
 │   └── templates/           # Naming templates by category
@@ -55,7 +57,12 @@ src/
 │       ├── nuts.rs          # Nut naming templates
 │       ├── washers.rs       # Washer naming templates
 │       ├── standoffs.rs     # Standoff naming templates
-│       └── bearings.rs      # Bearing naming templates
+│       ├── bearings.rs      # Bearing naming templates
+│       ├── spacers.rs       # Spacer naming templates
+│       ├── pins.rs          # Pin naming templates
+│       ├── pulleys.rs       # Pulley naming templates
+│       ├── cable_holders.rs # Cable holder naming templates
+│       └── latches.rs       # Latch naming templates
 ├── models/                   # Data structures
 │   ├── mod.rs               # Model exports
 │   ├── api.rs               # API response models
@@ -78,7 +85,7 @@ src/
 - **Enhanced Finish Extraction**: Works with both explicit fields and embedded material finishes
 - **Robust Pattern Matching**: Specific helper functions prevent false matches
 - **Template-based**: Each fastener type has specific naming templates
-- **Multiple Categories**: Screws, nuts, washers, standoffs, bearings, spacers, pins, shaft collars
+- **Multiple Categories**: Screws, nuts, washers, standoffs, bearings, spacers, pins, pulleys, cable holders, latches
 - **Smart abbreviations**: Material, thread size, dimensions automatically abbreviated
 - **Features**: Thread pitch extraction, screw size handling, standardized material abbreviations
 
@@ -86,8 +93,14 @@ src/
 - **Certificate-based auth**: Uses PKCS12 client certificates
 - **Token management**: Automatic token loading/saving
 - **Full CRUD**: Add/remove products, get info/pricing, download files
+- **Subscription management**: List, sync, and import subscriptions
 
-### 3. Output Formats
+### 3. Part Analysis/Debugging
+- **Analyze command**: Inspect part specifications, naming templates, and alias mappings
+- **Template inspection**: See which naming template matches a part
+- **Alias debugging**: View specification alias resolution for troubleshooting
+
+### 4. Output Formats
 - **Human-readable**: Formatted with emojis and clear descriptions
 - **JSON**: Machine-readable for automation
 - **Field selection**: Choose specific product attributes
@@ -165,16 +178,58 @@ mmc datasheet 91831A030
 
 **Note**: Files are saved with clean naming using just the McMaster-Carr part number and appropriate extension.
 
+### Subscription Management
+```bash
+# List locally tracked subscriptions
+mmc list
+
+# Sync local subscriptions with API
+mmc sync
+
+# Import subscriptions from file (one part number per line)
+mmc import parts.txt
+```
+
+### Part Analysis
+```bash
+# Analyze part specifications
+mmc analyze 91831A030
+
+# Show naming template details
+mmc analyze 91831A030 --template
+
+# Show specification aliases
+mmc analyze 91831A030 --aliases
+
+# Show all analysis details (JSON output)
+mmc analyze 91831A030 --all -o json
+```
+
+### Other Commands
+```bash
+# Logout from API
+mmc logout
+
+# Copy certificate to default location
+mmc init-cert /path/to/certificate.pfx
+
+# List changes since a date
+mmc changes --start "01/01/2024"
+```
+
 ## Dependencies
 
 ### Key Dependencies
 - `clap` - CLI argument parsing with derive macros
 - `tokio` - Async runtime for HTTP operations
 - `reqwest` - HTTP client with TLS support
+- `serde` / `serde_json` - Serialization/deserialization
+- `anyhow` - Error handling
 - `dirs` - Cross-platform directory paths
 - `toml` - Configuration file parsing
 - `regex` - Pattern matching for naming system
 - `native-tls` - TLS/certificate handling for API authentication
+- `urlencoding` - URL encoding utilities
 
 ## Testing Strategy
 
